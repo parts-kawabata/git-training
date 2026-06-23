@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ストーリーで覚えるClaude Code開発ガイド ─ 第4章</title>
+<style>
+  :root{
+    --bg:#0f1020;
+    --bg2:#15172b;
+    --panel:#1b1e36;
+    --panel2:#232746;
+    --ink:#e9e9f2;
+    --ink-dim:#b9bad0;
+    --ink-mute:#8688a8;
+    --line:#2c2f50;
+    --accent:#ff8a4c;
+    --accent2:#ff5e8a;
+    --violet:#9a7bff;
+    --teal:#54d6c4;
+    --gold:#ffd479;
+    --code-bg:#0c0d1a;
+    --novel: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic: "Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans JP",sans-serif;
+    --mono: "Consolas","SFMono-Regular","Menlo","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(154,123,255,.18), transparent 60%),
+      radial-gradient(1000px 500px at -10% 10%, rgba(255,138,76,.16), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--gothic);
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px 90px}
+  section{margin:64px 0}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    margin:0 -22px;
+    padding:0;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .art{display:block;width:100%;height:auto}
+  .hero .overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:34px 30px 30px;
+    background:linear-gradient(180deg,transparent 35%, rgba(15,16,32,.55) 70%, rgba(15,16,32,.92));
+  }
+  .badge{
+    display:inline-block;font-size:.74rem;letter-spacing:.28em;
+    color:var(--gold);border:1px solid rgba(255,212,121,.5);
+    padding:5px 14px;border-radius:999px;margin-bottom:14px;width:max-content;
+    background:rgba(255,212,121,.06);
+  }
+  .booktitle{
+    font-family:var(--novel);
+    font-size:clamp(1.5rem,4.6vw,2.5rem);
+    font-weight:700;margin:0;line-height:1.4;
+    text-shadow:0 2px 24px rgba(0,0,0,.6);
+  }
+  .booktitle .em{
+    background:linear-gradient(90deg,var(--accent),var(--accent2) 60%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .chapline{margin-top:10px;color:var(--ink-dim);font-family:var(--novel);font-size:1.02rem}
+
+  /* ===== headings ===== */
+  .eyebrow{
+    display:flex;align-items:center;gap:12px;
+    font-size:.8rem;letter-spacing:.24em;color:var(--accent);
+    text-transform:uppercase;margin-bottom:8px;font-weight:700;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--accent),transparent);display:inline-block}
+  h2.sec{
+    font-family:var(--novel);
+    font-size:clamp(1.4rem,3.4vw,1.9rem);
+    margin:.1em 0 .2em;font-weight:700;
+  }
+  .lead{color:var(--ink-dim);font-size:1.02rem;margin-top:.2em}
+
+  /* ===== characters ===== */
+  .premise{
+    font-family:var(--novel);font-size:1.08rem;color:var(--ink-dim);
+    border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:22px 0 30px;
+  }
+  .chars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .char{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:18px;
+    display:flex;gap:14px;align-items:center;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .char:hover{transform:translateY(-3px);border-color:var(--violet)}
+  .char .av{flex:0 0 64px}
+  .char .nm{font-weight:700;font-size:1.08rem}
+  .char .role{font-size:.82rem;color:var(--accent);margin-top:2px;letter-spacing:.04em}
+
+  /* ===== novel blocks ===== */
+  .novel{
+    position:relative;
+    font-family:var(--novel);
+    font-size:1.16rem;line-height:2.15;
+    background:
+      radial-gradient(600px 300px at 100% 0%, rgba(255,94,138,.10), transparent 60%),
+      linear-gradient(180deg,var(--bg2),#101327);
+    border:1px solid var(--line);border-radius:20px;
+    padding:40px 38px;
+    color:#f0eef7;
+    box-shadow:0 20px 60px -30px rgba(0,0,0,.8);
+  }
+  .novel p{margin:0 0 1.25em;text-indent:1em}
+  .novel p:last-child{margin-bottom:0}
+  .novel .qmark{
+    position:absolute;top:8px;left:18px;font-size:5rem;line-height:1;
+    color:rgba(154,123,255,.18);font-family:Georgia,serif;pointer-events:none;
+  }
+  .novel.cliff{
+    background:
+      radial-gradient(600px 300px at 0% 100%, rgba(255,138,76,.12), transparent 60%),
+      linear-gradient(180deg,#120f22,#0c0a18);
+    border-color:#3a2a48;
+  }
+  .tbc{
+    text-align:right;margin-top:24px;font-family:var(--novel);
+    color:var(--gold);letter-spacing:.18em;font-size:1.05rem;
+  }
+
+  /* ===== scene steps ===== */
+  .steps{position:relative;margin-top:10px}
+  .step{
+    position:relative;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:24px 26px;margin:20px 0;
+  }
+  .step::before{
+    content:attr(data-no);
+    position:absolute;top:-16px;left:24px;
+    width:46px;height:46px;border-radius:12px;
+    display:grid;place-items:center;font-weight:800;font-size:1.15rem;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0c00;box-shadow:0 8px 22px -8px rgba(255,94,138,.7);
+  }
+  .step h3{margin:14px 0 6px;font-size:1.18rem;font-weight:700}
+  .step .desc{color:var(--ink-dim);margin:10px 0 0}
+
+  .prompt{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;overflow:hidden;
+  }
+  .prompt .bar{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;
+    background:#11132a;border-bottom:1px solid #1d2138;
+  }
+  .prompt .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+  .prompt .bar span{margin-left:8px;color:var(--ink-mute);font-size:.76rem;font-family:var(--mono);letter-spacing:.04em}
+  .prompt pre{
+    margin:0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#d7e3ff;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .code{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#cfe;
+    white-space:pre;
+  }
+
+  /* novice callout */
+  .nv{
+    margin-top:16px;border-radius:12px;padding:14px 16px 14px 16px;
+    background:linear-gradient(180deg,rgba(84,214,196,.08),rgba(84,214,196,.03));
+    border:1px solid rgba(84,214,196,.3);
+  }
+  .nv .nvh{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--teal);font-size:.92rem;margin-bottom:6px}
+  .nv ul{margin:0;padding-left:1.2em}
+  .nv li{margin:.32em 0;color:var(--ink-dim);font-size:.95rem}
+  .nv li b{color:var(--ink)}
+
+  .highlight-band{
+    margin-top:26px;
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    border:1px solid rgba(255,138,76,.35);border-radius:16px;
+    padding:20px 24px;font-size:1.05rem;display:flex;gap:14px;align-items:flex-start;
+  }
+  .highlight-band .ic{font-size:1.6rem;line-height:1}
+  .highlight-band b{color:var(--gold)}
+
+  /* ===== column compare ===== */
+  .col-fig{margin:8px 0 22px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0e1024}
+  .col-fig svg{display:block;width:100%;height:auto}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cmp{
+    border-radius:16px;padding:20px;border:1px solid var(--line);
+  }
+  .cmp.tool{background:linear-gradient(160deg,#161a30,#11132a)}
+  .cmp.agent{background:linear-gradient(160deg,#1d1630,#160f28);border-color:#3a2a52}
+  .cmp h4{margin:0 0 8px;font-size:1.08rem;display:flex;align-items:center;gap:8px}
+  .cmp.tool h4{color:var(--teal)}
+  .cmp.agent h4{color:var(--violet)}
+  .cmp p{margin:0;color:var(--ink-dim);font-size:.97rem}
+
+  /* ===== feature table ===== */
+  .feat{display:grid;gap:12px}
+  .feat .row{
+    display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    transition:border-color .15s ease,transform .15s ease;
+  }
+  .feat .row:hover{border-color:var(--accent);transform:translateX(4px)}
+  .feat .k{display:flex;align-items:center;gap:11px;font-weight:700}
+  .feat .k .ei{font-size:1.3rem}
+  .feat .v{color:var(--ink-dim);font-size:.96rem}
+
+  /* ===== learnings ===== */
+  .learn{display:grid;gap:14px}
+  .learn .li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-left:4px solid var(--gold);
+    border-radius:0 14px 14px 0;padding:18px 20px;
+  }
+  .learn .li .n{
+    flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:rgba(255,212,121,.14);color:var(--gold);font-weight:800;
+  }
+  .learn .li p{margin:0;font-size:1.02rem}
+
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:8px 0}
+
+  @media (max-width:620px){
+    .chars{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    .feat .row{grid-template-columns:1fr;gap:6px}
+    .novel{padding:30px 22px;font-size:1.08rem}
+  }
+
+  /* ===== extended components (多様な内容の章向け・追記のみ。既存ルールは不変) ===== */
+  /* section内サブ見出し */
+  .subhead{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--gothic);font-weight:700;font-size:1.06rem;color:var(--ink);
+    margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .subhead::before{content:"";width:10px;height:10px;border-radius:3px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-block}
+
+  /* 多列データテーブル */
+  .gtable{margin:14px 0 4px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .gtable .gt-scroll{overflow-x:auto}
+  .gtable table{width:100%;border-collapse:collapse;min-width:520px;font-size:.95rem}
+  .gtable th,.gtable td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable thead th{
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    color:var(--gold);font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  }
+  .gtable tbody tr{background:var(--panel)}
+  .gtable tbody tr:nth-child(even){background:var(--panel2)}
+  .gtable tbody tr:hover{background:#272c50}
+  .gtable td{color:var(--ink-dim)}
+  .gtable td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+
+  /* 中立の箇条書きパネル（生成結果・特徴の列挙用。teal の🔰とは別系統） */
+  .flist{
+    margin-top:14px;border-radius:12px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(154,123,255,.07),rgba(154,123,255,.02));
+    border:1px solid var(--line);
+  }
+  .flist .flh{font-weight:700;color:var(--violet);font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .flist ul{margin:0;padding-left:1.2em}
+  .flist li{margin:.34em 0;color:var(--ink-dim);font-size:.96rem}
+  .flist li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <svg class="art" viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="夕暮れのオフィスで画面に向かうエンジニアと、寄り添うAIの光">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#241a3a"/>
+        <stop offset="0.5" stop-color="#3a2340"/>
+        <stop offset="1" stop-color="#6b3a3a"/>
+      </linearGradient>
+      <radialGradient id="sun" cx="0.78" cy="0.42" r="0.5">
+        <stop offset="0" stop-color="#ffcf8a"/>
+        <stop offset="0.4" stop-color="#ff8a4c" stop-opacity="0.8"/>
+        <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7be0ff"/>
+        <stop offset="1" stop-color="#9a7bff"/>
+      </linearGradient>
+      <radialGradient id="aiglow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#9a7bff" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#9a7bff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="880" height="420" fill="url(#sky)"/>
+    <rect width="880" height="420" fill="url(#sun)"/>
+    <!-- distant city -->
+    <g opacity="0.5" fill="#1c1430">
+      <rect x="40" y="210" width="40" height="120"/>
+      <rect x="95" y="170" width="34" height="160"/>
+      <rect x="140" y="230" width="46" height="100"/>
+      <rect x="700" y="190" width="38" height="140"/>
+      <rect x="748" y="225" width="30" height="105"/>
+      <rect x="788" y="160" width="44" height="170"/>
+    </g>
+    <g opacity="0.65" fill="#ffd479">
+      <rect x="104" y="186" width="6" height="8"/><rect x="116" y="200" width="6" height="8"/>
+      <rect x="798" y="178" width="6" height="8"/><rect x="812" y="196" width="6" height="8"/>
+      <rect x="150" y="246" width="6" height="8"/>
+    </g>
+    <!-- window frame -->
+    <rect x="0" y="120" width="880" height="6" fill="#150f24" opacity="0.6"/>
+    <!-- desk -->
+    <rect x="0" y="330" width="880" height="90" fill="#13101f"/>
+    <rect x="0" y="330" width="880" height="4" fill="#2a2440"/>
+    <!-- monitor -->
+    <g>
+      <rect x="360" y="232" width="190" height="120" rx="8" fill="#0c0d1a" stroke="#33365e" stroke-width="2"/>
+      <rect x="372" y="244" width="166" height="96" rx="4" fill="#10122a"/>
+      <!-- code lines -->
+      <g opacity="0.9">
+        <rect x="384" y="256" width="60" height="6" rx="3" fill="url(#screen)"/>
+        <rect x="384" y="270" width="100" height="6" rx="3" fill="#54d6c4" opacity="0.7"/>
+        <rect x="396" y="284" width="78" height="6" rx="3" fill="#ffd479" opacity="0.7"/>
+        <rect x="396" y="298" width="110" height="6" rx="3" fill="#ff8a4c" opacity="0.6"/>
+        <rect x="384" y="312" width="54" height="6" rx="3" fill="#9a7bff" opacity="0.8"/>
+        <rect x="384" y="326" width="92" height="6" rx="3" fill="url(#screen)" opacity="0.6"/>
+      </g>
+      <rect x="448" y="352" width="14" height="16" fill="#0c0d1a"/>
+      <rect x="424" y="368" width="62" height="6" rx="3" fill="#0c0d1a"/>
+    </g>
+    <!-- engineer silhouette -->
+    <g fill="#0a0712">
+      <ellipse cx="250" cy="372" rx="70" ry="48"/>
+      <circle cx="250" cy="300" r="30"/>
+      <path d="M205 372 q45 -70 90 0 z"/>
+    </g>
+    <!-- AI glow companion -->
+    <circle cx="610" cy="250" r="60" fill="url(#aiglow)"/>
+    <g transform="translate(610,250)">
+      <circle r="20" fill="#150f28" stroke="#9a7bff" stroke-width="2"/>
+      <circle r="6" cy="-3" fill="#9a7bff"/>
+      <path d="M-9 6 q9 9 18 0" stroke="#9a7bff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <g stroke="#c9b6ff" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="-20" x2="0" y2="-30"/>
+        <circle cx="0" cy="-33" r="3" fill="#c9b6ff"/>
+      </g>
+    </g>
+    <!-- connecting spark line -->
+    <path d="M300 300 Q450 250 590 252" stroke="#ff8a4c" stroke-width="2" stroke-dasharray="2 8" fill="none" opacity="0.7" stroke-linecap="round"/>
+  </svg>
+  <div class="overlay">
+    <span class="badge">STORY &nbsp;DEV&nbsp; GUIDE</span>
+    <h1 class="booktitle">ストーリーで覚える<br><span class="em">Claude Code</span> 開発ガイド</h1>
+    <p class="chapline">― 第 4 章 　十万行の地図と、十五分で掴んだ全体像 ―</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== CHARACTERS ===================== -->
+  <section>
+    <div class="eyebrow">Characters</div>
+    <h2 class="sec">主な登場人物</h2>
+    <p class="premise">真面目で堅実な若手エンジニアである田中さんが、頼れる先輩・佐藤さんの助けを借りながら、技術的な課題を一つひとつ乗り越えていく物語。</p>
+
+    <div class="chars">
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#243b6b"/><circle cx="32" cy="26" r="12" fill="#dfe7ff"/><path d="M12 60 q20 -26 40 0z" fill="#9fb4e8"/><rect x="20" y="20" width="24" height="6" rx="3" fill="#1a2746"/></svg>
+        <div><div class="nm">田中 優太</div><div class="role">主人公</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5a2f5e"/><circle cx="32" cy="26" r="12" fill="#ffe2ef"/><path d="M12 60 q20 -26 40 0z" fill="#e89fc4"/><path d="M19 24 q13 -16 26 0 l-3 8 q-10 -10 -20 0z" fill="#3a1f3e"/></svg>
+        <div><div class="nm">佐藤 美咲</div><div class="role">メンター</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#2f5e4f"/><circle cx="32" cy="26" r="12" fill="#dffff2"/><path d="M12 60 q20 -26 40 0z" fill="#9fe8c8"/><rect x="22" y="30" width="20" height="4" rx="2" fill="#163a2c"/></svg>
+        <div><div class="nm">河野 拓実</div><div class="role">プロジェクトマネージャー</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5e4a2f"/><circle cx="32" cy="27" r="12" fill="#fff1dd"/><path d="M12 60 q20 -26 40 0z" fill="#e8c89f"/><path d="M22 22 q10 -8 20 0 l-2 6 q-8 -6 -16 0z" fill="#3a2c16"/></svg>
+        <div><div class="nm">高橋 部長</div><div class="role">上司</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== あらすじ ===================== -->
+  <section>
+    <div class="eyebrow">Prologue ／ あらすじ</div>
+    <h2 class="sec">十万行を、十五分で。</h2>
+    <div class="novel">
+      <span class="qmark">&#8220;</span>
+      <p>二週間の予定が、一週間で動くところまで来た。Claude Code の力を借りたあの成功の余韻も冷めやらぬうちに、田中の机に、また新しい依頼が舞い込んだ。——社内でも最大規模の、基幹システムのリファクタリングプロジェクトに入ってほしい。</p>
+      <p>だが、待っていたのは静かな難題だった。前任者は、すでに退職している。ファイルは八百以上。コードは、十万行。誰も全体を語れない、巨大な迷宮がそこにあった。</p>
+      <p>田中はコードを把握しようと試みる。けれど、あまりに長い。読んでも読んでも端が見えず、画面をスクロールするほどに、自分が今どこにいるのかさえ分からなくなる。手がかりは増えず、ただ時間だけが過ぎていく。二時間。それでも、全体像は霧の中だった。</p>
+      <p>ところが——その後、田中はわずか十五分で、十万行のコードを把握してみせた。</p>
+      <p>自分の力だけでは二時間かけても届かなかった理解に、彼は一体どんな方法でたどり着いたのか。十万行の迷宮を、たった十五分で“地図”に変えたものとは、何だったのか。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 何をしていたか ===================== -->
+  <section>
+    <div class="eyebrow">What happened ／ 舞台裏</div>
+    <h2 class="sec">田中さんがClaude Codeを使って行っていたこと</h2>
+    <p class="lead">今度の相手は、八百を超えるファイルと十万行の既存コードベース。田中さんは Claude Code と“対話”しながら、その巨大な全体像へ分け入っていった。やり取りを、順を追って覗いてみよう。<br><b style="color:var(--ink)">Claude Code とは</b> ── 指示を日本語で書くだけで、コードを設計し、ファイルを作り、修正までしてくれる「AIの開発パートナー」のこと。</p>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step" data-no="①">
+        <h3>リポジトリ全体を理解してもらう</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>このリポジトリの全体構造を説明して。
+　主要なパッケージ、エントリーポイント、データフローを整理して。
+　特に重要なドメインモデルとその関連を図示して。</pre>
+        </div>
+        <p class="desc">Claude Codeがファイル構造の探索を始め、ターミナルの画面に、ファイルを読み込んでいく様子が流れていき、数分後、回答を返した。</p>
+        <p class="desc">まず、パッケージの全体構造が図示された。core パッケージが共通基盤、order が受注管理、inventory が在庫管理、integration が外部連携。それぞれの依存関係が矢印で示されている。</p>
+
+        <!-- flow figure — パレット固定。パッケージ構成の地図。 -->
+        <svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;margin-top:18px" role="img" aria-label="order・inventory・integration の3パッケージが共通基盤の core に依存する構造図">
+          <defs>
+            <linearGradient id="pk1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#3a1f3e"/></linearGradient>
+            <linearGradient id="pk2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f5e4f"/><stop offset="1" stop-color="#163a2c"/></linearGradient>
+            <linearGradient id="pk3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5e4a2f"/><stop offset="1" stop-color="#3a2c16"/></linearGradient>
+            <linearGradient id="pk0" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f5e4f"/></linearGradient>
+            <marker id="pkar" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker>
+          </defs>
+          <g font-family="sans-serif">
+            <rect x="40" y="24" width="210" height="58" rx="14" fill="url(#pk1)" stroke="#6a4a6e"/>
+            <text x="60" y="50" fill="#ffe2ef" font-size="15" font-weight="700">order</text>
+            <text x="60" y="70" fill="#e8b9d0" font-size="12">受注管理</text>
+
+            <rect x="305" y="24" width="210" height="58" rx="14" fill="url(#pk2)" stroke="#3a6a58"/>
+            <text x="325" y="50" fill="#dffff2" font-size="15" font-weight="700">inventory</text>
+            <text x="325" y="70" fill="#9fe8c8" font-size="12">在庫管理</text>
+
+            <rect x="570" y="24" width="210" height="58" rx="14" fill="url(#pk3)" stroke="#6e5a3a"/>
+            <text x="590" y="50" fill="#fff1dd" font-size="15" font-weight="700">integration</text>
+            <text x="590" y="70" fill="#e8c89f" font-size="12">外部連携</text>
+
+            <rect x="270" y="150" width="280" height="58" rx="14" fill="url(#pk0)" stroke="#3a4a78"/>
+            <text x="294" y="176" fill="#cfe0ff" font-size="15" font-weight="700">core</text>
+            <text x="294" y="196" fill="#9fb4e8" font-size="12">共通基盤</text>
+
+            <path d="M150 84 Q240 120 330 148" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#pkar)"/>
+            <path d="M410 84 l0 62" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#pkar)"/>
+            <path d="M670 84 Q560 120 490 148" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#pkar)"/>
+          </g>
+        </svg>
+
+        <p class="desc">次に、主要なAPIエンドポイントの一覧。どのコントローラがどのURLを受け持ち、どのサービス層を呼び出しているか。田中さんが2時間かけても掴めなかった全体像が、整理された形で表示されている。</p>
+        <p class="desc">さらに、ドメインモデルの関連図。Order → OrderItem → Product → InventoryUnit という主要なエンティティの関連と、それぞれのテーブル構成。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ ─ ここに出てくる言葉</div>
+          <ul>
+            <li><b>リポジトリ</b>：プロジェクトのソースコード一式をまとめて管理している“置き場”。</li>
+            <li><b>パッケージ</b>：関連するコードをまとめた“フォルダ”のような単位（例：core, order…）。</li>
+            <li><b>エントリーポイント</b>：プログラムが動き始める“入口”となる場所。</li>
+            <li><b>データフロー</b>：データがどこから来て、どこを通り、どこへ行くかの流れ。</li>
+            <li><b>ドメインモデル</b>：業務上の“もの”（注文・商品など）をコードで表した中心的なデータ構造。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-no="②">
+        <h3>実際のコードと見比べ</h3>
+        <p class="desc">表示された構造図とIntelliJで実際のコードを見比べ、一つずつ確認。</p>
+        <p class="desc">パッケージ構成は正確、エンドポイントの一覧も実際のコントローラと一致している。</p>
+        <p class="desc">ドメインモデルの関連に一箇所だけ補足が必要だったが、おおむね正確。</p>
+        <div class="nv">
+          <div class="nvh">🔰 ポイント</div>
+          <ul>
+            <li>AIが描いた“地図”を鵜呑みにせず、<b>IntelliJ（Javaの統合開発環境＝コードを書いたり読んだりする道具）で実物と突き合わせる</b>──この確認作業が、地図を信頼に変える。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-no="③">
+        <h3>CLAUDE.mdの作成</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>この情報をもとに、既存プロジェクト用のCLAUDE.mdを作成して。
+　パッケージ構成、命名規則、主要なアーキテクチャパターンを整理してほしい。</pre>
+        </div>
+        <p class="desc">Claude Codeは既存コードから読み取った規約（命名規則、レイヤードアーキテクチャのパターン、例外処理の方針、テストの書き方）をCLAUDE.mdとして出力。前任者がドキュメントに残さなかった暗黙のルールが、コードから逆引きされて明文化された。</p>
+        <p class="desc">田中さんは生成されたCLAUDE.mdを一行ずつレビューし、河野PMから聞いた補足情報を書き加えた。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ</div>
+          <ul>
+            <li><b>CLAUDE.md</b>：Claude Codeに「このプロジェクトの決まりごと」を伝えるためのメモ書きファイル。置いておくと出力がプロジェクトの流儀に沿う。</li>
+            <li><b>命名規則</b>：クラスや変数の名前の付け方のルール。</li>
+            <li><b>レイヤードアーキテクチャ</b>：コントローラ→サービス→リポジトリのように、役割ごとに層を分けて積み上げる設計の型。</li>
+            <li><b>逆引き</b>：ここでは「ドキュメントが無いので、コードのほうから規約を読み取って文章化する」こと。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight-band">
+        <span class="ic">🗺️</span>
+        <div><b>3日</b>はかかると思っていた全体構造の把握が、Claude Codeではものの<b>15分</b>で終わった</div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-no="④">
+        <h3>スタックトレースの原因の特定</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span># incident-alert ／ Slack</span></div>
+<pre>本番環境で受注一覧APIのレスポンスが断続的にタイムアウトしています。影響範囲を調査中。</pre>
+        </div>
+        <p class="desc">スロークエリログを確認したところ、クエリの本数が異常に多く、1リクエストあたり数百本のSQLが発行されているように見える。どのコードがこれだけのクエリを発行しているのか、ログだけでは特定できず、「このあたりが怪しい」という当たりは付けたが、確信は持てないまま、2時間が経過していた。</p>
+        <p class="desc">田中さんは、APMツールからコピーしたスタックトレースとスロークエリログをそのまま貼り付けた。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>以下のスタックトレースの原因を特定して。
+
+  [スタックトレースを貼り付け]
+
+  本番環境で /api/orders のレスポンスがタイムアウトしている。
+  スロークエリログを見ると、1リクエストあたり数百本のSQLが発行されている。関連するコードを探索し、原因と修正案を提示して。
+  修正後、関連するテストを実行して影響範囲を確認して。</pre>
+        </div>
+        <p class="desc">Claude Codeが動き始め、まずはスタックトレースに含まれるクラス名をもとに、関連するコードファイルを次々と読み込んでいく。OrderService → OrderRepository → OrderItemRepository。そして OrderService.getOrderList() メソッドの実装を詳しく分析し始めた。</p>
+        <p class="desc">1分ほどで、Claude Codeが原因を指摘した。</p>
+
+        <!-- flow figure — N+1クエリ問題の概念図。パレット固定。 -->
+        <svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;margin-top:18px" role="img" aria-label="注文一覧の取得1回に対し、注文の件数だけ追加のSQLが発行されるN+1問題の図">
+          <defs>
+            <linearGradient id="nq1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f5e4f"/></linearGradient>
+            <linearGradient id="nq2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#5e4a2f"/></linearGradient>
+            <marker id="nqar" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker>
+          </defs>
+          <g font-family="sans-serif">
+            <rect x="30" y="70" width="240" height="64" rx="14" fill="url(#nq1)" stroke="#3a4a78"/>
+            <text x="52" y="100" fill="#cfe0ff" font-size="15" font-weight="700">① 注文一覧を取得</text>
+            <text x="52" y="122" fill="#9fb4e8" font-size="12">SQL 1本（500件）</text>
+
+            <g>
+              <rect x="540" y="22" width="250" height="40" rx="10" fill="url(#nq2)" stroke="#6a4a6e"/>
+              <text x="560" y="47" fill="#ffe2ef" font-size="12.5">findByOrderId() ＋1本</text>
+              <rect x="552" y="74" width="250" height="40" rx="10" fill="url(#nq2)" stroke="#6a4a6e"/>
+              <text x="572" y="99" fill="#ffe2ef" font-size="12.5">findByOrderId() ＋1本</text>
+              <rect x="540" y="126" width="250" height="40" rx="10" fill="url(#nq2)" stroke="#6a4a6e"/>
+              <text x="560" y="151" fill="#ffe2ef" font-size="12.5">findByOrderId() ＋1本 …×500</text>
+            </g>
+
+            <path d="M270 96 Q420 60 538 42" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#nqar)"/>
+            <path d="M270 102 l268 -8" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#nqar)" opacity="0.9"/>
+            <path d="M270 110 Q420 150 538 146" stroke="#ff8a4c" stroke-width="2.5" fill="none" marker-end="url(#nqar)"/>
+            <text x="300" y="186" fill="#ffd479" font-size="13" font-weight="700">＝ 1 ＋ N 本のSQL（典型的なN+1クエリ問題）</text>
+          </g>
+        </svg>
+
+        <p class="desc">OrderService.getOrderList() の中で、注文一覧を取得した後、各注文に対してループで OrderItemRepository.findByOrderId() を呼び出しており、注文が500件あれば、500回のSQLが追加で発行される。典型的なN+1クエリ問題。</p>
+        <p class="desc">Claude Codeはさらに修正案も提示した。@EntityGraph アノテーションを使って関連エンティティを一括取得する方法、あるいはJPQLの JOIN FETCH を使う方法の2案。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ</div>
+          <ul>
+            <li><b>スタックトレース</b>：エラーが起きたとき「どの処理を経てそこに至ったか」を上から並べた足跡。</li>
+            <li><b>スロークエリログ</b>：実行に時間がかかったデータベース問い合わせ（SQL）の記録。</li>
+            <li><b>N+1クエリ問題</b>：一覧を1回取った後、その件数ぶん追加でSQLを投げてしまい、本数が爆発する典型的な性能問題。</li>
+            <li><b>APM</b>：アプリの動作を監視し、遅い箇所などを可視化するツール。</li>
+            <li><b>JOIN FETCH／@EntityGraph</b>：関連データを“まとめて1回で”取りに行き、N+1を防ぐためのやり方。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step" data-no="⑤">
+        <h3>テストの実行</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>関連テストを実行して影響範囲を確認して。</pre>
+        </div>
+        <p class="desc">Claude Codeがターミナルでテストスイートを実行し始め、結果が整理されて表示される。既存のテスト32件がすべてパス。</p>
+        <p class="desc">Claude Codeはさらにテスト結果を分析し、「修正箇所に関連するテストはすべて成功しています。ただし、パフォーマンスに関するテストが存在しないため、N+1の再発を防ぐテストの追加を推奨します」とコメントを添えた。</p>
+        <div class="nv">
+          <div class="nvh">🔰 ひとこと</div>
+          <ul><li><b>テストスイート</b>：プログラムが正しく動くか自動でまとめて確かめる、テストの集まり。</li></ul>
+        </div>
+      </div>
+
+      <div class="highlight-band">
+        <span class="ic">⚡</span>
+        <div>Claude Codeはバグの特定だけでなく、テストの実行、ログの確認、普段なら自分でターミナルを叩いて行っていた作業をそのままやってくれた。<b>Bashコマンドを自分で打つ代わりに、「テストを実行して」と言うだけ</b>で、Claude Codeが行ってくれる。</div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step" data-no="⑥">
+        <h3>Claude Codeの提案をそのまま適用する前の確認</h3>
+        <div class="flist">
+          <div class="flh">🧩 適用前に確認した2点</div>
+          <ul>
+            <li><b>1つ目：</b>JOIN FETCH でデータ量が増えた場合のメモリへの影響<br>→受注一覧は最大1,000件のページネーションが入っているため、問題ないと判断</li>
+            <li><b>2つ目：</b>同じパターンが他のAPIでも使われていないか<br>→Claude Codeに「同様のN+1パターンが他にもないか調査して」と依頼すると、InventoryService.getStockList() にも同じ問題が潜んでいることが分かった。これは今回のインシデントとは無関係だが、将来の障害を予防できる。修正を適用し、テストを実行。全テストがグリーン。田中さんはプルリクエストを作成し、ステージング環境にデプロイして動作確認を完了した。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== コラム ===================== -->
+  <section>
+    <div class="eyebrow">Column ／ コラム</div>
+    <h2 class="sec">既存コードベースの「最初の一手」</h2>
+    <p class="lead">見知らぬ十万行に放り込まれたとき、最初の一手が、その後の効率を決める。鍵になるのは一枚の“地図”だ。</p>
+
+    <div class="col-fig">
+      <svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="地図なしで迷路をさまようのと、地図を片手に進むのとの対比">
+        <defs>
+          <linearGradient id="mgL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1630"/><stop offset="1" stop-color="#120c22"/></linearGradient>
+          <linearGradient id="mgR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161a30"/><stop offset="1" stop-color="#0e1226"/></linearGradient>
+          <marker id="mgar" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9 z" fill="#ff8a4c"/></marker>
+        </defs>
+        <!-- left: no map -->
+        <rect x="20" y="20" width="370" height="180" rx="16" fill="url(#mgL)" stroke="#3a2a52"/>
+        <text x="42" y="52" fill="#9a7bff" font-size="16" font-weight="700" font-family="sans-serif">地図なしで歩き回る</text>
+        <g stroke="#5a4a8a" stroke-width="3" fill="none">
+          <path d="M60 90 h70 v34 h-44 v34 h80 v-50 h44 v60"/>
+          <path d="M210 96 v40 h60 v-26"/>
+          <path d="M300 150 h54 v-44"/>
+        </g>
+        <circle cx="60" cy="90" r="6" fill="#54d6c4"/>
+        <text x="44" y="190" fill="#b0a0d8" font-size="12.5" font-family="sans-serif">どこにいるのか分からないまま、時間が溶ける。</text>
+
+        <!-- right: with map -->
+        <rect x="430" y="20" width="370" height="180" rx="16" fill="url(#mgR)" stroke="#2a3050"/>
+        <text x="452" y="52" fill="#54d6c4" font-size="16" font-weight="700" font-family="sans-serif">地図を片手に進む</text>
+        <g font-family="sans-serif" font-size="12">
+          <rect x="452" y="74" width="150" height="30" rx="8" fill="#241a3a" stroke="#3a4a78"/><text x="466" y="94" fill="#cfe0ff">全体構造</text>
+          <rect x="452" y="116" width="150" height="30" rx="8" fill="#241a3a" stroke="#3a6a58"/><text x="466" y="136" fill="#dffff2">主要クラス</text>
+          <rect x="630" y="74" width="150" height="30" rx="8" fill="#241a3a" stroke="#6a4a6e"/><text x="644" y="94" fill="#ffe2ef">データフロー</text>
+          <rect x="630" y="116" width="150" height="30" rx="8" fill="#241a3a" stroke="#6e5a3a"/><text x="644" y="136" fill="#fff1dd">依存関係</text>
+          <path d="M602 89 h28" stroke="#ff8a4c" stroke-width="2.5" marker-end="url(#mgar)"/>
+          <path d="M602 131 h28" stroke="#ff8a4c" stroke-width="2.5" marker-end="url(#mgar)"/>
+        </g>
+        <text x="452" y="190" fill="#9fb0d0" font-size="12.5" font-family="sans-serif">迷わず、まっすぐ詳細へ入っていける。</text>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cmp tool">
+        <h4>🗺️ 全体の地図を手に入れる</h4>
+        <p>Claude Codeに「このリポジトリの全体構造を説明して」と聞くだけで、パッケージ構成、主要なクラス、データフロー、依存関係が整理される。もちろん100％性格とは限らないが、「全体の地図」を手に入れた状態で詳細に入るのと、地図なしで歩き回るのとでは、効率がまるで違う。</p>
+      </div>
+      <div class="cmp agent">
+        <h4>🧭 地図を片手に、自分の足で確かめる</h4>
+        <p>大事なのは、AIが出した「地図」を自分の目で確認すること。地図を信じて歩き出すのではなく、地図を片手に自分の足で確かめる姿勢が、既存コードベースでのAI活用の鍵となる。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 実践活用 ===================== -->
+  <section>
+    <div class="eyebrow">Practice ／ 実践活用</div>
+    <h2 class="sec">既存コードベースでのClaude Code活用</h2>
+
+    <div class="subhead">全体構造の把握</div>
+    <p class="lead">新しいプロジェクトにアサインされたら、まず「このリポジトリの全体構造を説明して」と聞く。パッケージ構成、エントリーポイント、データフロー、主要な依存関係が整理される。数日かかる全体像の把握が、数十分に短縮される。</p>
+
+    <div class="subhead">バグの特定</div>
+    <p class="lead">スタックトレースやエラーログをそのまま貼り付けるだけで、Claude Codeが関連コードを探索し、原因を特定してくれる。人間が目でコードを追うよりも、網羅的かつ高速に原因にたどり着けることが多い。</p>
+
+    <div class="subhead">CLAUDE.mdの重要性</div>
+    <p class="lead">既存コードベースの規約、アーキテクチャの方針、命名規則をCLAUDE.mdに記載しておくと、Claude Codeの出力精度が格段に上がる。前任者がドキュメントを残していなくても、Claude Codeにコードから規約を読み取らせ、CLAUDE.mdとして明文化することも可能。</p>
+
+    <div class="subhead">新規と既存の違い</div>
+    <div class="gtable"><div class="gt-scroll"><table>
+      <thead><tr><th>観点</th><th>新規プロジェクト</th><th>既存プロジェクト</th></tr></thead>
+      <tbody>
+        <tr><td>最初のステップ</td><td>「こういうものを作りたい」</td><td>「このコードの全体構造を教えて」</td></tr>
+        <tr><td>AIへの入力</td><td>要件・設計方針</td><td>スタックトレース、ログ、既存コード</td></tr>
+        <tr><td>コンテキストの量</td><td>少ない（自分が決める）</td><td>多い（既存コードが決めている）</td></tr>
+        <tr><td>CLAUDE.mdの役割</td><td>コーディング規約の定義</td><td>既存規約の明文化+追加方針</td></tr>
+        <tr><td>AIの主な役割</td><td>「一緒に作る」</td><td>「まず理解する」→「一緒に直す」</td></tr>
+      </tbody>
+    </table></div></div>
+  </section>
+
+  <!-- ===================== 学び ===================== -->
+  <section>
+    <div class="eyebrow">Lessons ／ 学び</div>
+    <h2 class="sec">この章で田中さんが得たもの</h2>
+    <p class="lead">AI駆動開発の原則は、新規でも既存でも同じ。ただし既存コードではコンテキストの量が違う。</p>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p>全体構造の把握：「リポジトリ構造を説明して」から始める</p></div>
+      <div class="li"><div class="n">2</div><p>バグ特定：スタックトレースを貼り付けるだけ</p></div>
+      <div class="li"><div class="n">3</div><p>Bash操作の委任：テスト実行もログ確認もAIに任せる</p></div>
+      <div class="li"><div class="n">4</div><p>CLAUDE.md：既存コードの規約を明文化しておくと精度が上がる</p></div>
+    </div>
+    <div class="highlight-band">
+      <span class="ic">🎯</span>
+      <div>デバッグの<b>8割</b>はAI、残り<b>2割</b>の判断は自分。その<b>2割</b>がエンジニアの価値。</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===================== 次回予告 ===================== -->
+  <section>
+    <div class="eyebrow">Next ／ 次回予告</div>
+    <h2 class="sec">数十ファイルのリファクタリング。期間は、二週間。</h2>
+    <div class="novel cliff">
+      <span class="qmark">&#8220;</span>
+      <p>コードベースを理解し、バグも直せるようになった。手応えはあった。——でも、次は違う。数十のファイルにまたがる、大がかりなリファクタリングだ。</p>
+      <p>河野PMから告げられた期間は、二週間。「2週間で完了できるか?」。その問いに、田中はまだ、答えを持っていない。</p>
+      <p>けれど、再び佐藤さんから助言をもらったことで——田中の開発スタイルが、さらに大きく変わる瞬間が、すぐそこまで来ていた。</p>
+      <div class="tbc">― To be continued ―</div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

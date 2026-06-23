@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ストーリーで覚えるClaude Code開発ガイド ─ 第7章</title>
+<style>
+  :root{
+    --bg:#0f1020;
+    --bg2:#15172b;
+    --panel:#1b1e36;
+    --panel2:#232746;
+    --ink:#e9e9f2;
+    --ink-dim:#b9bad0;
+    --ink-mute:#8688a8;
+    --line:#2c2f50;
+    --accent:#ff8a4c;
+    --accent2:#ff5e8a;
+    --violet:#9a7bff;
+    --teal:#54d6c4;
+    --gold:#ffd479;
+    --code-bg:#0c0d1a;
+    --novel: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic: "Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans JP",sans-serif;
+    --mono: "Consolas","SFMono-Regular","Menlo","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(154,123,255,.18), transparent 60%),
+      radial-gradient(1000px 500px at -10% 10%, rgba(255,138,76,.16), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--gothic);
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px 90px}
+  section{margin:64px 0}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    margin:0 -22px;
+    padding:0;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .art{display:block;width:100%;height:auto}
+  .hero .overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:34px 30px 30px;
+    background:linear-gradient(180deg,transparent 35%, rgba(15,16,32,.55) 70%, rgba(15,16,32,.92));
+  }
+  .badge{
+    display:inline-block;font-size:.74rem;letter-spacing:.28em;
+    color:var(--gold);border:1px solid rgba(255,212,121,.5);
+    padding:5px 14px;border-radius:999px;margin-bottom:14px;width:max-content;
+    background:rgba(255,212,121,.06);
+  }
+  .booktitle{
+    font-family:var(--novel);
+    font-size:clamp(1.5rem,4.6vw,2.5rem);
+    font-weight:700;margin:0;line-height:1.4;
+    text-shadow:0 2px 24px rgba(0,0,0,.6);
+  }
+  .booktitle .em{
+    background:linear-gradient(90deg,var(--accent),var(--accent2) 60%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .chapline{margin-top:10px;color:var(--ink-dim);font-family:var(--novel);font-size:1.02rem}
+
+  /* ===== headings ===== */
+  .eyebrow{
+    display:flex;align-items:center;gap:12px;
+    font-size:.8rem;letter-spacing:.24em;color:var(--accent);
+    text-transform:uppercase;margin-bottom:8px;font-weight:700;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--accent),transparent);display:inline-block}
+  h2.sec{
+    font-family:var(--novel);
+    font-size:clamp(1.4rem,3.4vw,1.9rem);
+    margin:.1em 0 .2em;font-weight:700;
+  }
+  .lead{color:var(--ink-dim);font-size:1.02rem;margin-top:.2em}
+
+  /* ===== characters ===== */
+  .premise{
+    font-family:var(--novel);font-size:1.08rem;color:var(--ink-dim);
+    border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:22px 0 30px;
+  }
+  .chars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .char{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:18px;
+    display:flex;gap:14px;align-items:center;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .char:hover{transform:translateY(-3px);border-color:var(--violet)}
+  .char .av{flex:0 0 64px}
+  .char .nm{font-weight:700;font-size:1.08rem}
+  .char .role{font-size:.82rem;color:var(--accent);margin-top:2px;letter-spacing:.04em}
+
+  /* ===== novel blocks ===== */
+  .novel{
+    position:relative;
+    font-family:var(--novel);
+    font-size:1.16rem;line-height:2.15;
+    background:
+      radial-gradient(600px 300px at 100% 0%, rgba(255,94,138,.10), transparent 60%),
+      linear-gradient(180deg,var(--bg2),#101327);
+    border:1px solid var(--line);border-radius:20px;
+    padding:40px 38px;
+    color:#f0eef7;
+    box-shadow:0 20px 60px -30px rgba(0,0,0,.8);
+  }
+  .novel p{margin:0 0 1.25em;text-indent:1em}
+  .novel p:last-child{margin-bottom:0}
+  .novel .qmark{
+    position:absolute;top:8px;left:18px;font-size:5rem;line-height:1;
+    color:rgba(154,123,255,.18);font-family:Georgia,serif;pointer-events:none;
+  }
+  .novel.cliff{
+    background:
+      radial-gradient(600px 300px at 0% 100%, rgba(255,138,76,.12), transparent 60%),
+      linear-gradient(180deg,#120f22,#0c0a18);
+    border-color:#3a2a48;
+  }
+  .tbc{
+    text-align:right;margin-top:24px;font-family:var(--novel);
+    color:var(--gold);letter-spacing:.18em;font-size:1.05rem;
+  }
+
+  /* ===== scene steps ===== */
+  .steps{position:relative;margin-top:10px}
+  .step{
+    position:relative;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:24px 26px;margin:20px 0;
+  }
+  .step::before{
+    content:attr(data-no);
+    position:absolute;top:-16px;left:24px;
+    width:46px;height:46px;border-radius:12px;
+    display:grid;place-items:center;font-weight:800;font-size:1.15rem;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0c00;box-shadow:0 8px 22px -8px rgba(255,94,138,.7);
+  }
+  .step h3{margin:14px 0 6px;font-size:1.18rem;font-weight:700}
+  .step .desc{color:var(--ink-dim);margin:10px 0 0}
+
+  .prompt{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;overflow:hidden;
+  }
+  .prompt .bar{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;
+    background:#11132a;border-bottom:1px solid #1d2138;
+  }
+  .prompt .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+  .prompt .bar span{margin-left:8px;color:var(--ink-mute);font-size:.76rem;font-family:var(--mono);letter-spacing:.04em}
+  .prompt pre{
+    margin:0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#d7e3ff;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .code{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#cfe;
+    white-space:pre;
+  }
+
+  /* novice callout */
+  .nv{
+    margin-top:16px;border-radius:12px;padding:14px 16px 14px 16px;
+    background:linear-gradient(180deg,rgba(84,214,196,.08),rgba(84,214,196,.03));
+    border:1px solid rgba(84,214,196,.3);
+  }
+  .nv .nvh{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--teal);font-size:.92rem;margin-bottom:6px}
+  .nv ul{margin:0;padding-left:1.2em}
+  .nv li{margin:.32em 0;color:var(--ink-dim);font-size:.95rem}
+  .nv li b{color:var(--ink)}
+
+  .highlight-band{
+    margin-top:26px;
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    border:1px solid rgba(255,138,76,.35);border-radius:16px;
+    padding:20px 24px;font-size:1.05rem;display:flex;gap:14px;align-items:flex-start;
+  }
+  .highlight-band .ic{font-size:1.6rem;line-height:1}
+  .highlight-band b{color:var(--gold)}
+
+  /* ===== column compare ===== */
+  .col-fig{margin:8px 0 22px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0e1024}
+  .col-fig svg{display:block;width:100%;height:auto}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cmp{
+    border-radius:16px;padding:20px;border:1px solid var(--line);
+  }
+  .cmp.tool{background:linear-gradient(160deg,#161a30,#11132a)}
+  .cmp.agent{background:linear-gradient(160deg,#1d1630,#160f28);border-color:#3a2a52}
+  .cmp h4{margin:0 0 8px;font-size:1.08rem;display:flex;align-items:center;gap:8px}
+  .cmp.tool h4{color:var(--teal)}
+  .cmp.agent h4{color:var(--violet)}
+  .cmp p{margin:0;color:var(--ink-dim);font-size:.97rem}
+
+  /* ===== feature table ===== */
+  .feat{display:grid;gap:12px}
+  .feat .row{
+    display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    transition:border-color .15s ease,transform .15s ease;
+  }
+  .feat .row:hover{border-color:var(--accent);transform:translateX(4px)}
+  .feat .k{display:flex;align-items:center;gap:11px;font-weight:700}
+  .feat .k .ei{font-size:1.3rem}
+  .feat .v{color:var(--ink-dim);font-size:.96rem}
+
+  /* ===== learnings ===== */
+  .learn{display:grid;gap:14px}
+  .learn .li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-left:4px solid var(--gold);
+    border-radius:0 14px 14px 0;padding:18px 20px;
+  }
+  .learn .li .n{
+    flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:rgba(255,212,121,.14);color:var(--gold);font-weight:800;
+  }
+  .learn .li p{margin:0;font-size:1.02rem}
+
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:8px 0}
+
+  @media (max-width:620px){
+    .chars{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    .feat .row{grid-template-columns:1fr;gap:6px}
+    .novel{padding:30px 22px;font-size:1.08rem}
+  }
+
+  /* ===== extended components (多様な内容の章向け・追記のみ。既存ルールは不変) ===== */
+  /* section内サブ見出し */
+  .subhead{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--gothic);font-weight:700;font-size:1.06rem;color:var(--ink);
+    margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .subhead::before{content:"";width:10px;height:10px;border-radius:3px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-block}
+
+  /* 多列データテーブル */
+  .gtable{margin:14px 0 4px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .gtable .gt-scroll{overflow-x:auto}
+  .gtable table{width:100%;border-collapse:collapse;min-width:520px;font-size:.95rem}
+  .gtable th,.gtable td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable thead th{
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    color:var(--gold);font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  }
+  .gtable tbody tr{background:var(--panel)}
+  .gtable tbody tr:nth-child(even){background:var(--panel2)}
+  .gtable tbody tr:hover{background:#272c50}
+  .gtable td{color:var(--ink-dim)}
+  .gtable td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+
+  /* 中立の箇条書きパネル（生成結果・特徴の列挙用。teal の🔰とは別系統） */
+  .flist{
+    margin-top:14px;border-radius:12px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(154,123,255,.07),rgba(154,123,255,.02));
+    border:1px solid var(--line);
+  }
+  .flist .flh{font-weight:700;color:var(--violet);font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .flist ul{margin:0;padding-left:1.2em}
+  .flist li{margin:.34em 0;color:var(--ink-dim);font-size:.96rem}
+  .flist li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <svg class="art" viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="夕暮れのオフィスで画面に向かうエンジニアと、寄り添うAIの光">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#241a3a"/>
+        <stop offset="0.5" stop-color="#3a2340"/>
+        <stop offset="1" stop-color="#6b3a3a"/>
+      </linearGradient>
+      <radialGradient id="sun" cx="0.78" cy="0.42" r="0.5">
+        <stop offset="0" stop-color="#ffcf8a"/>
+        <stop offset="0.4" stop-color="#ff8a4c" stop-opacity="0.8"/>
+        <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7be0ff"/>
+        <stop offset="1" stop-color="#9a7bff"/>
+      </linearGradient>
+      <radialGradient id="aiglow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#9a7bff" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#9a7bff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="880" height="420" fill="url(#sky)"/>
+    <rect width="880" height="420" fill="url(#sun)"/>
+    <!-- distant city -->
+    <g opacity="0.5" fill="#1c1430">
+      <rect x="40" y="210" width="40" height="120"/>
+      <rect x="95" y="170" width="34" height="160"/>
+      <rect x="140" y="230" width="46" height="100"/>
+      <rect x="700" y="190" width="38" height="140"/>
+      <rect x="748" y="225" width="30" height="105"/>
+      <rect x="788" y="160" width="44" height="170"/>
+    </g>
+    <g opacity="0.65" fill="#ffd479">
+      <rect x="104" y="186" width="6" height="8"/><rect x="116" y="200" width="6" height="8"/>
+      <rect x="798" y="178" width="6" height="8"/><rect x="812" y="196" width="6" height="8"/>
+      <rect x="150" y="246" width="6" height="8"/>
+    </g>
+    <!-- window frame -->
+    <rect x="0" y="120" width="880" height="6" fill="#150f24" opacity="0.6"/>
+    <!-- desk -->
+    <rect x="0" y="330" width="880" height="90" fill="#13101f"/>
+    <rect x="0" y="330" width="880" height="4" fill="#2a2440"/>
+    <!-- monitor -->
+    <g>
+      <rect x="360" y="232" width="190" height="120" rx="8" fill="#0c0d1a" stroke="#33365e" stroke-width="2"/>
+      <rect x="372" y="244" width="166" height="96" rx="4" fill="#10122a"/>
+      <!-- code lines -->
+      <g opacity="0.9">
+        <rect x="384" y="256" width="60" height="6" rx="3" fill="url(#screen)"/>
+        <rect x="384" y="270" width="100" height="6" rx="3" fill="#54d6c4" opacity="0.7"/>
+        <rect x="396" y="284" width="78" height="6" rx="3" fill="#ffd479" opacity="0.7"/>
+        <rect x="396" y="298" width="110" height="6" rx="3" fill="#ff8a4c" opacity="0.6"/>
+        <rect x="384" y="312" width="54" height="6" rx="3" fill="#9a7bff" opacity="0.8"/>
+        <rect x="384" y="326" width="92" height="6" rx="3" fill="url(#screen)" opacity="0.6"/>
+      </g>
+      <rect x="448" y="352" width="14" height="16" fill="#0c0d1a"/>
+      <rect x="424" y="368" width="62" height="6" rx="3" fill="#0c0d1a"/>
+    </g>
+    <!-- engineer silhouette -->
+    <g fill="#0a0712">
+      <ellipse cx="250" cy="372" rx="70" ry="48"/>
+      <circle cx="250" cy="300" r="30"/>
+      <path d="M205 372 q45 -70 90 0 z"/>
+    </g>
+    <!-- AI glow companion -->
+    <circle cx="610" cy="250" r="60" fill="url(#aiglow)"/>
+    <g transform="translate(610,250)">
+      <circle r="20" fill="#150f28" stroke="#9a7bff" stroke-width="2"/>
+      <circle r="6" cy="-3" fill="#9a7bff"/>
+      <path d="M-9 6 q9 9 18 0" stroke="#9a7bff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <g stroke="#c9b6ff" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="-20" x2="0" y2="-30"/>
+        <circle cx="0" cy="-33" r="3" fill="#c9b6ff"/>
+      </g>
+    </g>
+    <!-- connecting spark line -->
+    <path d="M300 300 Q450 250 590 252" stroke="#ff8a4c" stroke-width="2" stroke-dasharray="2 8" fill="none" opacity="0.7" stroke-linecap="round"/>
+  </svg>
+  <div class="overlay">
+    <span class="badge">STORY &nbsp;DEV&nbsp; GUIDE</span>
+    <h1 class="booktitle">ストーリーで覚える<br><span class="em">Claude Code</span> 開発ガイド</h1>
+    <p class="chapline">― 第 7 章 　号令ではなく、淡々と続けた開発ログ ―</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== CHARACTERS ===================== -->
+  <section>
+    <div class="eyebrow">Characters</div>
+    <h2 class="sec">主な登場人物</h2>
+    <p class="premise">真面目で堅実な若手エンジニアである田中さんが、頼れる先輩・佐藤さんの助けを借りながら、技術的な課題を一つひとつ乗り越えていく物語。</p>
+
+    <div class="chars">
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#243b6b"/><circle cx="32" cy="26" r="12" fill="#dfe7ff"/><path d="M12 60 q20 -26 40 0z" fill="#9fb4e8"/><rect x="20" y="20" width="24" height="6" rx="3" fill="#1a2746"/></svg>
+        <div><div class="nm">田中 優太</div><div class="role">主人公</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5a2f5e"/><circle cx="32" cy="26" r="12" fill="#ffe2ef"/><path d="M12 60 q20 -26 40 0z" fill="#e89fc4"/><path d="M19 24 q13 -16 26 0 l-3 8 q-10 -10 -20 0z" fill="#3a1f3e"/></svg>
+        <div><div class="nm">佐藤 美咲</div><div class="role">メンター</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#2f5e4f"/><circle cx="32" cy="26" r="12" fill="#dffff2"/><path d="M12 60 q20 -26 40 0z" fill="#9fe8c8"/><rect x="22" y="30" width="20" height="4" rx="2" fill="#163a2c"/></svg>
+        <div><div class="nm">河野 拓実</div><div class="role">プロジェクトマネージャー</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5e4a2f"/><circle cx="32" cy="27" r="12" fill="#fff1dd"/><path d="M12 60 q20 -26 40 0z" fill="#e8c89f"/><path d="M22 22 q10 -8 20 0 l-2 6 q-8 -6 -16 0z" fill="#3a2c16"/></svg>
+        <div><div class="nm">高橋 部長</div><div class="role">上司</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== あらすじ ===================== -->
+  <section>
+    <div class="eyebrow">Prologue ／ あらすじ</div>
+    <h2 class="sec">便利だから使って、では人は動かない。</h2>
+    <div class="novel">
+      <span class="qmark">&#8220;</span>
+      <p>ワークフロー全体を、自分の手で設計できるようになった——その手応えを噛みしめていた田中の机に、新しい号令が下りてきた。「チーム全体でAI駆動開発を推進せよ」。高橋部長の言葉には、期待がこもっていた。</p>
+      <p>定例ミーティング。これまでの成果を携え、田中はAIを使った業務の進め方を提案した。手応えはある、きっと前向きに受け止めてくれる——そう信じていた。だが、会議室の空気は、思い描いたものとは違った。</p>
+      <p>ベテランの木村さんは静かに言った。「今のやり方で回っているんだよね」。入社二年目の山田さんは眉を曇らせた。「設定が難しそうで……」。そして高橋部長の問いが、机を横切る。「セキュリティは大丈夫なのか」。</p>
+      <p>自分は便利だと思っていても、全員がそう思うわけではない——田中は、提案の仕方を間違えたことに気づく。後日、佐藤さんが穏やかに告げた。「押しつけると、逆効果だよ」。</p>
+      <p>号令でも、正論でもなく。果たして田中さんは、チームのひとりひとりに、どうやって納得してもらうのか。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 何をしていたか ===================== -->
+  <section>
+    <div class="eyebrow">What happened ／ 舞台裏</div>
+    <h2 class="sec">田中さんがチームに働きかけて行っていたこと</h2>
+    <p class="lead">「チーム全体でAI駆動開発を推進せよ」──部長の号令を受けて、田中さんが動き出す。正面からの提案、淡々とした成果の見える化、セキュリティガイドラインづくり、そしてAgent Teamsの実演まで。その舞台裏を、順を追って覗いてみよう。</p>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step" data-no="①">
+        <h3>定例ミーティングでの提案</h3>
+        <p class="desc">「1つ目は、CLAUDE.mdの共有化です。プロジェクトルートにCLAUDE.mdを配置して、コーディング規約やアーキテクチャの方針をチーム全員のClaude Codeに共有します。これにより、誰がAIと作業しても、同じルールに基づいたコードが生成されます。」</p>
+        <p class="desc">「2つ目は、カスタムスラッシュコマンドの整備です。コードレビューやテスト生成の定型作業を、チーム共有のコマンドとして定義します。新しいメンバーが入っても、すぐに同じワークフローで作業できるようになります。」</p>
+        <p class="desc">「3つ目は、hooks設定の統一です。コミット前のチェックやPR作成時の要約生成など、品質を担保する仕組みをチーム全体に導入します。」</p>
+        <p class="desc">説明を終えた田中さんは手応えを感じ、きっとチームも前向きに受け止めてくれるはずと期待していたが、会議室の空気は違った。</p>
+        <p class="desc">最初に口を開いたのは、入社12年目のベテラン、木村さん。</p>
+        <p class="desc">「うーん、田中くんの成果は見てるよ。すごいと思う。ただ正直なところ、今のやり方で回ってるんだよね。新しいツールを覚える時間を取るよりも、今のプロジェクトの納期を優先したいんだけど。」</p>
+        <p class="desc">次に、入社2年目の後輩、山田さん。</p>
+        <p class="desc">「田中さん、興味はあるんですけど...CLIで作業するのって、設定が難しそうで。ターミナルに慣れてないと、最初のハードルが高くないですか？」</p>
+        <p class="desc">そして、高橋部長。</p>
+        <p class="desc">「セキュリティは大丈夫なんだろうな？AIにソースコードを読ませるってことだろ。うちのコードが外部に漏れるリスクはないのか。経営層にも説明できるようにしておかないと。」</p>
+      </div>
+
+      <div class="highlight-band">
+        <span class="ic">💡</span>
+        <div>木村さんが「今のやり方で回っている」と言ったのは事実。納期に追われるチームに、新しいツールの学習ソフトを負担させようとしていた。山田さんの不安も正当。CLIベースのツールは、GUIに慣れた人にはハードルが高い。そして高橋部長のセキュリティの懸念は、組織のリーダーとして当然の問いかけ。自分は便利だと思っても、全員がそう思うわけではなく、<b>便利だから使って、では人は動かない</b>。この提案の仕方では押しつけてしまっている。</div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-no="②">
+        <h3>成果の見える化</h3>
+        <p class="desc">チーム全員への提案はやめて、自分の日々の作業記録を淡々とSlackに投稿し始めた。チャンネル名は #ai-dev-log 。説明文には「田中の個人的な作業記録です。興味のある方はご自由にどうぞ。」とだけ書いた。</p>
+        <p class="desc">最初の投稿は火曜日。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>#ai-dev-log</span></div>
+<pre>【AI駆動開発ログ #1】バグ修正
+  Before: 原因調査～修正～テスト 2時間
+  After: Claude Codeで原因特定+修正提案 30分
+
+  ユーザー権限チェックのバグ。10万行のコードから原因箇所を
+  特定するのに、以前は手動で追いかけて1時間以上かかっていた。
+  Claude Codeにスタックトレースを渡したら、5分で原因と特定。
+  修正パッチの提案も的確だった。</pre>
+        </div>
+        <p class="desc">水曜日。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>#ai-dev-log</span></div>
+<pre>【AI駆動開発ログ #2】テスト生成
+  Before: TimeEntryServiceのテスト作成 1日（8時間）
+  After: Claude Codeでテスト雛形生成+手動生成 2時間
+
+  24本のテストケースのうち、20本はAI生成のまま使えた。
+  残り4本は業務ロジック固有の条件を手動で修正。
+  「8割AIに任せて、2割の判断に集中する」のパターンが
+  定着してきた。</pre>
+        </div>
+        <p class="desc">木曜日。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>#ai-dev-log</span></div>
+<pre>【AI駆動開発ログ #3】リファクタリング
+  Before: レガシーモジュールの構造改善 見積4週間
+  After: Subagent+git worktreeで並列作業 2週間で完了
+
+  前任者が残した複雑な依存関係を、Claude Codeの
+  コード解析で可視化。Subagentに分割タスクを並列で
+  担当させて、全体の工期を半分に圧縮できた。</pre>
+        </div>
+        <p class="desc">田中さんはあえて「みんなも使ってください」と書かず、佐藤さんの教え通り、自分の記録を淡々と共有するだけ。</p>
+        <p class="desc">最初の3日間、リアクションはゼロ。田中さんは焦りを感じつつも、投稿を続けた。</p>
+        <p class="desc">金曜日の夕方、最初の変化が起きた。後輩の山田さんからDMが届き、翌週、山田さんと隣同士でClaude Codeを使ってテストを書いてみた。</p>
+        <p class="desc">その翌週には、木村さんがSlackのスレッドに初めてリアクションをつけた。</p>
+        <p class="desc">3週間が経つ頃には、田中さんが「使ってください」と一度も言わないまま、#ai-dev-log のメンバーがチームの半数に増えていた。</p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-no="③">
+        <h3>Claude Codeでセキュリティガイドラインの作成</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>チーム向けのAI活用セキュリティガイドラインを作成してほしい。
+  以下の観点をカバーして:
+  - AIに入力してはいけない情報のリスト
+  - 利用可能ツールの承認プロセス
+  - AI出力の確認フロー
+  社内の中規模開発チーム（10名程度）を想定。</pre>
+        </div>
+        <p class="desc">Claude Codeが生成した下書きを、田中さん、佐藤さんの2人でレビュー。</p>
+        <p class="desc">「この"入力禁止情報"のリスト、うちの社内規定に合わせて修正しよう。」</p>
+        <p class="desc">「"認証キーやAPIキー"は当然として...本番環境の接続情報も入れておいた方がいいですね。」</p>
+        <p class="desc">「あと、非公開のビジネス戦略情報。来期の事業計画とか、M&amp;Aの話とか。コードには直接関係ないけど、AIに入力するリスクはある。」</p>
+        <p class="desc">2時間かけて、ガイドラインが完成。</p>
+        <p class="desc">高橋部長にガイドラインを提出した結果、これでチームに展開することに決まった。</p>
+      </div>
+
+      <div class="highlight-band">
+        <span class="ic">🛡️</span>
+        <div>Claude Codeが作った骨子に、自分たちの業務知識を肉付けした感じ。ガイドラインを作ること自体がAIとの協働の実践例で、<b>ルールがあれば、安心して使える人が増える</b>。</div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-no="④">
+        <h3>Agent Teamsについて</h3>
+        <p class="desc">実際の業務に近い例を河野PMに見せる。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>通知モジュールにSlack通知機能を追加してほしい。
+  チームを編成して対応して。
+
+  - まず既存の通知モジュールの構造を調査してから実装方針を決めて
+  - 実装とテストは並列で進めて
+  - 最後に全体の整合性を確認して</pre>
+        </div>
+        <p class="desc">Claude Codeの出力</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>Claude Code 出力</span></div>
+<pre>リーダー: タスクを分析中...
+  → 3つのサブタスクに分解しました
+
+  タスク一覧:
+  1. ［調査］既存の通知モジュールの構造分析 → researcher
+  2. ［実装］Slack通知機能の実装 → implementer （タスク1の完了待ち）
+  3. ［テスト］Slack通知機能のテスト生成 → tester （タスク1の完了待ち）
+
+  researcher を起動中...</pre>
+        </div>
+        <div class="flist">
+          <div class="flh">🤝 このとき起きていたこと</div>
+          <ul>
+            <li>リーダーエージェントがタスクを3つに分解</li>
+            <li>調査担当が既存コードの構造を分析</li>
+            <li>調査担当の分析が完了すると、実装担当とテスト担当が同時に動き始める</li>
+            <li>実装担当がSlack APIとの連携コードを書く傍ら、テスト担当がモックを使ったテストを作成している</li>
+            <li>Agent Teamsは、それぞれのエージェントが異なる役割を持って、チームとして協調する</li>
+          </ul>
+        </div>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ ─ ここに出てくる言葉</div>
+          <ul>
+            <li><b>Agent Teams</b>：複数のAIエージェントが役割を分担し、チームとして協力して1つの仕事を仕上げる仕組み。</li>
+            <li><b>researcher / implementer / tester</b>：それぞれ「調査担当」「実装担当」「テスト担当」のエージェント。</li>
+            <li><b>並列</b>：複数の作業を同時に進めること。調査が終われば、実装とテストを同時進行できる。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== コラム1 ===================== -->
+  <section>
+    <div class="eyebrow">Column ／ コラム</div>
+    <h2 class="sec">Subagentで十分？ Agent Teamsを使うべきとき</h2>
+    <p class="lead">同じ作業の手分けか、役割の異なる協働か。たった一つの問いで、選ぶべき道具が見えてくる。</p>
+    <p class="desc" style="color:var(--ink-dim)">「役割分担が必要かどうか」でSubagent（Task tool）とAgent Teams、どちらを使うか決める</p>
+
+    <div class="col-fig">
+      <svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Subagentは同じ作業を並列に手分けし、Agent Teamsは役割の異なるエージェントが協調する">
+        <defs>
+          <linearGradient id="cgT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161a30"/><stop offset="1" stop-color="#0e1226"/></linearGradient>
+          <linearGradient id="cgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1630"/><stop offset="1" stop-color="#120c22"/></linearGradient>
+        </defs>
+        <!-- left: Subagent -->
+        <rect x="20" y="20" width="370" height="180" rx="16" fill="url(#cgT)" stroke="#2a3050"/>
+        <text x="42" y="52" fill="#54d6c4" font-size="16" font-weight="700" font-family="sans-serif">Subagent</text>
+        <text x="42" y="74" fill="#7f93b8" font-size="12" font-family="sans-serif">同じ作業を並列に手分け（1対多）</text>
+        <g font-family="sans-serif" font-size="12">
+          <rect x="150" y="86" width="92" height="26" rx="8" fill="#1c3a36" stroke="#3a6a60"/><text x="166" y="103" fill="#aef0e6">親</text>
+          <rect x="44" y="150" width="92" height="26" rx="8" fill="#11262a" stroke="#2f5e54"/><text x="60" y="167" fill="#9fe8d8">子・同種</text>
+          <rect x="150" y="150" width="92" height="26" rx="8" fill="#11262a" stroke="#2f5e54"/><text x="166" y="167" fill="#9fe8d8">子・同種</text>
+          <rect x="256" y="150" width="92" height="26" rx="8" fill="#11262a" stroke="#2f5e54"/><text x="272" y="167" fill="#9fe8d8">子・同種</text>
+          <path d="M196 112 L90 150M196 112 L196 150M196 112 L302 150" stroke="#ff8a4c" stroke-width="2" marker-end="url(#ar2)"/>
+        </g>
+
+        <!-- right: Agent Teams -->
+        <rect x="430" y="20" width="370" height="180" rx="16" fill="url(#cgA)" stroke="#3a2a52"/>
+        <text x="452" y="52" fill="#9a7bff" font-size="16" font-weight="700" font-family="sans-serif">Agent Teams</text>
+        <text x="452" y="74" fill="#9385b8" font-size="12" font-family="sans-serif">役割の異なるエージェントが協調</text>
+        <g font-family="sans-serif" font-size="12">
+          <rect x="556" y="86" width="118" height="26" rx="13" fill="#241a3a" stroke="#5a4a8a"/><text x="572" y="103" fill="#cbb6ff">リーダー</text>
+          <rect x="448" y="150" width="92" height="26" rx="13" fill="#1a2746" stroke="#3a4a78"/><text x="462" y="167" fill="#bcd0ff">調査</text>
+          <rect x="554" y="150" width="92" height="26" rx="13" fill="#3a1f3e" stroke="#6a4a6e"/><text x="568" y="167" fill="#f0c4dc">実装</text>
+          <rect x="660" y="150" width="92" height="26" rx="13" fill="#163a2c" stroke="#2f5e4f"/><text x="674" y="167" fill="#aef0d2">テスト</text>
+          <path d="M615 112 L494 150M615 112 L600 150M615 112 L706 150" stroke="#ff8a4c" stroke-width="2" marker-end="url(#ar2)"/>
+        </g>
+        <defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0 0 L8 4.5 L0 9 z" fill="#ff8a4c"/></marker></defs>
+      </svg>
+    </div>
+
+    <div class="subhead">Subagentが向いているケース</div>
+    <div class="flist">
+      <div class="flh">🧩 Subagent（Task tool）</div>
+      <ul>
+        <li>同じ種類の作業を複数のファイルやモジュールに対して並列実行したいとき</li>
+        <li>例：「5つのサービスクラスのテストを同時に生成して」「3つのモジュールのREADMEを並列で更新して」</li>
+        <li>1つの親エージェントが全体を把握しているので、シンプルに使える</li>
+      </ul>
+    </div>
+
+    <div class="subhead">Agent Teamsが向いているケース</div>
+    <div class="flist">
+      <div class="flh">👥 Agent Teams</div>
+      <ul>
+        <li>異なる専門性を持つ作業を組み合わせて1つの成果物を作りたいとき</li>
+        <li>例：「既存コードを調査してから、その結果に基づいて実装とテストを並列で進めて」</li>
+        <li>タスク間に依存関係がある（調査が終わらないと実装に入れない、など）</li>
+        <li>作業の途中でエージェント間の情報共有が必要</li>
+      </ul>
+    </div>
+
+    <div class="subhead">迷ったらSubagentから始める</div>
+    <p class="desc" style="color:var(--ink-dim)">実務では、まずSubagentで十分かを考える。「同じことを複数回やる」ならSubagent、「違うことを組み合わせる」ならAgent Teams。田中さんも第5章のリファクタリングではSubagentで十分だったが、調査・実装・テストという異なる役割が必要な場面ではAgent Teamsが力を発揮した。</p>
+  </section>
+
+  <!-- ===================== コラム2 ===================== -->
+  <section>
+    <div class="eyebrow">Column ／ コラム</div>
+    <h2 class="sec">チーム導入で避けるべき3つのアンチパターン</h2>
+    <p class="lead">よかれと思った一手が、定着をいちばん遠ざける。導入でつまずきやすい3つの落とし穴。</p>
+
+    <div class="learn">
+      <div class="li">
+        <div class="n">1</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">強制導入</p>
+          <p style="color:var(--ink-dim)">「来月からチーム全員Claude Codeを使うこと」と号令をかけるパターン。義務化された瞬間、人は心理的に反発する。特に、既存のワークフローに慣れているベテランメンバーにとっては、「今のやり方を否定された」と感じてしまう。</p>
+          <p style="color:var(--ink-dim);margin-top:8px">佐藤さんが経験したように、強制的に研修を実施しても、1か月後にはほとんどの人が使わなくなる。「やりたい人からどうぞ」のスタンスで、自発的な採用を促すほうが、定着率は圧倒的に高くなる。</p>
+        </div>
+      </div>
+      <div class="li">
+        <div class="n">2</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">ツール信仰</p>
+          <p style="color:var(--ink-dim)">「Claude Codeを使えば全て解決」という過度な期待。AIツールは万能ではない。得意な作業（定型的なコード生成、テストの量産、パターン化しやすいリファクタリング）と、苦手な作業（業務固有の判断、暗黙の仕様の理解、組織内の政治的な調整）がある。</p>
+          <p style="color:var(--ink-dim);margin-top:8px">ツールへの過度な期待は、期待通りにいかなかったときに大きな失望に変わる。「万能ではないが、使い方次第で強力な武器になる」という現実的な期待値を、チーム内で共有しておくことが大切。</p>
+        </div>
+      </div>
+      <div class="li">
+        <div class="n">3</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">セキュリティ無視</p>
+          <p style="color:var(--ink-dim)">ガイドラインなしにAIツールを使わせるパターン。「まずは自由に試してみよう」という姿勢自体は良いのですが、最低限のルールがないと、機密情報の漏洩やセキュリティインシデントのリスクが高まる。</p>
+          <p style="color:var(--ink-dim);margin-top:8px">一度インシデントが起きると、「やっぱりAIは危険だ」という空気が広がり、チーム全体のAI活用が後退する。田中さんが高橋部長の懸念に応えてガイドラインを策定したように、セキュリティの仕組みを先に整えることで、安心して試せる環境を作る。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== セキュリティガイドライン ===================== -->
+  <section>
+    <div class="eyebrow">Security ／ セキュリティ</div>
+    <h2 class="sec">AI駆動開発のセキュリティガイドライン</h2>
+    <p class="lead">テンプレート（田中さんと佐藤さんが策定したガイドライン）</p>
+
+    <div class="prompt">
+      <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>AI活用セキュリティガイドライン.md</span></div>
+<pre># AI活用セキュリティガイドライン
+
+  ## 前提: データの取り扱いについて
+  - Claude Codeに入力したコードや会話内容は、モデルの学習（トレーニング）には使用されません（Anthropic公式ポリシー）
+  - ただし、上記ポリシーに依存せず、以下のルールを守ること
+
+  ## AIに入力してはいけない情報
+  - 顧客の個人情報（氏名、メールアドレス、住所等）
+  - 認証キー、APIキー、パスワード
+  - 本番環境の接続情報
+  - 未公開のビジネス戦略情報
+
+  ## 利用ルール
+  - Claude Codeの出力は必ず人間がレビューしてからコミット
+  - CLAUDE.mdに機密情報を含めない
+  - MCPサーバーの追加はチームリーダーの承認を得ること
+
+  ## AI出力の確認フロー
+  1. AI生成コードは通常のPRレビューと同じプロセスを経る
+  2. セキュリティに関わるコード（認証・認可・暗号化）は必ず2名以上でレビュー
+  3. AI生成コードであることをコミットメッセージに明記する
+     （例: 「Claude Code支援で実装」）
+
+  ## インシデント対応
+  - 機密情報を誤ってAIに入力した場合は、速やかにチームリーダーに報告する
+  - 該当するAPIキーやパスワードは即座にローテーションする</pre>
+    </div>
+
+    <p class="lead" style="margin-top:26px">ガイドラインのポイントは3つ</p>
+    <div class="learn">
+      <div class="li">
+        <div class="n">1</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">禁止事項を明確にする</p>
+          <p style="color:var(--ink-dim)">「何を入力してはいけないか」をリスト化することで、チームメンバーが判断に迷う場面を減らす。曖昧なルールは守られない。具体的なリストがあれば、誰もが同じ基準で判断できる。</p>
+        </div>
+      </div>
+      <div class="li">
+        <div class="n">2</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">フローを定義する</p>
+          <p style="color:var(--ink-dim)">「AIが出力したコードをどう扱うのか」のフローを決めておくことで、品質とセキュリティの担保が仕組み化される。属人的な判断ではなく、プロセスとして組み込むのがポイント。</p>
+        </div>
+      </div>
+      <div class="li">
+        <div class="n">3</div>
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:6px">インシデント対応を想定する</p>
+          <p style="color:var(--ink-dim)">どんなに注意しても、ミスは起こる。重要なのは「ミスが起きたときにどうするか」を事前に決めておくこと。報告のハードルを下げ、対応手順を明確にしておくことで、被害を最小化できる。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Agent Teams（特徴） ===================== -->
+  <section>
+    <div class="eyebrow">Features ／ 特徴</div>
+    <h2 class="sec">Agent Teams</h2>
+    <p class="lead">Agent Teamsは、複数のAIエージェントがチームとして協調作業する機能。Subagent（Task tool）が「1対多の並列実行」だったのに対し、Agent Teamsは「役割を持ったチームの編成と協調」を実現する。</p>
+
+    <div class="subhead">Subagent vs Agent Teams</div>
+    <div class="gtable"><div class="gt-scroll"><table>
+      <thead><tr><th>&nbsp;</th><th>Subagent（第5章）</th><th>Agent Teams</th></tr></thead>
+      <tbody>
+        <tr><td>構造</td><td>親エージェントが子を生成</td><td>リーダーがチームを編成</td></tr>
+        <tr><td>役割分担</td><td>同じ種類のタスクを並列実行</td><td>異なる役割のエージェントが協調</td></tr>
+        <tr><td>コミュニケーション</td><td>親→子の一方向</td><td>リーダー↔メンバー間の双方向メッセージ</td></tr>
+        <tr><td>タスク管理</td><td>親が直接管理</td><td>共有タスクリストで進捗を管理</td></tr>
+        <tr><td>適したシーン</td><td>同種の作業を高速に処理</td><td>複数の専門性が必要な複合タスク</td></tr>
+      </tbody>
+    </table></div></div>
+
+    <svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;margin-top:20px" role="img" aria-label="リーダーがタスクを分解し、調査担当の完了後に実装担当とテスト担当が並列で動く">
+      <defs>
+        <linearGradient id="tg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#3a2f6b"/></linearGradient>
+        <linearGradient id="tg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f5e4f"/></linearGradient>
+        <linearGradient id="tg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#5e4a2f"/></linearGradient>
+        <linearGradient id="tg4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f5e4f"/><stop offset="1" stop-color="#243b6b"/></linearGradient>
+      </defs>
+      <g font-family="sans-serif">
+        <rect x="40" y="78" width="180" height="56" rx="14" fill="url(#tg1)" stroke="#6a4a8a"/>
+        <text x="62" y="104" fill="#dcd2ff" font-size="14" font-weight="700">リーダー</text>
+        <text x="62" y="122" fill="#bcb0e8" font-size="11">タスクを3つに分解</text>
+
+        <rect x="300" y="78" width="180" height="56" rx="14" fill="url(#tg2)" stroke="#3a4a78"/>
+        <text x="322" y="104" fill="#cfe0ff" font-size="14" font-weight="700">researcher（調査）</text>
+        <text x="322" y="122" fill="#9fb4e8" font-size="11">既存モジュールの構造分析</text>
+
+        <rect x="560" y="34" width="220" height="56" rx="14" fill="url(#tg3)" stroke="#6a4a6e"/>
+        <text x="582" y="60" fill="#ffe2ef" font-size="14" font-weight="700">implementer（実装）</text>
+        <text x="582" y="78" fill="#e8b9d0" font-size="11">Slack通知機能を実装</text>
+
+        <rect x="560" y="122" width="220" height="56" rx="14" fill="url(#tg4)" stroke="#3a6a5a"/>
+        <text x="582" y="148" fill="#aef0d2" font-size="14" font-weight="700">tester（テスト）</text>
+        <text x="582" y="166" fill="#9fe8c8" font-size="11">モックを使ったテスト生成</text>
+
+        <path d="M220 106 L298 106" stroke="#ff8a4c" stroke-width="3" marker-end="url(#ar3)"/>
+        <path d="M480 100 Q520 100 558 70" stroke="#ff8a4c" stroke-width="3" fill="none" marker-end="url(#ar3)"/>
+        <path d="M480 112 Q520 112 558 146" stroke="#ff8a4c" stroke-width="3" fill="none" marker-end="url(#ar3)"/>
+        <text x="496" y="106" fill="#8688a8" font-size="10" font-family="monospace">並列</text>
+      </g>
+      <defs><marker id="ar3" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker></defs>
+    </svg>
+
+    <div class="subhead">チームの構成要素</div>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p><b style="color:var(--ink)">リーダーエージェント</b>：タスクの分解、メンバーへの割り当て、全体の整合性チェックを担当</p></div>
+      <div class="li"><div class="n">2</div><p><b style="color:var(--ink)">メンバーエージェント</b>：それぞれの専門領域で作業を実行。エージェントの種類によって得意分野が異なる</p></div>
+      <div class="li"><div class="n">3</div><p><b style="color:var(--ink)">タスクリスト</b>：チーム全体で共有される作業リスト。タスク間の依存関係（「タスクAが完了してからタスクBを開始」）も定義可能</p></div>
+      <div class="li"><div class="n">4</div><p><b style="color:var(--ink)">メッセージング</b>：リーダーとメンバー間、メンバー同士でのコミュニケーション手段</p></div>
+    </div>
+
+    <div class="subhead">エージェントの種類と使い分け</div>
+    <div class="gtable"><div class="gt-scroll"><table>
+      <thead><tr><th>エージェント種別</th><th>得意な作業</th><th>利用できるツール</th></tr></thead>
+      <tbody>
+        <tr><td>general-purpose</td><td>コードの実装・編集全般</td><td>ファイル操作、Bash、検索など全ツール</td></tr>
+        <tr><td>Explore</td><td>コードベースの調査・分析</td><td>読み取り・検索系（編集不可）</td></tr>
+        <tr><td>Plan</td><td>設計・計画立案</td><td>読み取り・検索系（編集不可）</td></tr>
+        <tr><td>Bash</td><td>コマンド実行に特化</td><td>Bashコマンドのみ</td></tr>
+      </tbody>
+    </table></div></div>
+
+    <div class="subhead">活用シーンの例</div>
+    <div class="prompt">
+      <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre># 新機能開発（調査→実装→テストの流れ）
+  通知モジュールにメール通知機能を追加して。
+  チームを編成して、調査・実装・テストを分担して進めて。
+
+  # フロントエンド + バックエンドの並列開発
+  ユーザー設定画面を作って。APIエンドポイントとReactコンポーネントを並列で開発して、最後に結合テストをして。
+
+  # 大規模リファクタリングのモジュール分割
+  OrderService,PaymentService,NotificationService のリファクタリングをチームで分担して進めて。
+  各モジュールの変更が他に影響しないことを確認して。</pre>
+    </div>
+
+    <div class="subhead">注意点</div>
+    <div class="flist">
+      <div class="flh">⚠️ 使ううえで押さえておくこと</div>
+      <ul>
+        <li>Agent Teamsは現在Research Preview（実験的機能）です。今後、仕様が変更される可能性があります。</li>
+        <li>複雑なタスクでは精度が落ちることがあります。最終的なレビューは必ず人間が行ってください。</li>
+        <li>各エージェントの作業結果は独立しているため、結合時の整合性チェックが特に重要です。</li>
+        <li>チームの規模は、タスクの複雑さに応じて2～5体程度が実用的です。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== 学び ===================== -->
+  <section>
+    <div class="eyebrow">Lessons ／ 学び</div>
+    <h2 class="sec">この章で田中さんが得たもの</h2>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p>自分は便利だと思っていても、全員がそう思うわけではない</p></div>
+      <div class="li"><div class="n">2</div><p>押しつけるのではなく、焦らず、一緒に試すスタンスでいる</p></div>
+      <div class="li"><div class="n">3</div><p>数字を見せれば、興味を持つ人は自然に来る</p></div>
+      <div class="li"><div class="n">4</div><p>Subagentが"分身の術"だとしたら、Agent Teamsは"プロジェクトチームの編成"。1人が10人に分身するのではなく、調査担当・実装担当・テスト担当がそれぞれの専門性を持って動く</p></div>
+      <div class="li"><div class="n">5</div><p>技術の導入は、仕組みと文化の両輪。押しつけず、成果で示し、安心して使える環境を整えることがリーダーの仕事</p></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===================== 次回予告 ===================== -->
+  <section>
+    <div class="eyebrow">Next ／ 次回予告</div>
+    <h2 class="sec">チームに根づいた。けれど、その先で。</h2>
+    <div class="novel cliff">
+      <span class="qmark">&#8220;</span>
+      <p>チームに根づき始めたAI駆動開発。半年が経ち、成果も出た。高橋部長との評価面談で、田中さんの取り組みは、ついに正式に認められることになる。報われた——そのはずだった。</p>
+      <p>でも——。ふと開いた画面に、ある記事が飛び込んできた。「AIマルチエージェントで開発チーム丸ごと自動化」。文字を追う指が、止まる。</p>
+      <p>AIがチーム全体の仕事を代替する未来が、もし本当に来たら。そのとき、自分たちエンジニアの価値は、いったい何になるのか。</p>
+      <p>——最終章。田中さんは「エンジニアの価値とは何か」という、根本的な問いに向き合う。</p>
+      <div class="tbc">― To be continued ―</div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

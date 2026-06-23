@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ストーリーで覚えるClaude Code開発ガイド ─ 第2章</title>
+<style>
+  :root{
+    --bg:#0f1020;
+    --bg2:#15172b;
+    --panel:#1b1e36;
+    --panel2:#232746;
+    --ink:#e9e9f2;
+    --ink-dim:#b9bad0;
+    --ink-mute:#8688a8;
+    --line:#2c2f50;
+    --accent:#ff8a4c;
+    --accent2:#ff5e8a;
+    --violet:#9a7bff;
+    --teal:#54d6c4;
+    --gold:#ffd479;
+    --code-bg:#0c0d1a;
+    --novel: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic: "Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans JP",sans-serif;
+    --mono: "Consolas","SFMono-Regular","Menlo","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(154,123,255,.18), transparent 60%),
+      radial-gradient(1000px 500px at -10% 10%, rgba(255,138,76,.16), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--gothic);
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px 90px}
+  section{margin:64px 0}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    margin:0 -22px;
+    padding:0;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .art{display:block;width:100%;height:auto}
+  .hero .overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:34px 30px 30px;
+    background:linear-gradient(180deg,transparent 35%, rgba(15,16,32,.55) 70%, rgba(15,16,32,.92));
+  }
+  .badge{
+    display:inline-block;font-size:.74rem;letter-spacing:.28em;
+    color:var(--gold);border:1px solid rgba(255,212,121,.5);
+    padding:5px 14px;border-radius:999px;margin-bottom:14px;width:max-content;
+    background:rgba(255,212,121,.06);
+  }
+  .booktitle{
+    font-family:var(--novel);
+    font-size:clamp(1.5rem,4.6vw,2.5rem);
+    font-weight:700;margin:0;line-height:1.4;
+    text-shadow:0 2px 24px rgba(0,0,0,.6);
+  }
+  .booktitle .em{
+    background:linear-gradient(90deg,var(--accent),var(--accent2) 60%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .chapline{margin-top:10px;color:var(--ink-dim);font-family:var(--novel);font-size:1.02rem}
+
+  /* ===== headings ===== */
+  .eyebrow{
+    display:flex;align-items:center;gap:12px;
+    font-size:.8rem;letter-spacing:.24em;color:var(--accent);
+    text-transform:uppercase;margin-bottom:8px;font-weight:700;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--accent),transparent);display:inline-block}
+  h2.sec{
+    font-family:var(--novel);
+    font-size:clamp(1.4rem,3.4vw,1.9rem);
+    margin:.1em 0 .2em;font-weight:700;
+  }
+  .lead{color:var(--ink-dim);font-size:1.02rem;margin-top:.2em}
+
+  /* ===== characters ===== */
+  .premise{
+    font-family:var(--novel);font-size:1.08rem;color:var(--ink-dim);
+    border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:22px 0 30px;
+  }
+  .chars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .char{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:18px;
+    display:flex;gap:14px;align-items:center;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .char:hover{transform:translateY(-3px);border-color:var(--violet)}
+  .char .av{flex:0 0 64px}
+  .char .nm{font-weight:700;font-size:1.08rem}
+  .char .role{font-size:.82rem;color:var(--accent);margin-top:2px;letter-spacing:.04em}
+
+  /* ===== novel blocks ===== */
+  .novel{
+    position:relative;
+    font-family:var(--novel);
+    font-size:1.16rem;line-height:2.15;
+    background:
+      radial-gradient(600px 300px at 100% 0%, rgba(255,94,138,.10), transparent 60%),
+      linear-gradient(180deg,var(--bg2),#101327);
+    border:1px solid var(--line);border-radius:20px;
+    padding:40px 38px;
+    color:#f0eef7;
+    box-shadow:0 20px 60px -30px rgba(0,0,0,.8);
+  }
+  .novel p{margin:0 0 1.25em;text-indent:1em}
+  .novel p:last-child{margin-bottom:0}
+  .novel .qmark{
+    position:absolute;top:8px;left:18px;font-size:5rem;line-height:1;
+    color:rgba(154,123,255,.18);font-family:Georgia,serif;pointer-events:none;
+  }
+  .novel.cliff{
+    background:
+      radial-gradient(600px 300px at 0% 100%, rgba(255,138,76,.12), transparent 60%),
+      linear-gradient(180deg,#120f22,#0c0a18);
+    border-color:#3a2a48;
+  }
+  .tbc{
+    text-align:right;margin-top:24px;font-family:var(--novel);
+    color:var(--gold);letter-spacing:.18em;font-size:1.05rem;
+  }
+
+  /* ===== scene steps ===== */
+  .steps{position:relative;margin-top:10px}
+  .step{
+    position:relative;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:24px 26px;margin:20px 0;
+  }
+  .step::before{
+    content:attr(data-no);
+    position:absolute;top:-16px;left:24px;
+    width:46px;height:46px;border-radius:12px;
+    display:grid;place-items:center;font-weight:800;font-size:1.15rem;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0c00;box-shadow:0 8px 22px -8px rgba(255,94,138,.7);
+  }
+  .step h3{margin:14px 0 6px;font-size:1.18rem;font-weight:700}
+  .step .desc{color:var(--ink-dim);margin:10px 0 0}
+
+  .prompt{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;overflow:hidden;
+  }
+  .prompt .bar{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;
+    background:#11132a;border-bottom:1px solid #1d2138;
+  }
+  .prompt .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+  .prompt .bar span{margin-left:8px;color:var(--ink-mute);font-size:.76rem;font-family:var(--mono);letter-spacing:.04em}
+  .prompt pre{
+    margin:0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#d7e3ff;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .code{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#cfe;
+    white-space:pre;
+  }
+
+  /* novice callout */
+  .nv{
+    margin-top:16px;border-radius:12px;padding:14px 16px 14px 16px;
+    background:linear-gradient(180deg,rgba(84,214,196,.08),rgba(84,214,196,.03));
+    border:1px solid rgba(84,214,196,.3);
+  }
+  .nv .nvh{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--teal);font-size:.92rem;margin-bottom:6px}
+  .nv ul{margin:0;padding-left:1.2em}
+  .nv li{margin:.32em 0;color:var(--ink-dim);font-size:.95rem}
+  .nv li b{color:var(--ink)}
+
+  .highlight-band{
+    margin-top:26px;
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    border:1px solid rgba(255,138,76,.35);border-radius:16px;
+    padding:20px 24px;font-size:1.05rem;display:flex;gap:14px;align-items:flex-start;
+  }
+  .highlight-band .ic{font-size:1.6rem;line-height:1}
+  .highlight-band b{color:var(--gold)}
+
+  /* ===== column compare ===== */
+  .col-fig{margin:8px 0 22px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0e1024}
+  .col-fig svg{display:block;width:100%;height:auto}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cmp{
+    border-radius:16px;padding:20px;border:1px solid var(--line);
+  }
+  .cmp.tool{background:linear-gradient(160deg,#161a30,#11132a)}
+  .cmp.agent{background:linear-gradient(160deg,#1d1630,#160f28);border-color:#3a2a52}
+  .cmp h4{margin:0 0 8px;font-size:1.08rem;display:flex;align-items:center;gap:8px}
+  .cmp.tool h4{color:var(--teal)}
+  .cmp.agent h4{color:var(--violet)}
+  .cmp p{margin:0;color:var(--ink-dim);font-size:.97rem}
+
+  /* ===== feature table ===== */
+  .feat{display:grid;gap:12px}
+  .feat .row{
+    display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    transition:border-color .15s ease,transform .15s ease;
+  }
+  .feat .row:hover{border-color:var(--accent);transform:translateX(4px)}
+  .feat .k{display:flex;align-items:center;gap:11px;font-weight:700}
+  .feat .k .ei{font-size:1.3rem}
+  .feat .v{color:var(--ink-dim);font-size:.96rem}
+
+  /* ===== learnings ===== */
+  .learn{display:grid;gap:14px}
+  .learn .li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-left:4px solid var(--gold);
+    border-radius:0 14px 14px 0;padding:18px 20px;
+  }
+  .learn .li .n{
+    flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:rgba(255,212,121,.14);color:var(--gold);font-weight:800;
+  }
+  .learn .li p{margin:0;font-size:1.02rem}
+
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:8px 0}
+
+  @media (max-width:620px){
+    .chars{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    .feat .row{grid-template-columns:1fr;gap:6px}
+    .novel{padding:30px 22px;font-size:1.08rem}
+  }
+
+  /* ===== extended components (多様な内容の章向け・追記のみ。既存ルールは不変) ===== */
+  /* section内サブ見出し */
+  .subhead{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--gothic);font-weight:700;font-size:1.06rem;color:var(--ink);
+    margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .subhead::before{content:"";width:10px;height:10px;border-radius:3px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-block}
+
+  /* 多列データテーブル */
+  .gtable{margin:14px 0 4px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .gtable .gt-scroll{overflow-x:auto}
+  .gtable table{width:100%;border-collapse:collapse;min-width:520px;font-size:.95rem}
+  .gtable th,.gtable td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable thead th{
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    color:var(--gold);font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  }
+  .gtable tbody tr{background:var(--panel)}
+  .gtable tbody tr:nth-child(even){background:var(--panel2)}
+  .gtable tbody tr:hover{background:#272c50}
+  .gtable td{color:var(--ink-dim)}
+  .gtable td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+
+  /* 中立の箇条書きパネル（生成結果・特徴の列挙用。teal の🔰とは別系統） */
+  .flist{
+    margin-top:14px;border-radius:12px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(154,123,255,.07),rgba(154,123,255,.02));
+    border:1px solid var(--line);
+  }
+  .flist .flh{font-weight:700;color:var(--violet);font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .flist ul{margin:0;padding-left:1.2em}
+  .flist li{margin:.34em 0;color:var(--ink-dim);font-size:.96rem}
+  .flist li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="art" viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="夕暮れのオフィスで画面に向かうエンジニアと、寄り添うAIの光">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#241a3a"/>
+        <stop offset="0.5" stop-color="#3a2340"/>
+        <stop offset="1" stop-color="#6b3a3a"/>
+      </linearGradient>
+      <radialGradient id="sun" cx="0.78" cy="0.42" r="0.5">
+        <stop offset="0" stop-color="#ffcf8a"/>
+        <stop offset="0.4" stop-color="#ff8a4c" stop-opacity="0.8"/>
+        <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7be0ff"/>
+        <stop offset="1" stop-color="#9a7bff"/>
+      </linearGradient>
+      <radialGradient id="aiglow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#9a7bff" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#9a7bff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="880" height="420" fill="url(#sky)"/>
+    <rect width="880" height="420" fill="url(#sun)"/>
+    
+    <g opacity="0.5" fill="#1c1430">
+      <rect x="40" y="210" width="40" height="120"/>
+      <rect x="95" y="170" width="34" height="160"/>
+      <rect x="140" y="230" width="46" height="100"/>
+      <rect x="700" y="190" width="38" height="140"/>
+      <rect x="748" y="225" width="30" height="105"/>
+      <rect x="788" y="160" width="44" height="170"/>
+    </g>
+    <g opacity="0.65" fill="#ffd479">
+      <rect x="104" y="186" width="6" height="8"/><rect x="116" y="200" width="6" height="8"/>
+      <rect x="798" y="178" width="6" height="8"/><rect x="812" y="196" width="6" height="8"/>
+      <rect x="150" y="246" width="6" height="8"/>
+    </g>
+    
+    <rect x="0" y="120" width="880" height="6" fill="#150f24" opacity="0.6"/>
+    
+    <rect x="0" y="330" width="880" height="90" fill="#13101f"/>
+    <rect x="0" y="330" width="880" height="4" fill="#2a2440"/>
+    
+    <g>
+      <rect x="360" y="232" width="190" height="120" rx="8" fill="#0c0d1a" stroke="#33365e" stroke-width="2"/>
+      <rect x="372" y="244" width="166" height="96" rx="4" fill="#10122a"/>
+      
+      <g opacity="0.9">
+        <rect x="384" y="256" width="60" height="6" rx="3" fill="url(#screen)"/>
+        <rect x="384" y="270" width="100" height="6" rx="3" fill="#54d6c4" opacity="0.7"/>
+        <rect x="396" y="284" width="78" height="6" rx="3" fill="#ffd479" opacity="0.7"/>
+        <rect x="396" y="298" width="110" height="6" rx="3" fill="#ff8a4c" opacity="0.6"/>
+        <rect x="384" y="312" width="54" height="6" rx="3" fill="#9a7bff" opacity="0.8"/>
+        <rect x="384" y="326" width="92" height="6" rx="3" fill="url(#screen)" opacity="0.6"/>
+      </g>
+      <rect x="448" y="352" width="14" height="16" fill="#0c0d1a"/>
+      <rect x="424" y="368" width="62" height="6" rx="3" fill="#0c0d1a"/>
+    </g>
+    
+    <g fill="#0a0712">
+      <ellipse cx="250" cy="372" rx="70" ry="48"/>
+      <circle cx="250" cy="300" r="30"/>
+      <path d="M205 372 q45 -70 90 0 z"/>
+    </g>
+    
+    <circle cx="610" cy="250" r="60" fill="url(#aiglow)"/>
+    <g transform="translate(610,250)">
+      <circle r="20" fill="#150f28" stroke="#9a7bff" stroke-width="2"/>
+      <circle r="6" cy="-3" fill="#9a7bff"/>
+      <path d="M-9 6 q9 9 18 0" stroke="#9a7bff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <g stroke="#c9b6ff" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="-20" x2="0" y2="-30"/>
+        <circle cx="0" cy="-33" r="3" fill="#c9b6ff"/>
+      </g>
+    </g>
+    
+    <path d="M300 300 Q450 250 590 252" stroke="#ff8a4c" stroke-width="2" stroke-dasharray="2 8" fill="none" opacity="0.7" stroke-linecap="round"/>
+  </svg>
+  <div class="overlay">
+    <span class="badge">STORY &nbsp;DEV&nbsp; GUIDE</span>
+    <h1 class="booktitle">ストーリーで覚える<br><span class="em">Claude Code</span> 開発ガイド</h1>
+    
+    <p class="chapline">― 第 2 章 　返ってきたレビューと、チームの作法 ―</p>
+    
+  </div>
+</header>
+
+<div class="wrap">
+
+  
+  
+  <section>
+    <div class="eyebrow">Characters</div>
+    <h2 class="sec">主な登場人物</h2>
+    
+    <p class="premise">真面目で堅実な若手エンジニアである田中さんが、頼れる先輩・佐藤さんの助けを借りながら、技術的な課題を一つひとつ乗り越えていく物語。</p>
+    
+
+    
+    <div class="chars">
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#243b6b"/><circle cx="32" cy="26" r="12" fill="#dfe7ff"/><path d="M12 60 q20 -26 40 0z" fill="#9fb4e8"/><rect x="20" y="20" width="24" height="6" rx="3" fill="#1a2746"/></svg>
+        <div><div class="nm">田中 優太</div><div class="role">主人公</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5a2f5e"/><circle cx="32" cy="26" r="12" fill="#ffe2ef"/><path d="M12 60 q20 -26 40 0z" fill="#e89fc4"/><path d="M19 24 q13 -16 26 0 l-3 8 q-10 -10 -20 0z" fill="#3a1f3e"/></svg>
+        <div><div class="nm">佐藤 美咲</div><div class="role">メンター</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#2f5e4f"/><circle cx="32" cy="26" r="12" fill="#dffff2"/><path d="M12 60 q20 -26 40 0z" fill="#9fe8c8"/><rect x="22" y="30" width="20" height="4" rx="2" fill="#163a2c"/></svg>
+        <div><div class="nm">河野 拓実</div><div class="role">プロジェクトマネージャー</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5e4a2f"/><circle cx="32" cy="27" r="12" fill="#fff1dd"/><path d="M12 60 q20 -26 40 0z" fill="#e8c89f"/><path d="M22 22 q10 -8 20 0 l-2 6 q-8 -6 -16 0z" fill="#3a2c16"/></svg>
+        <div><div class="nm">高橋 部長</div><div class="role">上司</div></div>
+      </div>
+    </div>
+    
+  </section>
+
+<!-- ===================== あらすじ ===================== -->
+  <section>
+    <div class="eyebrow">Prologue ／ あらすじ</div>
+    <h2 class="sec">規約は、毎回伝えるしかないのか。</h2>
+    <div class="novel">
+      <span class="qmark">&#8220;</span>
+      <p>自信を持って送り出したプルリクエスト。だが返ってきたのは、賞賛ではなかった。「ここは、チームの規約に沿っていない」——コードのあちこちに、そう告げるレビューコメントが並んでいた。動く。確かに動く。けれど、それは“チームの書き方”ではなかった。</p>
+      <p>田中はコメントに一つずつ返信しながら、指摘された箇所を手で直し始める。だが、修正すべき場所は一つのファイルには収まらない。複数のファイルにまたがった訂正は、思いのほか時間を溶かしていく。スクロールする指が、ふと止まった。——Claude Codeに、最初からチームのルールを教えておく方法は、ないのだろうか。</p>
+      <p>答えを探して、田中はまた佐藤さんのもとへ向かった。事情を聞いた佐藤さんは、迷いなく一つの名前を口にする。「それなら、“CLAUDE.md”で解決できるよ」。</p>
+      <p>教わったとおりに CLAUDE.md を書き、同じような依頼を、もう一度 Claude Code に投げてみる。——すると。レビューで指摘されたはずの箇所は、最初から規約に沿った形で書かれていた。ルールを守ったコードが、一度で、目の前に生成されていた。</p>
+      <p>一体なぜ、CLAUDE.md を作成しただけで、一度でチームの規約に沿ったコードを生成できたのか。そして——CLAUDE.md とは、どういうものなのか。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 何をしていたか ===================== -->
+  <section>
+    <div class="eyebrow">What happened ／ 舞台裏</div>
+    <h2 class="sec">田中さんが CLAUDE.md・Skillsを使って行っていたこと</h2>
+    <p class="lead">あの“一度で規約どおり”の裏で、田中さんは2つの仕組みを用意していた。順を追って覗いてみよう。<br><b style="color:var(--ink)">CLAUDE.md とは</b> ── プロジェクトのルールを書いておくと、Claude Code が起動時に自動で読み込み、最初から規約に沿ってコードを書いてくれる「AIへの申し送り書」。<br><b style="color:var(--ink)">Skills（カスタムコマンド）とは</b> ── よく使う指示を定型文として登録し、「/review」のような短いコマンドで呼び出せる仕組み。</p>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step" data-no="①">
+        <h3>CLAUDE.md の作成 ─ チームの規約を一枚に書き出す</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>ファイル：CLAUDE.md</span></div>
+<pre># CLAUDE.md - 工数管理システム（TimeTracker）
+
+## プロジェクト概要
+Spring Boot 3.x + Java 17 で構築する社内工数管理ツール。
+REST APIを提供し、フロントエンドはReact（別リポジトリ）から呼び出す。
+
+## コーディング規約
+
+### 命名規則
+- 変数名・メソッド名: lowerCamelCase
+  - 良い例: userId, getOrderCount(), isActive
+  - 悪い例: user_id, UserID, get_order_count()
+- クラス名: UpperCamelCase
+  - 良い例: UserService, OrderRepository
+  - 悪い例: userService, user_service
+- 定数: UPPER_SNAKE_CASE
+  - 良い例: MAX_RETRY_COUNT, DEFAULT_PAGE_SIZE
+  - 悪い例: maxRetryCount, max_retry_count
+
+### 例外処理
+- 素のRuntimeExceptionは禁止。必ずCustomExceptionを継承した例外を使う
+- 理由: 例外の種類によってHTTPステータスコードを自動マッピングするため
+  - BusinessLogicException → 400 Bad Request
+  - ResourceNotFoundException → 404 Not Found
+  - ApplicationException → 500 Internal Server Error
+
+### Repository層
+- 戻り値はOptional型で統一する
+  - 良い例: Optional&lt;User&gt; findByUserId(String UserId)
+  - 悪い例: user findByUserId(String UserId) // nullを返す可能性
+
+### アーキテクチャ
+- Controller → Service → Repository の3層構造を守る
+- 各層の責務:
+  - Controller: リクエストの受付、バリデーション、レスポンス整形
+  - Service: ビジネスロジック
+  - Repository: データアクセス
+- DTOとEntityは必ず分離する。Entityを直接レスポンスに使わない
+
+## 禁止事項
+- System.out.println()でのログ出力 → SLF4J（@Slf4j）を使うこと
+- マジックナンバーの直書き → 定数クラスに定義すること
+- SQLの直書き → Spring Data JPAのRepositoryメソッドを使うこと
+- Controllerから直接Repositoryを呼ぶこと → 必ずServiceを経由すること </pre>
+        </div>
+        <p class="desc">「AIに伝わるように」と意識して、自分の頭の中になんとなく入っていた知識を、「なぜこのルールがあるのか」「良い例と悪い例はどう違うのか」まで掘り下げて書く必要がある。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ ─ ここに出てくる言葉</div>
+          <ul>
+            <li><b>CLAUDE.md</b>：プロジェクトのルールを書いた“申し送り書”。Claude Code が起動時に自動で読む。</li>
+            <li><b>lowerCamelCase / UpperCamelCase / UPPER_SNAKE_CASE</b>：名前の付け方の流儀。変数は小文字始まり、クラスは大文字始まり、定数は全部大文字＋アンダースコア。</li>
+            <li><b>CustomException</b>：自分たちで定義した例外。種類ごとにHTTPの応答コードを切り替えられる。</li>
+            <li><b>Optional型</b>：「値が無いかもしれない」を安全に表す入れ物。null の事故を防ぐ。</li>
+            <li><b>DTO と Entity の分離</b>：DBの形（Entity）と、外に返す形（DTO）を分けて、内部構造を露出させない。</li>
+            <li><b>SLF4J（@Slf4j）</b>：きちんとしたログ出力の仕組み。println の代わりに使う。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-no="②">
+        <h3>個人用の CLAUDE.local.md の作成</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>ファイル：CLAUDE.local.md</span></div>
+<pre># CLAUDE.local.md - 田中の個人設定
+
+## 作業スタイル
+- コミットメッセージは日本語で書く
+- コードにはJavadocコメントを積極的に書く
+- テストクラス名は「対象クラス名 + Test」とする（例: UserServiceTest）</pre>
+        </div>
+        <div class="nv">
+          <div class="nvh">🔰 ポイント</div>
+          <ul>
+            <li><b>CLAUDE.local.md</b>：自分だけの設定。Git で共有せず（.gitignore に入れる）、好みや作業メモを書く。</li>
+            <li><b>Javadoc</b>：Java のクラスやメソッドに付ける説明コメント。後から読む人（と AI）の助けになる。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-no="③">
+        <h3>CLAUDE.md を置いたプロジェクトで、Claude Code に依頼を出す</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>工数入力のエンドポイントを作ってください。ユーザーIDとプロジェクトIDと
+作業時間を受け取って、工数レコードを作成するPOST APIです。</pre>
+        </div>
+        <div class="flist">
+          <div class="flh">🧩 Claude Codeが生成したコードは</div>
+          <ul>
+            <li>変数名は lowerCamelCase</li>
+            <li>リクエストとレスポンスにはDTOが使われている</li>
+            <li>Controller から直接 Repository を呼ばず、Service を経由している</li>
+            <li>Repository の戻り値は Optional 型で、見つからない場合は ResourceNotFoundException（CLAUDE.mdに書いた CustomException の派生クラス）</li>
+            <li>null チェックではなく orElseThrow を使っている</li>
+            <li>前回のコードと比べると、RuntimeException が使われ、変数名も userID や project_id が混在し、DTOとEntityの分離もされていなかった</li>
+          </ul>
+        </div>
+        <div class="nv">
+          <div class="nvh">🔰 いま起きたこと</div>
+          <ul>
+            <li>CLAUDE.md に書いたルールを Claude Code が<b>自動で読み込み</b>、指示していないのに規約どおりのコードを書いた。</li>
+            <li><b>orElseThrow</b>：値が無いとき、null を返す代わりに例外を投げる安全な書き方。</li>
+            <li>「前回のコード」とは、CLAUDE.md が無かった第1章の生成物。比べると違いは一目瞭然。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-no="④">
+        <h3>バリデーションの追加</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>このエンドポイントにバリデーションを追加してください。
+作業時間は0.5～24.0の範囲で、0.5刻みのみ有効です。</pre>
+        </div>
+        <p class="desc">生成されたバリデーションコードには、マジックナンバーではなく定数が使われ、ログ出力には @Slf4j が使われていた。CLAUDE.mdの「禁止事項」もきちんと反映されている。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ</div>
+          <ul>
+            <li><b>マジックナンバー</b>：コード中に直接書かれた意味不明の数値。後で読むと何の数か分からなくなる。</li>
+            <li><b>定数化</b>：その数値に名前を付けて一箇所にまとめること。CLAUDE.md の禁止事項に沿った書き方。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step" data-no="⑤">
+        <h3>Skills（カスタムコマンド）の作成</h3>
+        <p class="desc">1つ目：コードレビューの観点チェック用</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>ファイル：.claude/commands/review.md</span></div>
+<pre>&lt;!-- .clade/commands/review.md --&gt;
+以下の観点でコードレビューしてください:
+
+1. コーディング規約の遵守（CLAUDE.mdの規約に沿っているか）
+2. エラーハンドリング（例外処理は適切か、CustomExceptionを使っているか）
+3. セキュリティ（SQLインジェクション、XSS等の脆弱性がないか）
+4. パフォーマンス（N+1問題、不要なDBアクセスがないか）
+5. テスタビリティ（テストしやすい設計になっているか）
+
+問題が見つかった場合は、該当箇所のコードと改善案を具体的に提示してください。
+
+対象: $ARGUMENTS</pre>
+        </div>
+        <p class="desc">2つ目：テスト生成の定型指示</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>ファイル：.claude/commands/test.md</span></div>
+<pre>&lt;!-- .claude/commands/test.md --&gt;
+以下のクラス/メソッドのユニットテストを作成してください:
+
+## テスト方針
+- テストクラス名: 対象クラス名 + Test（例: UserServiceTest）
+- テストメソッド名: test + 対象メソッド名 + テストケースの説明（日本語可）
+- 正常系テスト: 少なくとも2ケース
+- 異常系テスト: 少なくとも2ケース（例外が正しくスローされることを確認）
+- 境界値テスト: 該当する場合は1ケース以上
+
+## 使用するライブラリ
+- JUnit 5
+- Mockito（依存クラスのモック用）
+- AssertJ（アサーション用）
+
+対象: $ARGUMENTS</pre>
+        </div>
+        <p class="desc">ファイル中の $ARGUMENTS は、コマンド実行時に引数で置き換わるプレースホルダーであり、 /review TimeEntryService.java と打つと、ファイル中の $ARGUMENTS が TimeEntryService.java に置き換わって、Claude Codeへの指示文が完成する。</p>
+        <div class="nv">
+          <div class="nvh">🔰 ひとこと</div>
+          <ul>
+            <li><b>Skills（カスタムコマンド）</b>：よく使う指示をファイルに保存し、「/review」などの短いコマンドで呼び出せる仕組み。</li>
+            <li><b>$ARGUMENTS</b>：コマンドの後ろに書いた文字（ファイル名など）が、ここに自動で差し込まれる“穴”。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="highlight-band">
+      <span class="ic">⚡</span>
+      <div>田中さんはCLAUDE.mdを書くのに<b>半日</b>かかったが、それは<b>一度きりの投資</b>であり、これからClaude Codeに依頼するたびに、チームの規約に沿ったコードが最初から生成される。Skillsを使うと、Claude Codeがレビュー観点に沿って、コードの問題点を指摘してくれる。変数名のチェック、例外処理の確認、N+1問題の検出など、毎回プロンプトで観点を説明する必要がなくなった。</div>
+    </div>
+  </section>
+
+  <!-- ===================== コラム ===================== -->
+  <section>
+    <div class="eyebrow">Column ／ コラム</div>
+    <h2 class="sec">CLAUDE.md は「人間のため」にもなる</h2>
+    <p class="lead">CLAUDE.md は AI のために書く文書だ。——のはずだった。ところが書き上げてみると、いちばん助かったのは“人間”だった。</p>
+
+    <div class="col-fig">
+      <svg viewBox="0 0 820 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AIに伝わるように書いた文章が、暗黙知の言語化と新メンバーのオンボーディングという人間向けの価値も生む">
+        <defs>
+          <linearGradient id="ccL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1630"/><stop offset="1" stop-color="#120c22"/></linearGradient>
+          <linearGradient id="ccR1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f5e4f"/></linearGradient>
+          <linearGradient id="ccR2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#5e4a2f"/></linearGradient>
+        </defs>
+        <rect x="20" y="58" width="300" height="94" rx="16" fill="url(#ccL)" stroke="#3a2a52"/>
+        <text x="40" y="92" fill="#9a7bff" font-size="16" font-weight="700" font-family="sans-serif">AIに伝わるように書く</text>
+        <text x="40" y="116" fill="#b0a0d8" font-size="12.5" font-family="sans-serif">「常識でしょ」を省略できない。</text>
+        <text x="40" y="135" fill="#b0a0d8" font-size="12.5" font-family="sans-serif">具体例つきで、理由まで書く。</text>
+
+        <path d="M328 105 l40 0" stroke="#ff8a4c" stroke-width="3" marker-end="url(#arc)"/>
+
+        <rect x="386" y="20" width="414" height="80" rx="14" fill="url(#ccR1)" stroke="#3a4a78"/>
+        <text x="406" y="50" fill="#cfe0ff" font-size="15" font-weight="700" font-family="sans-serif">① 暗黙知の言語化</text>
+        <text x="406" y="74" fill="#b9c6ea" font-size="12" font-family="sans-serif">ベテランの頭の中のルールが、読める形になる</text>
+
+        <rect x="386" y="110" width="414" height="80" rx="14" fill="url(#ccR2)" stroke="#6a4a6e"/>
+        <text x="406" y="140" fill="#ffe2ef" font-size="15" font-weight="700" font-family="sans-serif">② 新メンバーのオンボーディング資料</text>
+        <text x="406" y="164" fill="#e8c6d6" font-size="12" font-family="sans-serif">最初に知りたい情報が一枚にまとまっている</text>
+
+        <marker id="arc" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker>
+      </svg>
+    </div>
+
+    <div class="compare">
+      <div class="cmp tool">
+        <h4>🧠 暗黙知の言語化</h4>
+        <p>多くのチームでは、コーディング規約やアーキテクチャの方針が「なんとなく共有されている」状態。ベテランメンバーの頭の中にはあるけれど、ドキュメントにはなっていない。CLAUDE.mdを書く作業は、この暗黙知を言語化する強制力を持っている。</p>
+        <p style="margin-top:.8em">「AIに伝わるように書く」という制約が、実はドキュメントの質を上げてくれる。人間向けのドキュメントなら「常識でしょ」と省略してしまう部分も、AI向けには具体例付きで書く必要があり、結果として、人間が読んでも分かりやすいドキュメントができあがる。</p>
+      </div>
+      <div class="cmp agent">
+        <h4>🚀 新メンバーのオンボーディング</h4>
+        <p>プロジェクトの技術スタック、アーキテクチャの概要、コーディング規約、禁止事項など、新しく入ったメンバーが最初に知りたい情報がCLAUDE.mdにはコンパクトにまとまっているため、CLAUDE.mdをそのまま新メンバーのオンボーディング資料として使うところもある。</p>
+      </div>
+    </div>
+
+    <div class="highlight-band">
+      <span class="ic">💡</span>
+      <div>つまり、<b>「AIのために書いた文章」が「チームのため」にもなる</b>。</div>
+    </div>
+  </section>
+
+  <!-- ===================== CLAUDE.mdの仕組み ===================== -->
+  <section>
+    <div class="eyebrow">Mechanism ／ 仕組み</div>
+    <h2 class="sec">CLAUDE.md の仕組み</h2>
+
+    <div class="subhead">配置場所と読み込みの優先順位</div>
+    <p class="lead">CLAUDE.mdは、プロジェクト内の複数の場所に配置することができ、Claude Codeは起動時にこれらを自動的に読み込み、コンテキストとして利用する。</p>
+    <div class="gtable">
+      <div class="gt-scroll">
+        <table>
+          <thead><tr><th>配置場所</th><th>用途</th><th>読み込み</th></tr></thead>
+          <tbody>
+            <tr><td>~/CLAUDE.md</td><td>ユーザー全体の共通設定</td><td>常に読み込まれる</td></tr>
+            <tr><td>プロジェクトルールの CLAUDE.md</td><td>プロジェクト共通の規約</td><td>プロジェクト内で作業時に読み込まれる</td></tr>
+            <tr><td>サブディレクトリの CLAUDE.md</td><td>モジュール固有の規約</td><td>そのディレクトリ内のファイルを操作するときに読み込まれる</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;margin:18px 0 6px" role="img" aria-label="CLAUDE.mdは階層が深いほど優先される：ユーザー全体、プロジェクトルート、サブディレクトリの順にマージされ、深い設定が優先">
+      <defs>
+        <linearGradient id="hg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f3a6b"/></linearGradient>
+        <linearGradient id="hg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f5e4f"/><stop offset="1" stop-color="#3a5e4a"/></linearGradient>
+        <linearGradient id="hg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#5e3a4a"/></linearGradient>
+      </defs>
+      <g font-family="sans-serif">
+        <rect x="40" y="24" width="600" height="50" rx="12" fill="url(#hg1)" stroke="#3a4a78"/>
+        <text x="60" y="46" fill="#cfe0ff" font-size="14" font-weight="700">~/CLAUDE.md</text>
+        <text x="60" y="64" fill="#9fb4e8" font-size="11.5">ユーザー全体の共通設定（常に読み込み）</text>
+
+        <rect x="90" y="86" width="600" height="50" rx="12" fill="url(#hg2)" stroke="#3a6a55"/>
+        <text x="110" y="108" fill="#dffff2" font-size="14" font-weight="700">プロジェクトルートの CLAUDE.md</text>
+        <text x="110" y="126" fill="#9fe8c8" font-size="11.5">プロジェクト共通の規約</text>
+
+        <rect x="140" y="148" width="600" height="50" rx="12" fill="url(#hg3)" stroke="#6a4a6e"/>
+        <text x="160" y="170" fill="#ffe2ef" font-size="14" font-weight="700">サブディレクトリの CLAUDE.md</text>
+        <text x="160" y="188" fill="#e8b9d0" font-size="11.5">モジュール固有の規約（最優先）</text>
+
+        <line x1="770" y1="34" x2="770" y2="188" stroke="#ff8a4c" stroke-width="2.5" marker-end="url(#hav)"/>
+        <text x="784" y="100" fill="#ff8a4c" font-size="12" font-weight="700" transform="rotate(90 784 100)">深いほど優先</text>
+      </g>
+      <marker id="hav" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker>
+    </svg>
+    <p class="desc">複数のCLAUDE.mdが存在する場合、それぞれの内容がマージされて適用され、より具体的な（深い階層の）設定が優先されるため、プロジェクト全体のルールをルートに書き、特定モジュール固有のルールをサブディレクトリに書く、という使い分けができる。</p>
+
+    <div class="subhead">チーム共有用とローカル用の使い分け</div>
+    <div class="gtable">
+      <div class="gt-scroll">
+        <table>
+          <thead><tr><th>種類</th><th>ファイル名</th><th>Git管理</th><th>用途</th></tr></thead>
+          <tbody>
+            <tr><td>チーム共有</td><td>CLAUDE.md</td><td>する</td><td>コーディング規約、アーキテクチャ方針、禁止事項</td></tr>
+            <tr><td>ローカル</td><td>CLAUDE.local.md</td><td>しない（.gitignoreに追加）</td><td>個人の作業メモ、好みの設定、実験的なルール</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="desc">チーム共有のCLAUDE.mdをGitで管理することで、チーム全員のClaude Codeが同じルールで動作する。コーディング規約が更新されたら、CLAUDE.mdも一緒に更新してコミットすることで、ルールの変更がチーム全体に即座に反映される。</p>
+
+    <div class="subhead">効果的なCLAUDE.mdの書き方のコツ</div>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p>具体例を必ず添えるー「lowerCamelCaseを使う」だけでなく、良い例・悪い例を併記する</p></div>
+      <div class="li"><div class="n">2</div><p>禁止事項には理由を書くー「RuntimeException禁止」だけでなく「HTTPステータスコードの自動マッピングのため」と理由を書く</p></div>
+      <div class="li"><div class="n">3</div><p>プロジェクトの文脈を最初に書くー技術スタック、全体構成、依存関係など、プロジェクトの前提情報があるとAIの出力精度が上がる</p></div>
+      <div class="li"><div class="n">4</div><p>短く保つーCLAUDE.mdが長すぎると、重要なルールが埋もれるため、A4で1～2ページ程度が目安</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== 学び ===================== -->
+  <section>
+    <div class="eyebrow">Lessons ／ 学び</div>
+    <h2 class="sec">この章で田中さんが得たもの</h2>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p>CLAUDE.mdを書く作業は、チームの暗黙知を言語化する作業でもある</p></div>
+      <div class="li"><div class="n">2</div><p>チーム全体のルールはCLAUDE.mdに、自分だけの好みはCLAUDE.local.mdに</p></div>
+      <div class="li"><div class="n">3</div><p>例外処理のルール一つとっても、「CustomExceptionを使う」だけでは不十分で、理由まで書いて初めて、AIは適切な例外クラスを選べるようになる</p></div>
+      <div class="li"><div class="n">4</div><p>チーム共有のコマンドは .claude/commands/ に置いてGitで管理するため、チーム全員が同じコマンドを使える。個人用のコマンドは ~/.claude/commands/ に置くため、どのプロジェクトでも使える。</p></div>
+      <div class="li"><div class="n">5</div><p>CLAUDE.mdでルールを教え、Skillsで作業を定型化する</p></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===================== 次回予告 ===================== -->
+  <section>
+    <div class="eyebrow">Next ／ 次回予告</div>
+    <h2 class="sec">動く。ルールも守れる。——でも、テストが無い。</h2>
+    <div class="novel cliff">
+      <span class="qmark">&#8220;</span>
+      <p>「プロトタイプは動く。ルールも守れるようになった。テストは試しに1つ書いた。でも——それだけだ。」</p>
+      <p>河野PMから、このまま本番運用に引き上げたいと依頼を受けた田中さん。だが、サービス層のロジック、APIのバリデーション、エラーハンドリング……その全部にテストを書くとなると、一人でやったら一体、何日かかるのか。</p>
+      <p>膨れあがる工数を前に、田中さんはこのあと、AI協働テストの核心に触れることになる——。</p>
+      <div class="tbc">― To be continued ―</div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ストーリーで覚えるClaude Code開発ガイド ─ 第5章</title>
+<style>
+  :root{
+    --bg:#0f1020;
+    --bg2:#15172b;
+    --panel:#1b1e36;
+    --panel2:#232746;
+    --ink:#e9e9f2;
+    --ink-dim:#b9bad0;
+    --ink-mute:#8688a8;
+    --line:#2c2f50;
+    --accent:#ff8a4c;
+    --accent2:#ff5e8a;
+    --violet:#9a7bff;
+    --teal:#54d6c4;
+    --gold:#ffd479;
+    --code-bg:#0c0d1a;
+    --novel: "Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+    --gothic: "Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans JP",sans-serif;
+    --mono: "Consolas","SFMono-Regular","Menlo","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(154,123,255,.18), transparent 60%),
+      radial-gradient(1000px 500px at -10% 10%, rgba(255,138,76,.16), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--gothic);
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px 90px}
+  section{margin:64px 0}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    margin:0 -22px;
+    padding:0;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .art{display:block;width:100%;height:auto}
+  .hero .overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:34px 30px 30px;
+    background:linear-gradient(180deg,transparent 35%, rgba(15,16,32,.55) 70%, rgba(15,16,32,.92));
+  }
+  .badge{
+    display:inline-block;font-size:.74rem;letter-spacing:.28em;
+    color:var(--gold);border:1px solid rgba(255,212,121,.5);
+    padding:5px 14px;border-radius:999px;margin-bottom:14px;width:max-content;
+    background:rgba(255,212,121,.06);
+  }
+  .booktitle{
+    font-family:var(--novel);
+    font-size:clamp(1.5rem,4.6vw,2.5rem);
+    font-weight:700;margin:0;line-height:1.4;
+    text-shadow:0 2px 24px rgba(0,0,0,.6);
+  }
+  .booktitle .em{
+    background:linear-gradient(90deg,var(--accent),var(--accent2) 60%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .chapline{margin-top:10px;color:var(--ink-dim);font-family:var(--novel);font-size:1.02rem}
+
+  /* ===== headings ===== */
+  .eyebrow{
+    display:flex;align-items:center;gap:12px;
+    font-size:.8rem;letter-spacing:.24em;color:var(--accent);
+    text-transform:uppercase;margin-bottom:8px;font-weight:700;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--accent),transparent);display:inline-block}
+  h2.sec{
+    font-family:var(--novel);
+    font-size:clamp(1.4rem,3.4vw,1.9rem);
+    margin:.1em 0 .2em;font-weight:700;
+  }
+  .lead{color:var(--ink-dim);font-size:1.02rem;margin-top:.2em}
+
+  /* ===== characters ===== */
+  .premise{
+    font-family:var(--novel);font-size:1.08rem;color:var(--ink-dim);
+    border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:22px 0 30px;
+  }
+  .chars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .char{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:18px;
+    display:flex;gap:14px;align-items:center;
+    transition:transform .18s ease,border-color .18s ease;
+  }
+  .char:hover{transform:translateY(-3px);border-color:var(--violet)}
+  .char .av{flex:0 0 64px}
+  .char .nm{font-weight:700;font-size:1.08rem}
+  .char .role{font-size:.82rem;color:var(--accent);margin-top:2px;letter-spacing:.04em}
+
+  /* ===== novel blocks ===== */
+  .novel{
+    position:relative;
+    font-family:var(--novel);
+    font-size:1.16rem;line-height:2.15;
+    background:
+      radial-gradient(600px 300px at 100% 0%, rgba(255,94,138,.10), transparent 60%),
+      linear-gradient(180deg,var(--bg2),#101327);
+    border:1px solid var(--line);border-radius:20px;
+    padding:40px 38px;
+    color:#f0eef7;
+    box-shadow:0 20px 60px -30px rgba(0,0,0,.8);
+  }
+  .novel p{margin:0 0 1.25em;text-indent:1em}
+  .novel p:last-child{margin-bottom:0}
+  .novel .qmark{
+    position:absolute;top:8px;left:18px;font-size:5rem;line-height:1;
+    color:rgba(154,123,255,.18);font-family:Georgia,serif;pointer-events:none;
+  }
+  .novel.cliff{
+    background:
+      radial-gradient(600px 300px at 0% 100%, rgba(255,138,76,.12), transparent 60%),
+      linear-gradient(180deg,#120f22,#0c0a18);
+    border-color:#3a2a48;
+  }
+  .tbc{
+    text-align:right;margin-top:24px;font-family:var(--novel);
+    color:var(--gold);letter-spacing:.18em;font-size:1.05rem;
+  }
+
+  /* ===== scene steps ===== */
+  .steps{position:relative;margin-top:10px}
+  .step{
+    position:relative;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;padding:24px 26px;margin:20px 0;
+  }
+  .step::before{
+    content:attr(data-no);
+    position:absolute;top:-16px;left:24px;
+    width:46px;height:46px;border-radius:12px;
+    display:grid;place-items:center;font-weight:800;font-size:1.15rem;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0c00;box-shadow:0 8px 22px -8px rgba(255,94,138,.7);
+  }
+  .step h3{margin:14px 0 6px;font-size:1.18rem;font-weight:700}
+  .step .desc{color:var(--ink-dim);margin:10px 0 0}
+
+  .prompt{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;overflow:hidden;
+  }
+  .prompt .bar{
+    display:flex;align-items:center;gap:7px;padding:9px 14px;
+    background:#11132a;border-bottom:1px solid #1d2138;
+  }
+  .prompt .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .dot-r{background:#ff5f57}.dot-y{background:#febc2e}.dot-g{background:#28c840}
+  .prompt .bar span{margin-left:8px;color:var(--ink-mute);font-size:.76rem;font-family:var(--mono);letter-spacing:.04em}
+  .prompt pre{
+    margin:0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#d7e3ff;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .code{
+    background:var(--code-bg);border:1px solid #1d2138;border-radius:12px;
+    margin:14px 0 0;padding:16px 18px;overflow-x:auto;
+    font-family:var(--mono);font-size:.9rem;line-height:1.7;color:#cfe;
+    white-space:pre;
+  }
+
+  /* novice callout */
+  .nv{
+    margin-top:16px;border-radius:12px;padding:14px 16px 14px 16px;
+    background:linear-gradient(180deg,rgba(84,214,196,.08),rgba(84,214,196,.03));
+    border:1px solid rgba(84,214,196,.3);
+  }
+  .nv .nvh{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--teal);font-size:.92rem;margin-bottom:6px}
+  .nv ul{margin:0;padding-left:1.2em}
+  .nv li{margin:.32em 0;color:var(--ink-dim);font-size:.95rem}
+  .nv li b{color:var(--ink)}
+
+  .highlight-band{
+    margin-top:26px;
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    border:1px solid rgba(255,138,76,.35);border-radius:16px;
+    padding:20px 24px;font-size:1.05rem;display:flex;gap:14px;align-items:flex-start;
+  }
+  .highlight-band .ic{font-size:1.6rem;line-height:1}
+  .highlight-band b{color:var(--gold)}
+
+  /* ===== column compare ===== */
+  .col-fig{margin:8px 0 22px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0e1024}
+  .col-fig svg{display:block;width:100%;height:auto}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cmp{
+    border-radius:16px;padding:20px;border:1px solid var(--line);
+  }
+  .cmp.tool{background:linear-gradient(160deg,#161a30,#11132a)}
+  .cmp.agent{background:linear-gradient(160deg,#1d1630,#160f28);border-color:#3a2a52}
+  .cmp h4{margin:0 0 8px;font-size:1.08rem;display:flex;align-items:center;gap:8px}
+  .cmp.tool h4{color:var(--teal)}
+  .cmp.agent h4{color:var(--violet)}
+  .cmp p{margin:0;color:var(--ink-dim);font-size:.97rem}
+
+  /* ===== feature table ===== */
+  .feat{display:grid;gap:12px}
+  .feat .row{
+    display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    transition:border-color .15s ease,transform .15s ease;
+  }
+  .feat .row:hover{border-color:var(--accent);transform:translateX(4px)}
+  .feat .k{display:flex;align-items:center;gap:11px;font-weight:700}
+  .feat .k .ei{font-size:1.3rem}
+  .feat .v{color:var(--ink-dim);font-size:.96rem}
+
+  /* ===== learnings ===== */
+  .learn{display:grid;gap:14px}
+  .learn .li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-left:4px solid var(--gold);
+    border-radius:0 14px 14px 0;padding:18px 20px;
+  }
+  .learn .li .n{
+    flex:0 0 34px;height:34px;border-radius:9px;display:grid;place-items:center;
+    background:rgba(255,212,121,.14);color:var(--gold);font-weight:800;
+  }
+  .learn .li p{margin:0;font-size:1.02rem}
+
+  .divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:8px 0}
+
+  @media (max-width:620px){
+    .chars{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    .feat .row{grid-template-columns:1fr;gap:6px}
+    .novel{padding:30px 22px;font-size:1.08rem}
+  }
+
+  /* ===== extended components (多様な内容の章向け・追記のみ。既存ルールは不変) ===== */
+  /* section内サブ見出し */
+  .subhead{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--gothic);font-weight:700;font-size:1.06rem;color:var(--ink);
+    margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  .subhead::before{content:"";width:10px;height:10px;border-radius:3px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-block}
+
+  /* 多列データテーブル */
+  .gtable{margin:14px 0 4px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .gtable .gt-scroll{overflow-x:auto}
+  .gtable table{width:100%;border-collapse:collapse;min-width:520px;font-size:.95rem}
+  .gtable th,.gtable td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  .gtable tbody tr:last-child td{border-bottom:none}
+  .gtable thead th{
+    background:linear-gradient(120deg,rgba(255,138,76,.16),rgba(154,123,255,.16));
+    color:var(--gold);font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  }
+  .gtable tbody tr{background:var(--panel)}
+  .gtable tbody tr:nth-child(even){background:var(--panel2)}
+  .gtable tbody tr:hover{background:#272c50}
+  .gtable td{color:var(--ink-dim)}
+  .gtable td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+
+  /* 中立の箇条書きパネル（生成結果・特徴の列挙用。teal の🔰とは別系統） */
+  .flist{
+    margin-top:14px;border-radius:12px;padding:14px 18px;
+    background:linear-gradient(180deg,rgba(154,123,255,.07),rgba(154,123,255,.02));
+    border:1px solid var(--line);
+  }
+  .flist .flh{font-weight:700;color:var(--violet);font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .flist ul{margin:0;padding-left:1.2em}
+  .flist li{margin:.34em 0;color:var(--ink-dim);font-size:.96rem}
+  .flist li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <svg class="art" viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="夕暮れのオフィスで画面に向かうエンジニアと、寄り添うAIの光">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#241a3a"/>
+        <stop offset="0.5" stop-color="#3a2340"/>
+        <stop offset="1" stop-color="#6b3a3a"/>
+      </linearGradient>
+      <radialGradient id="sun" cx="0.78" cy="0.42" r="0.5">
+        <stop offset="0" stop-color="#ffcf8a"/>
+        <stop offset="0.4" stop-color="#ff8a4c" stop-opacity="0.8"/>
+        <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7be0ff"/>
+        <stop offset="1" stop-color="#9a7bff"/>
+      </linearGradient>
+      <radialGradient id="aiglow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#9a7bff" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#9a7bff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="880" height="420" fill="url(#sky)"/>
+    <rect width="880" height="420" fill="url(#sun)"/>
+    <!-- distant city -->
+    <g opacity="0.5" fill="#1c1430">
+      <rect x="40" y="210" width="40" height="120"/>
+      <rect x="95" y="170" width="34" height="160"/>
+      <rect x="140" y="230" width="46" height="100"/>
+      <rect x="700" y="190" width="38" height="140"/>
+      <rect x="748" y="225" width="30" height="105"/>
+      <rect x="788" y="160" width="44" height="170"/>
+    </g>
+    <g opacity="0.65" fill="#ffd479">
+      <rect x="104" y="186" width="6" height="8"/><rect x="116" y="200" width="6" height="8"/>
+      <rect x="798" y="178" width="6" height="8"/><rect x="812" y="196" width="6" height="8"/>
+      <rect x="150" y="246" width="6" height="8"/>
+    </g>
+    <!-- window frame -->
+    <rect x="0" y="120" width="880" height="6" fill="#150f24" opacity="0.6"/>
+    <!-- desk -->
+    <rect x="0" y="330" width="880" height="90" fill="#13101f"/>
+    <rect x="0" y="330" width="880" height="4" fill="#2a2440"/>
+    <!-- monitor -->
+    <g>
+      <rect x="360" y="232" width="190" height="120" rx="8" fill="#0c0d1a" stroke="#33365e" stroke-width="2"/>
+      <rect x="372" y="244" width="166" height="96" rx="4" fill="#10122a"/>
+      <!-- code lines -->
+      <g opacity="0.9">
+        <rect x="384" y="256" width="60" height="6" rx="3" fill="url(#screen)"/>
+        <rect x="384" y="270" width="100" height="6" rx="3" fill="#54d6c4" opacity="0.7"/>
+        <rect x="396" y="284" width="78" height="6" rx="3" fill="#ffd479" opacity="0.7"/>
+        <rect x="396" y="298" width="110" height="6" rx="3" fill="#ff8a4c" opacity="0.6"/>
+        <rect x="384" y="312" width="54" height="6" rx="3" fill="#9a7bff" opacity="0.8"/>
+        <rect x="384" y="326" width="92" height="6" rx="3" fill="url(#screen)" opacity="0.6"/>
+      </g>
+      <rect x="448" y="352" width="14" height="16" fill="#0c0d1a"/>
+      <rect x="424" y="368" width="62" height="6" rx="3" fill="#0c0d1a"/>
+    </g>
+    <!-- engineer silhouette -->
+    <g fill="#0a0712">
+      <ellipse cx="250" cy="372" rx="70" ry="48"/>
+      <circle cx="250" cy="300" r="30"/>
+      <path d="M205 372 q45 -70 90 0 z"/>
+    </g>
+    <!-- AI glow companion -->
+    <circle cx="610" cy="250" r="60" fill="url(#aiglow)"/>
+    <g transform="translate(610,250)">
+      <circle r="20" fill="#150f28" stroke="#9a7bff" stroke-width="2"/>
+      <circle r="6" cy="-3" fill="#9a7bff"/>
+      <path d="M-9 6 q9 9 18 0" stroke="#9a7bff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <g stroke="#c9b6ff" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="-20" x2="0" y2="-30"/>
+        <circle cx="0" cy="-33" r="3" fill="#c9b6ff"/>
+      </g>
+    </g>
+    <!-- connecting spark line -->
+    <path d="M300 300 Q450 250 590 252" stroke="#ff8a4c" stroke-width="2" stroke-dasharray="2 8" fill="none" opacity="0.7" stroke-linecap="round"/>
+  </svg>
+  <div class="overlay">
+    <span class="badge">STORY &nbsp;DEV&nbsp; GUIDE</span>
+    <h1 class="booktitle">ストーリーで覚える<br><span class="em">Claude Code</span> 開発ガイド</h1>
+    <p class="chapline">― 第 5 章 　並列で挑む大規模リファクタリングと、ひとつの過ち ―</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== CHARACTERS ===================== -->
+  <section>
+    <div class="eyebrow">Characters</div>
+    <h2 class="sec">主な登場人物</h2>
+    <p class="premise">真面目で堅実な若手エンジニアである田中さんが、頼れる先輩・佐藤さんの助けを借りながら、技術的な課題を一つひとつ乗り越えていく物語。</p>
+
+    <div class="chars">
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#243b6b"/><circle cx="32" cy="26" r="12" fill="#dfe7ff"/><path d="M12 60 q20 -26 40 0z" fill="#9fb4e8"/><rect x="20" y="20" width="24" height="6" rx="3" fill="#1a2746"/></svg>
+        <div><div class="nm">田中 優太</div><div class="role">主人公</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5a2f5e"/><circle cx="32" cy="26" r="12" fill="#ffe2ef"/><path d="M12 60 q20 -26 40 0z" fill="#e89fc4"/><path d="M19 24 q13 -16 26 0 l-3 8 q-10 -10 -20 0z" fill="#3a1f3e"/></svg>
+        <div><div class="nm">佐藤 美咲</div><div class="role">メンター</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#2f5e4f"/><circle cx="32" cy="26" r="12" fill="#dffff2"/><path d="M12 60 q20 -26 40 0z" fill="#9fe8c8"/><rect x="22" y="30" width="20" height="4" rx="2" fill="#163a2c"/></svg>
+        <div><div class="nm">河野 拓実</div><div class="role">プロジェクトマネージャー</div></div>
+      </div>
+      <div class="char">
+        <svg class="av" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#5e4a2f"/><circle cx="32" cy="27" r="12" fill="#fff1dd"/><path d="M12 60 q20 -26 40 0z" fill="#e8c89f"/><path d="M22 22 q10 -8 20 0 l-2 6 q-8 -6 -16 0z" fill="#3a2c16"/></svg>
+        <div><div class="nm">高橋 部長</div><div class="role">上司</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== あらすじ ===================== -->
+  <section>
+    <div class="eyebrow">Prologue ／ あらすじ</div>
+    <h2 class="sec">二週間と、数十ファイルの宿題。</h2>
+    <div class="novel">
+      <span class="qmark">&#8220;</span>
+      <p>コードベースを理解し、バグも直せるようになった。それでも田中の前には、まだ重い宿題が積まれていた。数十ファイルにまたがるリファクタリング。テストはある。けれど、一人で全部を終わらせるには重すぎる。「——二週間で、間に合うのか」。確信は、どこにもなかった。</p>
+      <p>再び、田中は佐藤さんのもとへ足を運ぶ。事情を打ち明けると、佐藤さんは二つの言葉を差し出した。「“Subagent”と、“git worktree”」。それを使えば、複数の作業を並列に進めていける——そう、佐藤さんは言う。</p>
+      <p>教わったとおり、田中は作業を走らせ始めた。複数のタスクが同時に動き、影響範囲の分析が並んで進んでいく。順調だった。あまりにも、順調だった。——そのとき、ひとつの過ちが、静かに混ざり込んでいたことに、田中はまだ気づいていない。</p>
+      <p>果たして、その失敗をうまく乗り切ることができるのか。そして、二週間という期限に、間に合うのか——。</p>
+    </div>
+  </section>
+
+  <!-- ===================== 何をしていたか ===================== -->
+  <section>
+    <div class="eyebrow">What happened ／ 舞台裏</div>
+    <h2 class="sec">田中さんが Claude Code を使って行っていたこと</h2>
+    <p class="lead">並列で動かし、慌てず捌き、そして自分の手で確かめる。田中さんと Claude Code のやり取りを、順を追って覗いてみよう。<br><b style="color:var(--ink)">Claude Code とは</b> ── 指示を日本語で書くだけで、コードを設計し、ファイルを作り、修正までしてくれる「AIの開発パートナー」のこと。</p>
+
+    <div class="steps">
+
+      <!-- STEP 1 -->
+      <div class="step" data-no="①">
+        <h3>Subagentを意識した指示</h3>
+        <p class="desc">まずはgit worktreeの準備。リファクタリング専用の作業ディレクトリを作る。</p>
+<div class="code"># リファクタリング用のworktreeを作成
+  git worktree add ../project-refactor feature/refactor-order
+
+# 作成されたworktreeを確認
+  git worktree list</div>
+        <p class="desc">ターミナルに2つのディレクトリが表示され、メインのディレクトリは main ブランチのまま。何かあればすぐにhotfixブランチを切れる状態であることを確認。</p>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>OrderServiceモジュールのリファクタリングを段階的に実行して。
+ 1. まず影響範囲を分析して
+ 2. 次にインターフェースを統一して
+ 3. 最後に実装を整理して
+各段階の結果を報告して。</pre>
+        </div>
+        <p class="desc">Claude Codeが動き始め、ターミナルの表示が変わり、Task toolを使って内部で複数のSubagentが立ち上がっている様子が見える。</p>
+        <p class="desc">普段のClaude Codeは1つの処理を順番に進めていくが、今回は複数のタスクが同時に走っている。ターミナルには各Subagentの進捗がリアルタイムで表示され、影響範囲の分析と依存関係の洗い出しが並列で進んでいき、数分後、最初の報告が返ってきた。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ ─ ここに出てくる言葉</div>
+          <ul>
+            <li><b>リファクタリング</b>：動きは変えずに、コードの形をきれいに整え直すこと。</li>
+            <li><b>git worktree</b>：1つのリポジトリを、複数のフォルダに同時に開いておける仕組み。フォルダごとに別のブランチを触れる。</li>
+            <li><b>ブランチ</b>：作業を枝分かれさせておく場所。main は本番用、hotfix は緊急修正用、といった具合に分ける。</li>
+            <li><b>Subagent（Task tool）</b>：Claude Code が内部でもう一人の自分を起ち上げ、複数の作業を同時に進める機能。</li>
+            <li><b>インターフェース</b>：部品どうしが繋がるための“約束ごと”（メソッドの名前・引数・戻り値の形）。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-no="②">
+        <h3>追加の指示</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>この変更はORDER_STATUSのenum定義にも影響するから、そっちも確認して」</pre>
+        </div>
+        <p class="desc">Claude Codeはすぐにenum定義の確認をSubagentに追加し、関連する変更箇所も洗い出してくれた。そして、インターフェースの統一が完了し、田中さんはGit diffで変更内容をざっと確認し、コミットした。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ</div>
+          <ul>
+            <li><b>enum（列挙型）</b>：「注文中／発送済／キャンセル」のように、決まった選択肢の集合を表す型。</li>
+            <li><b>Git diff</b>：変更前と変更後の差分を一覧で見せてくれるコマンド。コミット前のレビューに使う。</li>
+            <li><b>コミット</b>：変更内容に区切りをつけて記録として残す操作。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-no="③">
+        <h3>至急の対応</h3>
+        <div class="prompt">
+          <div class="bar"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i><span>田中さん → Claude Code</span></div>
+<pre>@channel 本番のログイン画面が崩れています。至急対応お願いします。</pre>
+        </div>
+        <p class="desc">以前の田中さんなら、リファクタリングの途中でstashして、mainに切り替えて、終わったら戻してと、そのたびに「さっきどこまでやったっけ」と混乱していたが、今は違う。</p>
+        <p class="desc">田中さんはリファクタリングの作業ディレクトリをそのまま残し、メインのディレクトリに移動。ログイン画面のCSSが最近のデプロイで崩れていた問題を特定し、修正。テストを実行して問題ないことを確認し、PRを作成して完了。わずか約30分で終了した。</p>
+        <p class="desc">hotfixが片付いたら、リファクタリングの作業ディレクトリに戻るだけで、作業状態はそのまま、何も失われていない。</p>
+        <div class="nv">
+          <div class="nvh">🔰 はじめての人へ</div>
+          <ul>
+            <li><b>stash</b>：作業途中の変更を一時的に棚上げしておく機能。ブランチを切り替えるときに使うが、戻し忘れて混乱しがち。</li>
+            <li><b>hotfix</b>：本番で起きた不具合を、緊急で直すための作業（やそのブランチ）。</li>
+            <li><b>PR（プルリクエスト）</b>：「この変更を取り込んでほしい」とレビューを依頼する仕組み。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-no="④">
+        <h3>想定外の変更を発見</h3>
+        <p class="desc">成果をレビューするためにターミナルを開くと、OrderRepositoryの findByCustomerId メソッドのシグネチャが変わっていて、戻り値がList&lt;Order&gt;から Optional&lt;List&lt;Order&gt;&gt; に変更されていた。</p>
+        <p class="desc">インターフェース統一の一環として、Claude Codeが「統一的に」Optionalで包んでしまっていた。OrderService内部では問題なく動いており、テストも通っているが、リファクタリングの対象外だったPaymentServiceのテストには、OrderRepositoryの findByCustomerId を直接呼び出すケースが含まれていない。</p>
+        <p class="desc">案の定、PaymentService.java の中で findByCustomerId の戻り値をList&lt;Order&gt;として受け取っている箇所があり、コンパイルは通っているが、実行時に型の不整合が起きる可能性がある。</p>
+        <p class="desc">田中さんはClaude Codeに修正を指示。PaymentService の呼び出し箇所を Optional に対応させ、テストも追加。さらに、同じ問題を繰り返さないよう、CLAUDE.mdに「リファクタリング時は対象モジュールの呼び出し元への影響を必ず確認すること」というルールを追加した。</p>
+
+        <!-- flow figure — パレット固定 -->
+        <svg viewBox="0 0 820 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;margin-top:18px" role="img" aria-label="Subagentは指示された範囲では正確だが、対象外モジュールへの波及は人が確認する">
+          <defs>
+            <linearGradient id="fg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#243b6b"/><stop offset="1" stop-color="#2f5e4f"/></linearGradient>
+            <linearGradient id="fg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a2f5e"/><stop offset="1" stop-color="#5e4a2f"/></linearGradient>
+            <linearGradient id="fg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f5e4f"/><stop offset="1" stop-color="#3a2f6b"/></linearGradient>
+          </defs>
+          <g font-family="sans-serif">
+            <rect x="6" y="30" width="246" height="92" rx="14" fill="url(#fg1)" stroke="#3a4a78"/>
+            <text x="28" y="58" fill="#cfe0ff" font-size="15" font-weight="700">1. 指示した範囲</text>
+            <text x="28" y="82" fill="#9fb4e8" font-size="11.5">OrderService の中は正確に</text>
+            <text x="28" y="100" fill="#9fb4e8" font-size="11.5">統一され、テストも通る</text>
+
+            <rect x="288" y="30" width="246" height="92" rx="14" fill="url(#fg2)" stroke="#6a4a6e"/>
+            <text x="310" y="58" fill="#ffe2ef" font-size="15" font-weight="700">2. 想定外のシグネチャ変更</text>
+            <text x="310" y="82" fill="#e8b9d0" font-size="11.5">戻り値が「統一的に」</text>
+            <text x="310" y="100" fill="#e8b9d0" font-size="11.5">Optional で包まれていた</text>
+
+            <rect x="570" y="30" width="244" height="92" rx="14" fill="url(#fg3)" stroke="#4a4a8a"/>
+            <text x="592" y="58" fill="#dcd2ff" font-size="15" font-weight="700">3. 対象外への波及</text>
+            <text x="592" y="82" fill="#bcb0e8" font-size="11.5">PaymentService で型が不整合</text>
+            <text x="592" y="100" fill="#bcb0e8" font-size="11.5">＝人の目で grep して確認</text>
+
+            <path d="M256 76 l28 0" stroke="#ff8a4c" stroke-width="3" marker-end="url(#ar)"/>
+            <path d="M538 76 l28 0" stroke="#ff8a4c" stroke-width="3" marker-end="url(#ar)"/>
+          </g>
+          <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker></defs>
+        </svg>
+
+        <div class="nv">
+          <div class="nvh">🔰 いま起きたこと（原文の解説）</div>
+          <ul>
+            <li><b>シグネチャ</b>：メソッドの“顔つき”＝名前・引数・戻り値の型のこと。ここが変わると呼び出し側にも影響する。</li>
+            <li><b>Optional&lt;T&gt;</b>：「値があるかもしれないし、無いかもしれない」を表す入れ物。中身を取り出すには一手間かかる。</li>
+            <li><b>コンパイルは通るが実行時に不整合</b>：型の包み方が食い違うと、ビルドは成功しても動かした瞬間に壊れる恐れがある。</li>
+            <li><b>CLAUDE.md</b>：プロジェクトのルールを書いておくと、Claude Code がそれを踏まえて動いてくれる“約束ごと”のファイル。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- highlight: ●まとめ行 + ルーティン -->
+    <div class="highlight-band">
+      <span class="ic">🔁</span>
+      <div>この日から、田中さんは<b>Subagentの実行後に必ず以下のルーティン</b>を踏むようになった。</div>
+    </div>
+    <div class="flist">
+      <div class="flh">🧭 Subagent実行後のルーティン</div>
+      <ul>
+        <li><b>1.</b> git diff --stat で変更ファイルの全体像を把握する</li>
+        <li><b>2.</b> 変更の「意図」と「実際」を照合する</li>
+        <li><b>3.</b> 対象外モジュールへの影響を grep で確認する</li>
+        <li><b>4.</b> コミットを小さく区切り、1コミット=1変更にする</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== コラム ===================== -->
+  <section>
+    <div class="eyebrow">Column ／ コラム</div>
+    <h2 class="sec">AI出力のレビューチェックリスト</h2>
+    <p class="lead">並列で速く動けるようになったぶん、見落としも生まれやすい。AIの成果を世に出す前に、自分の目で通すべき5つの観点を並べてみよう。</p>
+
+    <div class="flist">
+      <div class="flh">✅ 変更範囲は指示通りか（スコープの確認）</div>
+      <ul>
+        <li>指示した範囲だけが変更されているか。意図しないファイルが含まれていないか。</li>
+      </ul>
+    </div>
+    <div class="flist">
+      <div class="flh">✅ 意図しないシグネチャ変更はないか</div>
+      <ul>
+        <li>メソッドの引数型、戻り値型、アクセス修飾子が勝手に変わっていないか。</li>
+      </ul>
+    </div>
+    <div class="flist">
+      <div class="flh">✅ テスト対象外のモジュールへの影響は？</div>
+      <ul>
+        <li>変更したモジュールを参照している他のモジュールに影響はないか。grep で呼び出し箇所を確認する。</li>
+      </ul>
+    </div>
+    <div class="flist">
+      <div class="flh">✅ コミット単位は適切か（1コミット=1変更）</div>
+      <ul>
+        <li>複数の変更が1つのコミットに混ざっていないか。後から切り戻しやすい粒度になっているか。</li>
+      </ul>
+    </div>
+    <div class="flist">
+      <div class="flh">✅ CLAUDE.mdの規約に沿っているか</div>
+      <ul>
+        <li>命名規則、例外処理のルール、アーキテクチャ方針など、プロジェクト固有のルールが守られているか。</li>
+      </ul>
+    </div>
+
+    <p class="lead" style="margin-top:18px">このチェックリストは完璧ではない。プロジェクトに応じて項目を追加・修正する。大切なのは「チェックリストを持つこと」そのもの。レビューの習慣化が、AI協働の品質を担保する。</p>
+  </section>
+
+  <!-- ===================== 仕組み（第1章に無い新セクション） ===================== -->
+  <section>
+    <div class="eyebrow">Mechanism ／ 仕組み</div>
+    <h2 class="sec">Subagent（Task tool）とgit worktree</h2>
+
+    <div class="subhead">Subagent（Task tool）とは</div>
+    <p class="lead">Claude Codeが内部で別のエージェントを起動し、並列にタスクを実行する機能。ユーザーが「段階的にやって」「複数の観点で分析して」と指示すると、Claude Codeは自律的にTask toolを使い、複数のSubagentを立ち上げる。</p>
+
+    <div class="feat">
+      <div class="row"><div class="k"><span class="ei">🔍</span>影響範囲分析</div><div class="v">対象モジュールを参照している全ファイルを洗い出す</div></div>
+      <div class="row"><div class="k"><span class="ei">✅</span>テスト追加</div><div class="v">既存コードに対するテストケースを並列で生成する</div></div>
+      <div class="row"><div class="k"><span class="ei">✍️</span>コード書き換え</div><div class="v">インターフェースの統一や実装の整理を段階的に実行する</div></div>
+    </div>
+
+    <p class="lead" style="margin-top:18px">Subagentは「指示された範囲」では正確に動作するが、「指示されていない範囲」への影響は自動ではカバーしきれない。必ずレビューとセットで使うことが重要。</p>
+
+    <div class="subhead">git worktreeとは</div>
+    <p class="lead">1つのリポジトリで、複数のブランチを別のディレクトリに同時展開するGitの機能。</p>
+<div class="code"># worktreeの追加（新しいブランチを別ディレクトリに展開）
+  git worktree add &lt;path&gt; &lt;branch&gt;
+
+  # 例: リファクタリング用
+  git worktree add ../project-refactor feature/refactor-order
+
+  # worktreeの一覧表示
+  git worktree list
+
+  # worktreeの削除（作業完了後）
+  git worktree remove &lt;path&gt;</div>
+    <p class="lead" style="margin-top:18px">通常のブランチ切り替え（git checkout）では、1つのディレクトリで1つのブランチしか作業できないところを、worktreeを使えば、ディレクトリごとに異なるブランチを開けるため、リファクタリングとhotfixを同時並行で進められる。</p>
+
+    <div class="subhead">組み合わせの威力</div>
+    <p class="lead">worktreeで作業ディレクトリを分離+各ディレクトリでClaude Codeを起動＝並行作業が可能</p>
+
+    <!-- 概念図: worktreeで分離 + 各ディレクトリでClaude Code起動 = 並行作業 -->
+    <div class="col-fig">
+      <svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="worktreeで作業ディレクトリを分離し、各ディレクトリでClaude Codeを起動すれば、リファクタリングとhotfixを並行できる">
+        <defs>
+          <linearGradient id="wgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161a30"/><stop offset="1" stop-color="#0e1226"/></linearGradient>
+          <linearGradient id="wgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d1630"/><stop offset="1" stop-color="#120c22"/></linearGradient>
+        </defs>
+        <!-- repo -->
+        <rect x="330" y="14" width="160" height="40" rx="12" fill="#1b2240" stroke="#3a4a78"/>
+        <text x="410" y="39" fill="#cfe0ff" font-size="14" font-weight="700" font-family="sans-serif" text-anchor="middle">1つのリポジトリ</text>
+        <path d="M380 54 L210 86" stroke="#ff8a4c" stroke-width="2.5" marker-end="url(#war)"/>
+        <path d="M440 54 L612 86" stroke="#ff8a4c" stroke-width="2.5" marker-end="url(#war)"/>
+        <!-- left: refactor worktree -->
+        <rect x="30" y="90" width="360" height="96" rx="16" fill="url(#wgA)" stroke="#2a3050"/>
+        <text x="52" y="120" fill="#54d6c4" font-size="15" font-weight="700" font-family="sans-serif">../project-refactor</text>
+        <text x="52" y="142" fill="#7f93b8" font-size="12" font-family="monospace">feature/refactor-order</text>
+        <text x="52" y="168" fill="#9fb0d0" font-size="12.5" font-family="sans-serif">Claude Code でリファクタリング</text>
+        <!-- right: hotfix worktree -->
+        <rect x="430" y="90" width="360" height="96" rx="16" fill="url(#wgB)" stroke="#3a2a52"/>
+        <text x="452" y="120" fill="#9a7bff" font-size="15" font-weight="700" font-family="sans-serif">main（メイン）</text>
+        <text x="452" y="142" fill="#9385b8" font-size="12" font-family="monospace">hotfix</text>
+        <text x="452" y="168" fill="#b0a0d8" font-size="12.5" font-family="sans-serif">崩れたログイン画面を緊急修正</text>
+        <defs><marker id="war" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 z" fill="#ff8a4c"/></marker></defs>
+      </svg>
+    </div>
+
+    <p class="lead">これにより「リファクタリング中にhotfixが入っても慌てない」「複数の大きな変更を独立して進められる」という開発体験が実現するため、stashで退避→復元を繰り返す日々とはお別れ。</p>
+  </section>
+
+  <!-- ===================== 学び ===================== -->
+  <section>
+    <div class="eyebrow">Lessons ／ 学び</div>
+    <h2 class="sec">この章で田中さんが得たもの</h2>
+    <div class="learn">
+      <div class="li"><div class="n">1</div><p>Subagent（Claude CodeのTask tool）を使えば、Claude Codeが内部で別のエージェントを起動して、複数の作業を並列で進められる</p></div>
+      <div class="li"><div class="n">2</div><p>git worktreeは同じリポジトリの別ブランチを、別のディレクトリとして同時に開ける</p></div>
+      <div class="li"><div class="n">3</div><p>worktreeのおかげで一切慌てることなく、stashで中途半端に退避する必要もない。Subagent、worktreeはもう”AIアシスタント”ではなく”AIチームメンバー”。</p></div>
+      <div class="li"><div class="n">4</div><p>AIに任せっぱなしにしてはいけない。AIは指示された範囲では正確だけど、”指示されていない範囲”への影響まではカバーしきれない。だから、レビューをサボってはいけない。</p></div>
+      <div class="li"><div class="n">5</div><p>Plan modeで計画を立て、テストを生成し、Subagentで並列にリファクタリングし、レビューで品質を確認するサイクルの中でも、一番大事だったのは”レビューを怠らない”という教訓</p></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===================== 次回予告 ===================== -->
+  <section>
+    <div class="eyebrow">Next ／ 次回予告</div>
+    <h2 class="sec">効率化はできた。けれど、チームが使い始めたら——。</h2>
+    <div class="novel cliff">
+      <span class="qmark">&#8220;</span>
+      <p>「AIで効率化はできた。でも——チームメンバーもClaude Codeを使い始めたら……」。田中さんのリファクタリング成功は、社内で静かに注目を集めていた。やがて他のメンバーも、Claude Codeを手に取り始める。</p>
+      <p>すると、AI生成コードのPRが日に日に増えていく。レビューの負荷が、これまでとは違う形で膨らみ始めた。一人の効率化が、チームの課題へと姿を変えていく。</p>
+      <p>——田中さんは新たな方法で、フローワーク設計に踏み込んでいく。</p>
+      <div class="tbc">― To be continued ―</div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
