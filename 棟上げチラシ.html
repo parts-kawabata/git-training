@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>第五工場 棟上げのおしらせ｜株式会社パーツ精工</title>
+<!--
+========================================================================
+ ★差し替え箇所一覧（日程確定後にここを直してください）★
+  1. 日付       … id="date"        現在:「2026年10月吉日（日）」〈仮〉
+  2. 時間       … id="time"        現在:「午前10時 〜 正午」〈仮〉
+  3. 餅まき開始 … id="mochi-time"  現在:「午前11時ごろ」〈仮〉
+  4. 雨天対応   … id="rain"        現在:「雨天時は翌週へ順延予定」〈仮〉
+  5. 会場住所   … id="address"     現在:「○○市○○町 ○丁目 第五工場 建設地」
+  6. 問合せ電話 … id="tel"         現在:「000-000-0000」
+  7. 問合せ担当 … id="contact"     現在:「総務部 ○○」
+========================================================================
+-->
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 210mm; }
+  body {
+    font-family: "UD デジタル教科書体 N-R", "Yu Gothic", "Meiryo", sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: #3a2a14;
+  }
+  .page {
+    position: relative;
+    width: 210mm; height: 297mm;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, #fff6e0 0%, #fffdf4 38%, #eef9ef 100%);
+    padding: 8mm 9mm 7mm;
+    display: flex; flex-direction: column;
+  }
+  /* ---- 紅白の上下帯 ---- */
+  .kohaku {
+    height: 7mm; width: 100%;
+    background: repeating-linear-gradient(135deg,#e53935 0 18px,#ffffff 18px 36px);
+    border-radius: 4px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.08) inset;
+  }
+
+  /* ---- ヘッダー ---- */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 4mm 1mm 0;
+  }
+  .iwai {
+    font-family: "Yu Mincho","MS Mincho",serif;
+    font-weight: 900; font-size: 30px; letter-spacing: 4px;
+    color: #c62828;
+    text-shadow: 1px 1px 0 #ffe082;
+  }
+  .iwai small{ display:block; font-size:12px; letter-spacing:6px; color:#b71c1c; }
+  .company {
+    text-align: right; line-height: 1.3;
+  }
+  .company .nameJp { font-weight: 900; font-size: 17px; color:#1b5e20; }
+  .company .nameEn { font-size: 10px; letter-spacing: 1px; color:#2e7d32; }
+
+  /* ---- メインタイトル ---- */
+  .title-wrap { text-align: center; margin: 3mm 0 2mm; }
+  .title-sub { font-size: 15px; color:#ef6c00; font-weight:700; letter-spacing:2px; }
+  .title-main {
+    font-family:"UD デジタル教科書体 N-B","Yu Gothic UI","Meiryo",sans-serif;
+    font-weight: 900;
+    font-size: 46px; line-height: 1.05;
+    color:#1b3a6b;
+    margin: 1mm 0;
+    text-shadow: 2px 2px 0 #ffd54f, 3px 3px 0 rgba(0,0,0,.08);
+  }
+  .title-main .accent { color:#d84315; }
+  .ruby { font-size: 13px; color:#5d6d7e; letter-spacing:6px; }
+
+  /* ---- ヒーローイラスト ---- */
+  .hero { width: 100%; height: 104mm; margin: 0 0 1mm; }
+
+  /* ---- 餅まきバッジ ---- */
+  .event {
+    position: relative;
+    margin: 0 auto 3mm;
+    width: 95%;
+    background: linear-gradient(180deg,#ffeb3b,#ffc107);
+    border: 3px dashed #e65100;
+    border-radius: 16px;
+    padding: 4mm 5mm;
+    text-align: center;
+    box-shadow: 0 3px 8px rgba(230,81,0,.25);
+  }
+  .event .ttl {
+    font-family:"UD デジタル教科書体 N-B","Yu Gothic",sans-serif;
+    font-weight: 900; font-size: 30px; color:#bf360c;
+    letter-spacing: 2px;
+  }
+  .event .sub { font-size: 15px; font-weight:700; color:#5d4037; margin-top:1mm; }
+  .event .pill {
+    display:inline-block; margin-top:2mm; background:#fff; color:#c62828;
+    border-radius: 999px; padding: 2px 14px; font-weight:900; font-size:14px;
+    border:2px solid #e57373;
+  }
+
+  /* ---- 下段 2カラム ---- */
+  .lower { display: flex; gap: 4mm; flex: 1; }
+  .info, .mapbox {
+    background: #ffffffcc; border-radius: 14px; padding: 4mm 4.5mm;
+    box-shadow: 0 2px 5px rgba(0,0,0,.08);
+  }
+  .info { flex: 1.15; }
+  .mapbox { flex: 1; display:flex; flex-direction:column; }
+  .box-h {
+    font-weight: 900; font-size: 16px; color:#fff;
+    background:#2e7d32; display:inline-block;
+    padding: 2px 12px; border-radius: 999px; margin-bottom: 3mm;
+  }
+  .mapbox .box-h{ background:#1565c0; }
+  .info dl { display: grid; grid-template-columns: auto 1fr; row-gap: 2.6mm; column-gap: 3mm; }
+  .info dt {
+    font-weight: 900; font-size: 13px; color:#fff; background:#ef6c00;
+    border-radius: 6px; padding: 1px 8px; height: fit-content; white-space: nowrap; align-self:start;
+  }
+  .info dd { font-size: 14px; font-weight: 700; line-height: 1.35; color:#3a2a14; }
+  .info dd .kari { font-size:11px; color:#d84315; font-weight:900; }
+  .info .free {
+    margin-top: 3mm; text-align:center; font-weight:900; color:#c62828; font-size:15px;
+    border-top:1px dashed #ddd; padding-top:2.5mm;
+  }
+
+  /* ---- 地図（範囲枠だけ）---- */
+  .maparea {
+    flex:1; position: relative; border: 3px dashed #1565c0; border-radius: 12px;
+    background:
+      linear-gradient(#e3f2fd 0 0) padding-box,
+      repeating-linear-gradient(0deg,transparent 0 11px,#d7eafc 11px 12px),
+      repeating-linear-gradient(90deg,transparent 0 11px,#d7eafc 11px 12px);
+    overflow:hidden; min-height: 40mm;
+  }
+  .map-note { font-size: 11px; color:#1565c0; margin-top: 2mm; line-height:1.4; }
+  .map-foot { display:flex; align-items:center; gap:3mm; margin-top: 2.5mm; }
+  .qr { width: 17mm; height: 17mm; flex:none; border:1px solid #cfd8dc; border-radius:4px; background:#fff; padding:1mm; }
+  .qr svg { width:100%; height:100%; display:block; }
+  .qr-cap { font-size:9.5px; font-weight:900; color:#1565c0; text-align:center; margin-top:0.5mm; }
+  .addr { font-size: 11.5px; color:#37474f; line-height:1.5; }
+  .addr b{ color:#c62828; }
+  .addr .coord { font-size:9.5px; color:#78909c; }
+
+  /* ---- フッター ---- */
+  .footer {
+    margin-top: 3mm; text-align: center; font-size: 12.5px; color:#4e342e; line-height:1.5;
+  }
+  .footer b{ color:#1b5e20; font-size:14px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="kohaku"></div>
+
+  <!-- ヘッダー -->
+  <div class="topbar">
+    <div class="iwai">祝<small>上棟</small></div>
+    <div class="company">
+      <div class="nameJp">株式会社&nbsp;パーツ精工</div>
+      <div class="nameEn">PARTS SEIKO CO., LTD.</div>
+    </div>
+  </div>
+
+  <!-- メインタイトル -->
+  <div class="title-wrap">
+    <div class="title-sub">ご近所のみなさまへ　〜 みんなで見にきてね！ 〜</div>
+    <div class="title-main">新・<span class="accent">第五工場</span>　棟上げの会</div>
+    <div class="ruby">しん だい ご こうじょう　むね あ げ の かい</div>
+  </div>
+
+  <!-- ヒーローイラスト -->
+  <svg class="hero" viewBox="0 0 700 430" xmlns="http://www.w3.org/2000/svg">
+    <!-- 空・太陽 -->
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#bbe9ff"/><stop offset="1" stop-color="#eafaff"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="700" height="360" rx="18" fill="url(#sky)"/>
+    <circle cx="610" cy="70" r="42" fill="#ffd54f"/>
+    <g stroke="#ffd54f" stroke-width="6" stroke-linecap="round">
+      <line x1="610" y1="6" x2="610" y2="22"/><line x1="610" y1="118" x2="610" y2="134"/>
+      <line x1="546" y1="70" x2="562" y2="70"/><line x1="658" y1="70" x2="674" y2="70"/>
+      <line x1="565" y1="25" x2="576" y2="36"/><line x1="644" y1="104" x2="655" y2="115"/>
+      <line x1="655" y1="25" x2="644" y2="36"/><line x1="576" y1="104" x2="565" y2="115"/>
+    </g>
+    <!-- 雲 -->
+    <g fill="#ffffff">
+      <ellipse cx="120" cy="60" rx="46" ry="24"/><ellipse cx="160" cy="66" rx="34" ry="20"/>
+      <ellipse cx="80" cy="70" rx="30" ry="17"/>
+    </g>
+    <!-- 鳥 -->
+    <g stroke="#5d6d7e" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M300 60 q10 -10 20 0 q10 -10 20 0"/>
+      <path d="M360 90 q8 -8 16 0 q8 -8 16 0"/>
+    </g>
+
+    <!-- 紅白幕（上部）-->
+    <g>
+      <rect x="20" y="100" width="660" height="20" fill="#e53935"/>
+      <g fill="#ffffff">
+        <rect x="40" y="100" width="40" height="20"/><rect x="120" y="100" width="40" height="20"/>
+        <rect x="200" y="100" width="40" height="20"/><rect x="280" y="100" width="40" height="20"/>
+        <rect x="360" y="100" width="40" height="20"/><rect x="440" y="100" width="40" height="20"/>
+        <rect x="520" y="100" width="40" height="20"/><rect x="600" y="100" width="40" height="20"/>
+      </g>
+      <g fill="#e53935"><path d="M40 120 l20 14 l20 -14z" opacity="0"/></g>
+    </g>
+
+    <!-- クレーン -->
+    <g stroke="#f9a825" stroke-width="9" fill="none" stroke-linecap="round">
+      <line x1="90" y1="350" x2="90" y2="150"/>
+      <line x1="90" y1="150" x2="300" y2="150"/>
+      <line x1="90" y1="150" x2="220" y2="200"/>
+    </g>
+    <line x1="260" y1="150" x2="260" y2="205" stroke="#7b5e3b" stroke-width="3"/>
+    <!-- 吊られた棟木 -->
+    <rect x="215" y="205" width="120" height="18" rx="4" fill="#a1683a"/>
+    <rect x="215" y="205" width="120" height="6" rx="3" fill="#c08552"/>
+
+    <!-- 建方中の家の骨組み -->
+    <g stroke="#b5793f" stroke-width="11" stroke-linecap="round">
+      <!-- 柱 -->
+      <line x1="380" y1="360" x2="380" y2="230"/>
+      <line x1="470" y1="360" x2="470" y2="230"/>
+      <line x1="560" y1="360" x2="560" y2="230"/>
+      <line x1="650" y1="360" x2="650" y2="230"/>
+      <!-- 梁 -->
+      <line x1="372" y1="232" x2="658" y2="232"/>
+      <!-- 屋根の三角（小屋組）-->
+      <line x1="380" y1="232" x2="470" y2="180"/>
+      <line x1="560" y1="180" x2="470" y2="180"/>
+      <line x1="560" y1="180" x2="650" y2="232"/>
+      <line x1="470" y1="180" x2="470" y2="232"/>
+      <line x1="560" y1="180" x2="560" y2="232"/>
+    </g>
+    <!-- 棟木の上の御幣（飾り）-->
+    <line x1="515" y1="180" x2="515" y2="150" stroke="#8d6e63" stroke-width="4"/>
+    <g fill="#e53935"><path d="M515 150 l-14 -10 l14 -4 l14 4 z"/></g>
+    <rect x="505" y="150" width="20" height="10" fill="#fff" stroke="#bbb"/>
+
+    <!-- 屋根の上で餅をまく職人 -->
+    <g>
+      <circle cx="470" cy="158" r="12" fill="#ffe0b2"/>
+      <rect x="458" y="168" width="24" height="30" rx="6" fill="#1565c0"/> <!-- 法被 -->
+      <rect x="455" y="150" width="30" height="8" rx="3" fill="#fff"/> <!-- 鉢巻 -->
+      <rect x="466" y="148" width="8" height="8" fill="#e53935"/>
+      <!-- 投げる腕 -->
+      <line x1="482" y1="174" x2="505" y2="156" stroke="#ffe0b2" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <!-- 飛んでいる餅・お菓子 -->
+    <g>
+      <circle cx="520" cy="150" r="9" fill="#fff" stroke="#e0c08a"/>
+      <circle cx="548" cy="138" r="8" fill="#fff" stroke="#e0c08a"/>
+      <rect x="498" y="120" width="16" height="11" rx="3" fill="#ff8a65" transform="rotate(20 506 125)"/>
+      <rect x="560" y="160" width="16" height="11" rx="3" fill="#4fc3f7" transform="rotate(-15 568 165)"/>
+      <circle cx="585" cy="185" r="8" fill="#fff" stroke="#e0c08a"/>
+      <rect x="430" y="135" width="15" height="10" rx="3" fill="#ba68c8" transform="rotate(15 437 140)"/>
+      <circle cx="410" cy="165" r="8" fill="#fff" stroke="#e0c08a"/>
+    </g>
+
+    <!-- 地面 -->
+    <rect x="0" y="350" width="700" height="60" rx="0" fill="#cde6b8"/>
+    <rect x="0" y="350" width="700" height="12" fill="#a5d680"/>
+
+    <!-- 手を伸ばす人々（大人と子供）-->
+    <!-- 子供1 -->
+    <g>
+      <circle cx="150" cy="320" r="15" fill="#ffe0b2"/>
+      <path d="M150 318 a15 15 0 0 1 -15 0 q15 -16 15 0" fill="#6d4c41"/>
+      <rect x="138" y="332" width="24" height="30" rx="7" fill="#ff7043"/>
+      <line x1="140" y1="338" x2="125" y2="312" stroke="#ffe0b2" stroke-width="6" stroke-linecap="round"/>
+      <line x1="160" y1="338" x2="175" y2="312" stroke="#ffe0b2" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <!-- 大人 -->
+    <g>
+      <circle cx="220" cy="305" r="17" fill="#ffe0b2"/>
+      <path d="M220 302 a17 17 0 0 1 -17 2 q17 -20 17 0" fill="#3e2723"/>
+      <rect x="205" y="320" width="30" height="42" rx="8" fill="#43a047"/>
+      <line x1="208" y1="328" x2="190" y2="298" stroke="#ffe0b2" stroke-width="7" stroke-linecap="round"/>
+      <line x1="232" y1="328" x2="250" y2="298" stroke="#ffe0b2" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <!-- 子供2（袋を持つ）-->
+    <g>
+      <circle cx="300" cy="322" r="14" fill="#ffe0b2"/>
+      <path d="M300 320 a14 14 0 0 1 -14 0 q14 -15 14 0" fill="#212121"/>
+      <rect x="289" y="334" width="22" height="28" rx="7" fill="#42a5f5"/>
+      <line x1="291" y1="340" x2="278" y2="316" stroke="#ffe0b2" stroke-width="6" stroke-linecap="round"/>
+      <rect x="306" y="338" width="16" height="20" rx="3" fill="#fff59d" stroke="#fbc02d"/>
+      <line x1="309" y1="340" x2="313" y2="334" stroke="#fbc02d" stroke-width="3"/>
+      <line x1="319" y1="340" x2="315" y2="334" stroke="#fbc02d" stroke-width="3"/>
+    </g>
+
+    <!-- 幟（のぼり旗）-->
+    <g>
+      <line x1="660" y1="360" x2="660" y2="250" stroke="#6d4c41" stroke-width="5"/>
+      <path d="M660 250 h32 v70 h-32z" fill="#e53935"/>
+      <text x="676" y="262" font-size="13" fill="#fff" font-weight="900" text-anchor="middle" writing-mode="tb" style="writing-mode:vertical-rl;">祝上棟</text>
+    </g>
+  </svg>
+
+  <!-- 餅まきバッジ -->
+  <div class="event">
+    <div class="ttl">🎉　餅まき・お菓子まき　🎉</div>
+    <div class="sub">屋根の上から、お餅とお菓子をまきます！　子どもも大人も、どなたでも大歓迎！</div>
+    <div class="pill">＼ 袋を持ってあつまれ〜！ ／</div>
+  </div>
+
+  <!-- 下段2カラム -->
+  <div class="lower">
+    <!-- 開催概要 -->
+    <div class="info">
+      <div class="box-h">開催のご案内</div>
+      <dl>
+        <dt>日　付</dt><dd id="date">2026年10月吉日（日）　<span class="kari">〈日程は仮です〉</span></dd>
+        <dt>時　間</dt><dd id="time">午前10時 〜 正午　<span class="kari">〈仮〉</span></dd>
+        <dt>餅まき</dt><dd id="mochi-time">午前11時ごろ スタート予定　<span class="kari">〈仮〉</span></dd>
+        <dt>内容</dt><dd>新しい <b>第五工場の棟上げ（上棟）</b><br>建物の骨組みを組み上げます</dd>
+        <dt>対　象</dt><dd>ご近所のみなさま　どなたでも</dd>
+        <dt>雨天時</dt><dd id="rain">雨天の場合は翌週へ順延予定　<span class="kari">〈仮〉</span></dd>
+      </dl>
+      <div class="free">参加無料 ・ 申込不要 ／ お気軽にお越しください</div>
+    </div>
+
+    <!-- 地図（範囲枠だけ）-->
+    <div class="mapbox">
+      <div class="box-h">会場マップ（道順）</div>
+      <div class="maparea">
+        <svg viewBox="0 0 260 220" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="'Yu Gothic',sans-serif">
+          <!-- 背景 -->
+          <rect x="0" y="0" width="260" height="220" fill="#eef7ee"/>
+
+          <!-- 川内川（北側・上端）-->
+          <rect x="0" y="0" width="260" height="12" fill="#9ccdf0"/>
+          <path d="M0 6 q13 -4 26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0 t26 0" stroke="#fff" stroke-width="1.2" fill="none" opacity="0.7"/>
+          <text x="6" y="9" font-size="7.5" fill="#0d47a1" font-weight="700">川内川（北）</text>
+
+          <!-- 国道3号（東側・縦の主要道）-->
+          <rect x="214" y="0" width="18" height="220" fill="#ffffff" stroke="#cfd8dc"/>
+          <line x1="223" y1="0" x2="223" y2="220" stroke="#ffca28" stroke-width="1.4" stroke-dasharray="6 5"/>
+          <g transform="translate(223,66)">
+            <rect x="-10" y="-10" width="20" height="20" rx="3" fill="#1b5e20"/>
+            <text x="0" y="-2" font-size="5" fill="#fff" text-anchor="middle">国道</text>
+            <text x="0" y="7" font-size="9" fill="#fff" text-anchor="middle" font-weight="900">3</text>
+          </g>
+          <!-- 国道3号の方面ラベル（道路の左隣の緑地に配置）-->
+          <text x="210" y="32" font-size="6.5" fill="#546e7a" text-anchor="end" font-weight="700">川内市街地方面 ↑</text>
+          <text x="210" y="201" font-size="6.5" fill="#546e7a" text-anchor="end" font-weight="700">鹿児島方面 ↓</text>
+
+          <!-- 工場前の道（国道3号から西へ）-->
+          <rect x="36" y="106" width="178" height="15" fill="#ffffff" stroke="#cfd8dc"/>
+          <line x1="36" y1="113.5" x2="214" y2="113.5" stroke="#ffca28" stroke-width="1.2" stroke-dasharray="6 5"/>
+
+          <!-- 順路（赤い破線：国道3号→交差点→工場）-->
+          <polyline points="223,18 223,113 70,113 70,134" fill="none" stroke="#e53935" stroke-width="2.6" stroke-dasharray="7 5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M70 134 l-4 -7 m4 7 l4 -7" fill="none" stroke="#e53935" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- 曲がる交差点 -->
+          <circle cx="214" cy="113" r="4.5" fill="#fff" stroke="#e53935" stroke-width="2"/>
+
+          <!-- 順路の案内（道の上の空きに、BSラベルと離して配置）-->
+          <text x="120" y="92" font-size="7" fill="#c62828" font-weight="900" text-anchor="middle">①国道3号からこの道を西へ</text>
+
+          <!-- バス停（月見団地前）：マーカーは道の上、ラベルは道の下の空き -->
+          <g transform="translate(150,113)">
+            <circle r="5" fill="#fb8c00"/>
+            <text x="0" y="2.5" font-size="6" fill="#fff" text-anchor="middle" font-weight="900">B</text>
+          </g>
+          <text x="150" y="131" font-size="6" fill="#e65100" text-anchor="middle" font-weight="700">月見団地前バス停</text>
+
+          <!-- 工場（目的地）-->
+          <g>
+            <!-- 建物（のこぎり屋根） -->
+            <rect x="44" y="146" width="62" height="22" fill="#b0bec5" stroke="#607d8b" stroke-width="1.5"/>
+            <path d="M44 146 l8 -7 l0 7 z M54 146 l8 -7 l0 7 z M64 146 l8 -7 l0 7 z M74 146 l8 -7 l0 7 z M84 146 l8 -7 l0 7 z M94 146 l8 -7 l0 7 z" fill="#cfd8dc" stroke="#607d8b" stroke-width="1"/>
+            <rect x="56" y="154" width="10" height="14" fill="#eceff1" stroke="#90a4ae"/>
+            <!-- 目的地ピン -->
+            <path d="M75 120 C66 120 62 127 62 132 C62 141 75 154 75 154 C75 154 88 141 88 132 C88 127 84 120 75 120 Z" fill="#e53935" stroke="#b71c1c" stroke-width="1.2"/>
+            <circle cx="75" cy="132" r="5.5" fill="#fff"/>
+            <text x="75" y="135" font-size="8" fill="#c62828" text-anchor="middle" font-weight="900">★</text>
+            <!-- ラベル（少し縮小・左寄せ） -->
+            <rect x="16" y="174" width="124" height="28" rx="5" fill="#fff" stroke="#e53935" stroke-width="2"/>
+            <text x="78" y="186" font-size="9" fill="#c62828" text-anchor="middle" font-weight="900">株式会社パーツ精工</text>
+            <text x="78" y="197" font-size="8.5" fill="#c62828" text-anchor="middle" font-weight="700">鹿児島工場（第五工場）</text>
+          </g>
+
+          <!-- 月見団地（住宅地）-->
+          <g>
+            <g fill="#aed581" stroke="#7cb342" stroke-width="1">
+              <path d="M176 138 l7 -6 l7 6 l0 10 l-14 0 z"/>
+              <path d="M192 138 l7 -6 l7 6 l0 10 l-14 0 z"/>
+              <path d="M184 152 l7 -6 l7 6 l0 10 l-14 0 z"/>
+            </g>
+            <text x="190" y="170" font-size="7" fill="#558b2f" text-anchor="middle" font-weight="700">月見団地</text>
+          </g>
+
+          <!-- 方面案内 -->
+          <g>
+            <text x="6" y="30" font-size="6.8" fill="#37474f" font-weight="700">← JR川内駅（新幹線）</text>
+            <text x="6" y="38" font-size="6.8" fill="#37474f" font-weight="700">　 ・市街地 方面</text>
+            <text x="210" y="186" font-size="6.8" fill="#37474f" font-weight="700" text-anchor="end">JR隈之城駅 ↘</text>
+          </g>
+
+          <!-- 方位（左の空きへ）-->
+          <g transform="translate(14,140)">
+            <circle r="8" fill="#fff" stroke="#1565c0" stroke-width="1.4"/>
+            <path d="M0 -6 L2.4 2.2 L0 0 L-2.4 2.2 Z" fill="#e53935"/>
+            <text x="0" y="-0.8" font-size="5" fill="#1565c0" text-anchor="middle" font-weight="900">N</text>
+          </g>
+
+          <!-- 注記 -->
+          <text x="120" y="216" font-size="6.5" fill="#90a4ae" text-anchor="middle">※周辺の案内図（簡易・縮尺は実際と異なります）</text>
+        </svg>
+      </div>
+      <div class="map-foot">
+        <div>
+          <div class="qr">
+            <svg viewBox="-4 -4 41 41" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+              <rect x="-4" y="-4" width="41" height="41" fill="#ffffff"/>
+              <path fill="#000000" d="M0 0h7v1h-7zM12 0h2v1h-2zM16 0h3v1h-3zM21 0h2v1h-2zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM11 1h2v1h-2zM16 1h1v1h-1zM18 1h1v1h-1zM20 1h2v1h-2zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h1v1h-1zM14 2h2v1h-2zM19 2h3v1h-3zM23 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM14 3h1v1h-1zM16 3h1v1h-1zM18 3h5v1h-5zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM10 4h1v1h-1zM13 4h5v1h-5zM20 4h1v1h-1zM22 4h3v1h-3zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM10 5h1v1h-1zM14 5h2v1h-2zM19 5h1v1h-1zM21 5h2v1h-2zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM11 7h2v1h-2zM14 7h3v1h-3zM19 7h2v1h-2zM22 7h2v1h-2zM0 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM10 8h2v1h-2zM13 8h1v1h-1zM16 8h4v1h-4zM22 8h5v1h-5zM29 8h3v1h-3zM2 9h1v1h-1zM4 9h2v1h-2zM7 9h2v1h-2zM10 9h1v1h-1zM13 9h1v1h-1zM15 9h1v1h-1zM17 9h3v1h-3zM21 9h3v1h-3zM28 9h4v1h-4zM2 10h6v1h-6zM9 10h2v1h-2zM13 10h5v1h-5zM20 10h2v1h-2zM24 10h1v1h-1zM28 10h1v1h-1zM30 10h1v1h-1zM4 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM13 11h1v1h-1zM15 11h5v1h-5zM23 11h1v1h-1zM25 11h6v1h-6zM32 11h1v1h-1zM0 12h2v1h-2zM3 12h1v1h-1zM6 12h2v1h-2zM9 12h1v1h-1zM11 12h3v1h-3zM17 12h1v1h-1zM19 12h2v1h-2zM22 12h1v1h-1zM24 12h3v1h-3zM0 13h2v1h-2zM3 13h3v1h-3zM7 13h2v1h-2zM10 13h4v1h-4zM17 13h2v1h-2zM21 13h4v1h-4zM26 13h1v1h-1zM31 13h2v1h-2zM4 14h1v1h-1zM6 14h1v1h-1zM8 14h2v1h-2zM11 14h1v1h-1zM14 14h4v1h-4zM22 14h1v1h-1zM24 14h3v1h-3zM28 14h1v1h-1zM30 14h2v1h-2zM1 15h2v1h-2zM5 15h1v1h-1zM7 15h1v1h-1zM10 15h1v1h-1zM12 15h1v1h-1zM14 15h1v1h-1zM16 15h1v1h-1zM20 15h1v1h-1zM24 15h2v1h-2zM27 15h2v1h-2zM30 15h1v1h-1zM32 15h1v1h-1zM3 16h2v1h-2zM6 16h2v1h-2zM9 16h1v1h-1zM15 16h3v1h-3zM22 16h1v1h-1zM24 16h2v1h-2zM27 16h3v1h-3zM32 16h1v1h-1zM1 17h1v1h-1zM3 17h1v1h-1zM5 17h1v1h-1zM7 17h6v1h-6zM15 17h1v1h-1zM18 17h3v1h-3zM23 17h4v1h-4zM29 17h2v1h-2zM32 17h1v1h-1zM0 18h1v1h-1zM2 18h2v1h-2zM5 18h2v1h-2zM9 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM17 18h4v1h-4zM23 18h1v1h-1zM27 18h1v1h-1zM29 18h4v1h-4zM0 19h3v1h-3zM5 19h1v1h-1zM7 19h3v1h-3zM11 19h1v1h-1zM13 19h3v1h-3zM19 19h2v1h-2zM23 19h1v1h-1zM28 19h4v1h-4zM2 20h1v1h-1zM4 20h1v1h-1zM6 20h1v1h-1zM8 20h2v1h-2zM11 20h3v1h-3zM15 20h1v1h-1zM18 20h2v1h-2zM28 20h2v1h-2zM0 21h4v1h-4zM5 21h1v1h-1zM7 21h2v1h-2zM10 21h2v1h-2zM14 21h1v1h-1zM17 21h1v1h-1zM20 21h1v1h-1zM23 21h3v1h-3zM28 21h1v1h-1zM30 21h1v1h-1zM0 22h1v1h-1zM2 22h5v1h-5zM9 22h2v1h-2zM12 22h2v1h-2zM20 22h1v1h-1zM22 22h1v1h-1zM25 22h1v1h-1zM27 22h1v1h-1zM29 22h3v1h-3zM0 23h1v1h-1zM2 23h1v1h-1zM4 23h2v1h-2zM9 23h1v1h-1zM11 23h2v1h-2zM15 23h2v1h-2zM22 23h5v1h-5zM30 23h1v1h-1zM32 23h1v1h-1zM0 24h2v1h-2zM3 24h4v1h-4zM9 24h1v1h-1zM11 24h4v1h-4zM19 24h2v1h-2zM23 24h6v1h-6zM31 24h2v1h-2zM8 25h3v1h-3zM12 25h8v1h-8zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h3v1h-3zM0 26h7v1h-7zM11 26h1v1h-1zM15 26h1v1h-1zM17 26h1v1h-1zM20 26h2v1h-2zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h6v1h-6zM16 27h3v1h-3zM22 27h3v1h-3zM28 27h4v1h-4zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM11 28h1v1h-1zM15 28h2v1h-2zM20 28h1v1h-1zM24 28h6v1h-6zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h1v1h-1zM14 29h1v1h-1zM18 29h2v1h-2zM21 29h3v1h-3zM25 29h1v1h-1zM27 29h6v1h-6zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM10 30h1v1h-1zM13 30h3v1h-3zM17 30h3v1h-3zM21 30h1v1h-1zM24 30h1v1h-1zM27 30h2v1h-2zM30 30h3v1h-3zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM12 31h1v1h-1zM23 31h1v1h-1zM27 31h2v1h-2zM30 31h1v1h-1zM0 32h7v1h-7zM8 32h2v1h-2zM11 32h1v1h-1zM13 32h5v1h-5zM19 32h1v1h-1zM22 32h1v1h-1zM24 32h2v1h-2zM27 32h1v1h-1zM29 32h1v1h-1zM31 32h1v1h-1z"/>
+            </svg>
+          </div>
+          <div class="qr-cap">スマホで地図</div>
+        </div>
+        <div class="addr" id="address">
+          <b>会場（鹿児島工場・第五工場）</b><br>
+          住所：薩摩川内市宮里町字高原1792番地<br>
+          <span class="coord">QRコードからGoogleマップで道案内できます（座標 31.8151, 130.2869）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <div class="footer">
+    主催　<b>株式会社パーツ精工</b>　／　お問い合わせ：<span id="tel">0996-29-3901</span><br>
+    工事に際しまして、ご近所のみなさまにはご迷惑をおかけいたします。当日はぜひ遊びにいらしてください。
+  </div>
+
+  <div class="kohaku" style="margin-top:4mm;"></div>
+</div>
+</body>
+</html>
