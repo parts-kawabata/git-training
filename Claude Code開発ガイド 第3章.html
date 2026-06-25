@@ -130,9 +130,28 @@
     border-color:#3a2a48;
   }
   .tbc{
-    text-align:right;margin-top:24px;font-family:var(--novel);
-    color:var(--gold);letter-spacing:.18em;font-size:1.05rem;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    width:fit-content;margin:30px auto 6px;padding:14px 36px;
+    font-family:var(--novel);text-decoration:none;cursor:pointer;
+    color:#1a1206;
+    background:linear-gradient(135deg,#f6e4a8,var(--gold) 55%,#caa53c);
+    border:1px solid #f7ecbf;border-radius:999px;
+    box-shadow:0 12px 30px -10px rgba(212,175,55,.65),
+               inset 0 1px 0 rgba(255,255,255,.55);
+    transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
   }
+  .tbc:hover{
+    transform:translateY(-3px) scale(1.015);
+    box-shadow:0 18px 42px -10px rgba(212,175,55,.85),
+               inset 0 1px 0 rgba(255,255,255,.65);
+    filter:brightness(1.04);
+  }
+  .tbc:active{transform:translateY(-1px) scale(1)}
+  .tbc .tbc-line{font-size:.92rem;letter-spacing:.14em;opacity:.8}
+  .tbc .tbc-cta{font-size:1.12rem;font-weight:700;letter-spacing:.1em;
+    display:inline-flex;align-items:center;gap:.5em}
+  .tbc .tbc-arrow{transition:transform .18s ease}
+  .tbc:hover .tbc-arrow{transform:translateX(4px)}
 
   /* ===== scene steps ===== */
   .steps{position:relative;margin-top:10px}
@@ -640,7 +659,10 @@ Action: 計画を修正し、次のサイクルへ</div>
       <p>二週間の予定を、一週間で。Claude Codeの力を借りて、田中はそこまで持っていくことができた。手応えを噛みしめる間もなく、次の依頼が舞い込む。それは、社内でも最大規模の基幹システムのリファクタリングプロジェクトだった。</p>
       <p>だが、待っていたのは途方もない壁だった。前任者は、すでに退職している。ファイルは800以上。そして、10万行にわたるコード。どこから読めばいいのかさえ、見当もつかない。</p>
       <p>——果たして田中さんは、この巨大なコードを、うまく使いこなすことができるのか——。</p>
-      <div class="tbc">― To be continued ―</div>
+      <a class="tbc" href="Claude%20Code開発ガイド%20第4章.html">
+        <span class="tbc-line">― To be continued ―</span>
+        <span class="tbc-cta">次の章を読む <span class="tbc-arrow">▶</span></span>
+      </a>
     </div>
   </section>
 
