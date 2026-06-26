@@ -39,7 +39,7 @@ Claude Codeが動き始め、ターミナルの表示が変わり、Task toolを
 
 ②追加の指示
 
-    この変更はORDER_STATUSのenum定義にも影響するから、そっちも確認して」
+    この変更はORDER_STATUSのenum定義にも影響するから、そっちも確認して
 
 Claude Codeはすぐにenum定義の確認をSubagentに追加し、関連する変更箇所も洗い出してくれた。そして、インターフェースの統一が完了し、田中さんはGit diffで変更内容をざっと確認し、コミットした。
 
