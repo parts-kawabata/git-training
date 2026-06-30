@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掃除でわかる「仕様のすり合わせ」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 依頼者（頼む人）の色A */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 掃除する人（やる人）の色B */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>お掃除でわかる、<span class="hl">「仕様のすり合わせ」</span>のはなし</h1>
+  <p>紙に書いて、直して、また提案して──お互い納得の“決まり”ができるまで。</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="依頼者が要望を紙にまとめる">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- 依頼者（笑顔・ペンを持つ） -->
+      <g transform="translate(95,72)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <!-- 書く腕＋ペン -->
+        <path d="M26 64 L52 84" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+        <path d="M50 86 l14 10" stroke="#5a4a10" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <!-- 要望メモ（紙） -->
+      <g transform="translate(176,120)">
+        <rect x="0" y="0" width="120" height="96" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="60" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">お掃除の要望</text>
+        <line x1="12" y1="38" x2="108" y2="38" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="12" y1="56" x2="108" y2="56" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="12" y1="74" x2="84" y2="74" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(176,18)">
+        <rect x="0" y="0" width="168" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M20 60 L10 82 L42 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="84" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">ここを綺麗に、</text>
+        <text x="84" y="49" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">この場所はこのやり方で</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">要望をまとめる</span><b>依頼者</b>が「ここを綺麗に」「この場所はこのやり方で」と、要望を<b>紙に書き出す</b>。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="紙を渡して順番ややり方を要求する">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- 依頼者（左・紙を差し出す） -->
+      <g transform="translate(72,80)">
+        <ellipse cx="0" cy="110" rx="32" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="62" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 6 Q0 -30 30 6 Q30 -18 0 -22 Q-30 -18 -30 6Z" fill="#7a5a44"/>
+        <circle cx="-10" cy="20" r="4" fill="#3a3a44"/><circle cx="10" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-9 31 Q0 39 9 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M22 56 L52 64" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+      </g>
+      <!-- 渡される紙 -->
+      <g transform="translate(132,128)">
+        <rect x="0" y="0" width="58" height="44" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="8" y1="14" x2="50" y2="14" stroke="var(--line)" stroke-width="2.5"/>
+        <line x1="8" y1="24" x2="50" y2="24" stroke="var(--line)" stroke-width="2.5"/>
+        <line x1="8" y1="34" x2="38" y2="34" stroke="var(--line)" stroke-width="2.5"/>
+      </g>
+      <!-- 掃除する人（右・受け取る） -->
+      <g transform="translate(282,80)">
+        <ellipse cx="0" cy="110" rx="32" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="62" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-28 4 Q-18 -26 0 -23 Q18 -26 28 6 Q18 -6 0 -6 Q-16 -6 -28 4Z" fill="#3a3a44"/>
+        <circle cx="-10" cy="20" r="4" fill="#3a3a44"/><circle cx="10" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-9 31 Q0 39 9 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-22 56 L-52 64" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(108,18)">
+        <rect x="0" y="0" width="170" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M70 46 L60 66 L92 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="85" y="30" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">この順番・やり方で掃除して</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">紙を渡して要求</span>紙を渡し「<b>この順番・やり方で掃除して</b>」とお願い ── まずは依頼者の案を提示。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="掃除する人が記載通りは難しいと気づく">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- 掃除する人（困り顔・紙を見る） -->
+      <g transform="translate(110,74)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M0 30 l0 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- 紙を持つ手 -->
+        <path d="M26 60 L48 70" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <!-- 見ている紙（難所に❓） -->
+      <g transform="translate(150,118)">
+        <rect x="0" y="0" width="76" height="92" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="10" y1="20" x2="66" y2="20" stroke="var(--line)" stroke-width="3"/>
+        <rect x="8" y="34" width="60" height="18" rx="4" fill="#fff4ea" stroke="#e7607c" stroke-width="2"/>
+        <text x="38" y="47" text-anchor="middle" font-size="13" font-weight="800" fill="#e7607c">？</text>
+        <line x1="10" y1="70" x2="66" y2="70" stroke="var(--line)" stroke-width="3"/>
+      </g>
+      <g transform="translate(196,24)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M26 46 L16 66 L46 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">ここ、このやり方</text>
+        <text x="75" y="40" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">だと難しいかも…</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">実現性をチェック</span><b>掃除する人</b>が紙を確認 ── 「ここは記載どおりだと<b>難しい</b>」箇所を見つける。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="掃除する人がやり方の変更を依頼する">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <!-- 掃除する人（指さしで提案） -->
+      <g transform="translate(110,72)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 42 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 指さし腕（上向き提案） -->
+        <path d="M26 58 Q48 46 46 28" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+        <circle cx="46" cy="24" r="6" fill="#ffe1c4"/>
+      </g>
+      <!-- 修正マーク -->
+      <g transform="translate(60,60)">
+        <circle r="16" fill="#fff" stroke="var(--child-d)" stroke-width="2"/>
+        <path d="M-7 0 l5 6 l9 -12" stroke="var(--child-d)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(184,24)">
+        <rect x="0" y="0" width="162" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M22 60 L12 82 L44 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="81" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="var(--child-d)">ここのやり方を</text>
+        <text x="81" y="49" text-anchor="middle" font-size="15" font-weight="700" fill="var(--child-d)">変更してほしい</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">修正をお願い</span>掃除する人が「<b>ここのやり方を変更して</b>」と<b>修正を依頼</b> ── 実現できる形へフィードバック。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="依頼者が考え直して新しいやり方を提案する">
+      <rect width="360" height="240" fill="#fff7ee"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ece1cd"/>
+      <!-- 依頼者（考える→ひらめき） -->
+      <g transform="translate(110,74)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-10 35 Q0 41 10 35" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- あごに手 -->
+        <path d="M22 60 Q34 64 18 70" stroke="#ffe1c4" stroke-width="10" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- ひらめき電球 -->
+      <g transform="translate(150,48)">
+        <circle cx="0" cy="0" r="13" fill="#fff3b0" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-5" y="11" width="10" height="6" rx="2" fill="var(--ink)"/>
+        <path d="M-18 -16 l-6 -6 M18 -16 l6 -6 M0 -22 l0 -8" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <!-- 思考の吹き出し:新しいやり方 -->
+      <g transform="translate(188,22)">
+        <rect x="0" y="0" width="158" height="60" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="20" cy="74" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="8" cy="86" r="3.5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="79" y="27" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">じゃあ、こういう</text>
+        <text x="79" y="48" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">やり方ではどう？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">考え直して再提案</span><b>依頼者</b>は修正をもとに<b>考え直し</b>、<b>新しいやり方を提案</b>する。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="提案と修正を繰り返してすり合わせる">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe1ee"/>
+      <!-- 依頼者（左） -->
+      <g transform="translate(58,96)">
+        <circle cx="0" cy="0" r="30" fill="var(--parent)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="var(--parent-d)">依頼者</text>
+      </g>
+      <!-- 掃除する人（右） -->
+      <g transform="translate(302,96)">
+        <circle cx="0" cy="0" r="30" fill="var(--child)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="48" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">掃除する人</text>
+      </g>
+      <!-- 往復の矢印 -->
+      <g fill="none" stroke-width="3" stroke-linecap="round">
+        <path d="M98 80 Q180 58 262 80" stroke="var(--parent-d)"/>
+        <path d="M262 80 l-10 -6 M262 80 l-2 -11" stroke="var(--parent-d)" stroke-width="3"/>
+        <path d="M262 118 Q180 140 98 118" stroke="var(--child-d)"/>
+        <path d="M98 118 l10 6 M98 118 l2 11" stroke="var(--child-d)" stroke-width="3"/>
+      </g>
+      <text x="180" y="74" text-anchor="middle" font-size="13" font-weight="700" fill="var(--parent-d)">提案</text>
+      <text x="180" y="138" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">修正</text>
+      <!-- 更新される紙 -->
+      <g transform="translate(152,96)">
+        <rect x="0" y="0" width="56" height="44" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="8" y1="14" x2="48" y2="14" stroke="var(--line)" stroke-width="2.5"/>
+        <line x1="8" y1="24" x2="48" y2="24" stroke="var(--line)" stroke-width="2.5"/>
+        <path d="M30 33 l5 6 l9 -12" stroke="#3aa86b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="180" y="214" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">提案 ⇄ 修正 を繰り返してすり合わせる</text>
+    </svg>
+    <div class="cap"><span class="tag">繰り返してすり合わせ</span><b>提案と修正のやり取りを繰り返す</b> ── 紙の内容を少しずつ更新し、現実的な形へ近づける。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="お互い合意して握手する">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6ecd9"/>
+      <!-- きらきら -->
+      <g fill="var(--accent)">
+        <path d="M60 56 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4Z"/>
+        <path d="M300 60 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z"/>
+      </g>
+      <!-- 依頼者（左・笑顔・手を伸ばす） -->
+      <g transform="translate(92,82)">
+        <ellipse cx="0" cy="110" rx="32" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="62" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 6 Q0 -30 30 6 Q30 -18 0 -22 Q-30 -18 -30 6Z" fill="#7a5a44"/>
+        <circle cx="-10" cy="20" r="4" fill="#3a3a44"/><circle cx="10" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-9 30 Q0 39 9 30" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="26" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="26" r="4.5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M22 58 L52 70" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+      </g>
+      <!-- 握手の手 -->
+      <g transform="translate(180,150)">
+        <circle r="10" fill="#ffe1c4" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <!-- 掃除する人（右・笑顔・手を伸ばす） -->
+      <g transform="translate(268,82)">
+        <ellipse cx="0" cy="110" rx="32" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="62" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-28 4 Q-18 -26 0 -23 Q18 -26 28 6 Q18 -6 0 -6 Q-16 -6 -28 4Z" fill="#3a3a44"/>
+        <circle cx="-10" cy="20" r="4" fill="#3a3a44"/><circle cx="10" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-9 30 Q0 39 9 30" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="26" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="26" r="4.5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M-22 58 L-52 70" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(108,18)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M64 46 L60 66 L88 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">これでいきましょう！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">合意</span>やり取りの末、<b>お互いが納得する掃除の仕方</b>で合意 ──「これでいきましょう！」</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="合意が条件になり その通りに掃除する">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <!-- 確定した条件書 -->
+      <g transform="translate(40,46)">
+        <rect x="0" y="0" width="104" height="128" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="0" y="0" width="104" height="26" rx="8" fill="var(--accent)"/>
+        <text x="52" y="18" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">合意した条件</text>
+        <g stroke="#3aa86b" stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M12 46 l5 6 l9 -12"/>
+          <path d="M12 70 l5 6 l9 -12"/>
+          <path d="M12 94 l5 6 l9 -12"/>
+        </g>
+        <line x1="34" y1="46" x2="92" y2="46" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="34" y1="70" x2="92" y2="70" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="34" y1="94" x2="78" y2="94" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <!-- 確定スタンプ -->
+        <g transform="translate(74,108) rotate(-12)">
+          <rect x="-22" y="-12" width="44" height="22" rx="4" fill="none" stroke="#e7607c" stroke-width="2.5"/>
+          <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="#e7607c">確定</text>
+        </g>
+      </g>
+      <!-- 掃除する人（条件通りに掃除＝モップ） -->
+      <g transform="translate(232,76)">
+        <ellipse cx="0" cy="116" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <!-- モップを持つ腕 -->
+        <path d="M26 62 L54 50" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+        <path d="M54 50 L72 104" stroke="#a9743e" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="74" cy="110" rx="18" ry="8" fill="#bcd0c2"/>
+      </g>
+      <!-- きらきら（掃除がきれい） -->
+      <g fill="var(--accent)">
+        <path d="M300 120 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z"/>
+      </g>
+      <g transform="translate(150,150)">
+        <rect x="0" y="0" width="150" height="40" rx="13" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">条件どおりに進める！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">条件として実施</span>合意した内容が<b>「条件（決まり）」</b>に ── 掃除する人は<b>その条件どおり</b>に掃除を進めていく。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ──「やり取りして決めた約束」が仕様になる</h2>
+    <p class="lead">頼む人の要望と、やる人の「ここは難しい」という事情。両方を<strong>提案と修正で往復させて合意</strong>すれば、その合意がそのまま“守るべき決まり”になります。これが開発での<strong>仕様のすり合わせ・合意</strong>です。</p>
+    <ul>
+      <li><b>掃除の場合</b>：要望を紙に書く → 難しい所は「変更して」 → 考え直して再提案 → 繰り返して合意 → 合意が<b>掃除の条件</b>に。</li>
+      <li><b>システムの場合</b>：要望を仕様書に書く → 作る側が実現性を指摘 → 案を練り直す → 合意した内容が<b>仕様（守る条件）</b>に。</li>
+      <li><b>ポイント</b>：仕様は一方的に押し付けず、<b>作る側の事情も織り込んで往復で固める</b>。決まった条件は両者が守る基準になる。</li>
+    </ul>
+    <p class="map">物語の流れ： ①要望を紙に → ②渡して要求 → ③難しい所を発見 → ④修正依頼 → ⑤考え直して再提案 → ⑥繰り返してすり合わせ → ⑦合意 → ⑧合意が条件になりその通り実施</p>
+  </section>
+
+</main>
+
+</body>
+</html>
