@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掃除でわかる「要件定義」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親キャラの色A */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 子キャラの色B */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>お掃除でわかる、<span class="hl">「要件定義」</span>のはなし</h1>
+  <p>「掃除しなさい」だけでは伝わらない。──作る前に“ゴール”をすり合わせる大切さ</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="親が掃除を命じる">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- 散らかった床の小物 -->
+      <ellipse cx="250" cy="205" rx="14" ry="5" fill="#cbb89a"/>
+      <rect x="290" y="196" width="18" height="12" rx="2" fill="#d9a06b"/>
+      <circle cx="320" cy="204" r="6" fill="#bcd0c2"/>
+      <!-- 親キャラ -->
+      <g transform="translate(95,70)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4" fill="#3a3a44"/>
+        <path d="M-10 36 Q0 42 10 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 指さし腕 -->
+        <path d="M24 60 L70 48" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="74" cy="47" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(195,30)">
+        <rect x="0" y="0" width="150" height="60" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M14 58 L4 80 L34 58Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">部屋を</text>
+        <text x="75" y="48" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">掃除しなさい！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">指示</span><b>親</b>「部屋を掃除しなさい」── “どこまで・どのくらい”の基準は言わない、ざっくりお願い。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="子が自分なりに掃除して満足">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- ちょっとだけ片付けた床（小物わずか） -->
+      <circle cx="300" cy="206" r="5" fill="#cdbfa6"/>
+      <!-- 子キャラ（笑顔・腰に手） -->
+      <g transform="translate(150,70)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <!-- 腰に手 -->
+        <path d="M-28 64 Q-46 60 -40 78" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+        <path d="M28 64 Q46 60 40 78" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- きらきら -->
+      <g fill="var(--accent)">
+        <path d="M70 60 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4Z"/>
+        <path d="M290 70 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z"/>
+      </g>
+      <g transform="translate(196,28)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M30 46 L20 66 L50 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">これで完璧！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">自分基準でOK</span>子は<b>自分なりに</b>片付けて大満足。「ちゃんとやった、もう終わり！」</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="親が点検してまだ汚れを指摘">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e7d6d6"/>
+      <!-- 親が指摘する床のホコリ -->
+      <g>
+        <circle cx="250" cy="206" r="7" fill="#b9a98c"/>
+        <circle cx="262" cy="210" r="4" fill="#b9a98c"/>
+        <text x="246" y="186" font-size="20">💢</text>
+      </g>
+      <!-- 親キャラ（怒り・指さし） -->
+      <g transform="translate(95,70)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <path d="M-18 16 L-6 22" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <path d="M18 16 L6 22" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="-12" cy="24" r="4" fill="#3a3a44"/>
+        <circle cx="12" cy="24" r="4" fill="#3a3a44"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M24 64 L74 92" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="78" cy="94" r="7" fill="#ffe1c4"/>
+      </g>
+      <g transform="translate(180,24)">
+        <rect x="0" y="0" width="165" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M16 60 L6 82 L36 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="82" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="var(--parent-d)">まだ汚れてる！</text>
+        <text x="82" y="49" text-anchor="middle" font-size="16" font-weight="700" fill="var(--parent-d)">できてないでしょ</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">相手基準でNG</span><b>親</b>が点検「まだ汚れてる、できてないでしょ」── 親の<b>合格ライン</b>には届いていない。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="子が納得いかずモヤモヤ">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- モヤモヤ雲 -->
+      <g fill="#c9cee0" opacity=".8">
+        <circle cx="240" cy="55" r="16"/>
+        <circle cx="262" cy="48" r="20"/>
+        <circle cx="288" cy="58" r="15"/>
+        <circle cx="266" cy="68" r="17"/>
+      </g>
+      <text x="252" y="62" font-size="22">😞</text>
+      <!-- 子キャラ（困り顔・うなだれ） -->
+      <g transform="translate(150,74)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M0 30 l0 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(196,30)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M28 46 L18 66 L48 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">ちゃんとやったのに…</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">不満発生</span>子は<b>納得いかずモヤモヤ</b>。「やったのに…」── “完成のイメージ”がズレていたのが原因。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="立場逆転 自分が親になって我が子に命じる">
+      <rect width="360" height="240" fill="#f0f7ee"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dde7d3"/>
+      <!-- 立場逆転バッジ -->
+      <g transform="translate(12,12)">
+        <rect x="0" y="0" width="120" height="26" rx="13" fill="var(--ink)"/>
+        <text x="60" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">⇄ 立場が逆転</text>
+      </g>
+      <!-- 今度は自分が"親役"（子キャラの色を大人にして指示） -->
+      <g transform="translate(95,72)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4" fill="#3a3a44"/>
+        <path d="M-10 36 Q0 41 10 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M24 60 L70 48" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="74" cy="47" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 我が子（小さめ・色は親色） -->
+      <g transform="translate(285,108) scale(.7)">
+        <ellipse cx="0" cy="118" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-24" y="48" width="48" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="24" r="28" fill="#ffe1c4"/>
+        <path d="M-26 12 Q-14 -16 0 -14 Q14 -16 26 12 Q14 0 0 0 Q-14 0 -26 12Z" fill="#5a4636"/>
+        <circle cx="-10" cy="26" r="3.5" fill="#3a3a44"/>
+        <circle cx="10" cy="26" r="3.5" fill="#3a3a44"/>
+        <path d="M-7 38 Q0 42 7 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(150,26)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M120 46 L138 66 L106 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">掃除しなさい！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">今度は自分が指示する番</span>立場逆転。<b>自分</b>が我が子に「掃除しなさい」── やっぱり基準は言わずに。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="我が子が自分なりに掃除を終える">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <circle cx="300" cy="207" r="5" fill="#cdbfa6"/>
+      <!-- 我が子（笑顔・親色） -->
+      <g transform="translate(150,72)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-30 8 Q-16 -22 0 -20 Q16 -22 30 8 Q16 -4 0 -4 Q-16 -4 -30 8Z" fill="#5a4636"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <!-- 手を上げる -->
+        <path d="M28 56 Q46 44 44 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <g fill="var(--accent)">
+        <path d="M80 70 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z"/>
+      </g>
+      <g transform="translate(196,30)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M30 46 L20 66 L50 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">終わったよ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">子は自分基準で完了</span>我が子も<b>自分なりに</b>片付けて「終わったよ！」── 本人はやり切ったつもり。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="自分が親として基準でダメ出し">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e7d6d6"/>
+      <g>
+        <circle cx="252" cy="206" r="6" fill="#b9a98c"/>
+        <text x="246" y="184" font-size="20">💢</text>
+      </g>
+      <!-- 自分（親役・子色・ダメ出し） -->
+      <g transform="translate(95,70)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-18 16 L-6 22" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <path d="M18 16 L6 22" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="-12" cy="24" r="4" fill="#3a3a44"/>
+        <circle cx="12" cy="24" r="4" fill="#3a3a44"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M24 64 L74 92" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="78" cy="94" r="7" fill="#ffe1c4"/>
+      </g>
+      <g transform="translate(184,26)">
+        <rect x="0" y="0" width="160" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M16 60 L6 82 L36 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="80" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="var(--child-d)">いや、ここがダメ。</text>
+        <text x="80" y="49" text-anchor="middle" font-size="16" font-weight="700" fill="var(--child-d)">やり直し！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">今度は自分の基準でNG</span><b>自分</b>「いや、ここがダメ」── 同じように、自分の<b>合格ライン</b>で不合格を出す。</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="我が子が だったら先に言ってよ と抗議">
+      <rect width="360" height="240" fill="#fff4ea"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecdcc8"/>
+      <text x="60" y="64" font-size="24">💥</text>
+      <!-- 我が子（プンプン・親色） -->
+      <g transform="translate(150,72)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-30 8 Q-16 -22 0 -20 Q16 -22 30 8 Q16 -4 0 -4 Q-16 -4 -30 8Z" fill="#5a4636"/>
+        <path d="M-18 18 L-6 16" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <path d="M18 18 L6 16" stroke="#3a3a44" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="-12" cy="24" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="24" r="4.5" fill="#3a3a44"/>
+        <path d="M-9 36 Q0 30 9 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-22" cy="28" r="5" fill="#ffb3b3" opacity=".7"/>
+        <circle cx="22" cy="28" r="5" fill="#ffb3b3" opacity=".7"/>
+        <!-- 両手を上げて抗議 -->
+        <path d="M-28 58 Q-48 46 -46 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+        <path d="M28 58 Q48 46 46 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(190,20)">
+        <rect x="0" y="0" width="160" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M30 60 L20 82 L52 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="80" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">だったら先に</text>
+        <text x="80" y="49" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">言っておいてよ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">同じ不満が再発</span>我が子「<b>だったら先に言っておいてよ！</b>」── 立場が変わっても、起きるズレは同じ。</div>
+  </section>
+
+  <!-- ============ コマ9 ============ -->
+  <section class="panel">
+    <div class="num">9</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="気づき 二人の完成イメージがズレていた">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 頭の中の"完成イメージ"が違う図解 -->
+      <!-- 左:指示する人 -->
+      <g transform="translate(70,118)">
+        <circle cx="0" cy="0" r="30" fill="var(--parent)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/>
+        <circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 6 Q0 10 6 6" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="var(--parent-d)">頼む人</text>
+      </g>
+      <!-- 思考の吹き出し:ピカピカ -->
+      <g transform="translate(40,30)">
+        <rect x="0" y="0" width="100" height="56" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="38" cy="74" r="5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="50" cy="86" r="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="50" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">ピカピカで</text>
+        <text x="50" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">床も棚も！</text>
+      </g>
+      <!-- 右:作る人 -->
+      <g transform="translate(290,118)">
+        <circle cx="0" cy="0" r="30" fill="var(--child)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/>
+        <circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 6 Q0 10 6 6" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">やる人</text>
+      </g>
+      <g transform="translate(220,30)">
+        <rect x="0" y="0" width="100" height="56" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="62" cy="74" r="5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="50" cy="86" r="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="50" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">床が見えれば</text>
+        <text x="50" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">OKでしょ</text>
+      </g>
+      <!-- ≠ -->
+      <g transform="translate(180,112)">
+        <circle r="26" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="800" fill="#e7607c">≠</text>
+      </g>
+      <text x="180" y="210" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">“完成のイメージ・合格基準”がそろっていなかった</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>原因は能力でも手抜きでもない。<b>「どうなれば完成か」の基準が共有されていなかった</b>こと。</div>
+  </section>
+
+  <!-- ============ コマ10 ============ -->
+  <section class="panel">
+    <div class="num">10</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="作る前に基準をすり合わせる">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <!-- 二人で同じチェックリストを見る -->
+      <g transform="translate(96,120)">
+        <circle cx="0" cy="0" r="30" fill="var(--parent)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(264,120)">
+        <circle cx="0" cy="0" r="30" fill="var(--child)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 共有のチェックリスト -->
+      <g transform="translate(140,58)">
+        <rect x="0" y="0" width="80" height="100" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="40" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">完成の条件</text>
+        <g stroke="#3aa86b" stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M12 36 l5 6 l9 -12"/>
+          <path d="M12 56 l5 6 l9 -12"/>
+          <path d="M12 76 l5 6 l9 -12"/>
+        </g>
+        <line x1="34" y1="36" x2="70" y2="36" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="34" y1="56" x2="70" y2="56" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="34" y1="76" x2="70" y2="76" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <!-- 握手っぽい矢印 -->
+      <path d="M128 120 Q180 150 232 120" stroke="var(--child-d)" stroke-width="3" fill="none" stroke-dasharray="2 6" stroke-linecap="round"/>
+      <text x="180" y="206" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">作る前に、ゴールをすり合わせる＝<tspan fill="#e7607c">要件定義</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">これが要件定義</span><b>始める前に</b>「どうなれば完成か（ゴール・合格基準）」を二人で言葉にして合意しておくこと。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ──「だったら先に言ってよ」を無くすのが要件定義</h2>
+    <p class="lead">「掃除しなさい」も「システムを作って」も同じ。指示だけでは、頼む人と作る人で<strong>“完成のイメージ”がズレ</strong>ます。作ってから「違う」「やり直し」となり、お互い不満が残ります。</p>
+    <ul>
+      <li><b>掃除の場合</b>：散らかった床だけ？ 棚やホコリも？ ＝ どこまでやれば「掃除した」と言えるかの<b>合格基準</b>を先に決める。</li>
+      <li><b>システムの場合</b>：何ができれば完成か、どんな状態を満たせばOKか ＝ <b>要件</b>を作る前に書き出して合意する。</li>
+      <li><b>ポイント</b>：基準は<b>始める前</b>に、<b>お互いの言葉で</b>すり合わせる。これが「要件定義」。</li>
+    </ul>
+    <p class="map">物語の流れ： ①あいまいな指示 → ②自分基準で完了 → ③相手基準でNG → ④モヤモヤ ／ ⑤⇄立場逆転 → ⑧同じ不満 → ⑨ズレの正体 → ⑩作る前にすり合わせる＝要件定義</p>
+  </section>
+
+</main>
+
+</body>
+</html>
