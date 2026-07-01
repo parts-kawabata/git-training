@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目玉焼きでわかる「要件定義」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親キャラの色A */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 子キャラの色B */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>目玉焼きでわかる、<span class="hl">「要件定義」</span>のはなし</h1>
+  <p>「目玉焼き作って」は伝わる。「ソフト作って」はなぜ伝わらない？──必要な3つの情報のはなし</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="お客さんが目玉焼きを食べたいと思う">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- お客さん（頼む人・ピンク・笑顔） -->
+      <g transform="translate(105,80)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M28 56 Q46 44 44 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 思考の吹き出し（目玉焼き） -->
+      <g transform="translate(178,18)">
+        <rect x="0" y="0" width="164" height="86" rx="16" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="26" cy="98" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="16" cy="110" r="3.5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <g transform="translate(44,46)">
+          <ellipse cx="0" cy="9" rx="27" ry="8" fill="#e9edf0"/>
+          <ellipse cx="0" cy="0" rx="23" ry="14" fill="#fffdf7" stroke="#efe7d2" stroke-width="1.5"/>
+          <circle cx="0" cy="0" r="9" fill="#ffce4a"/>
+          <circle cx="-3" cy="-3" r="2.5" fill="#fff2c2" opacity=".85"/>
+        </g>
+        <text x="112" y="40" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">目玉焼きが</text>
+        <text x="112" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">食べたいな</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">作りたい状態</span>「目玉焼きが食べたい」── 実現したいのは<b>「目玉焼きがある」という状態（ゴール）</b>。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="お客さんがコックに目玉焼きを作ってと頼む">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- お客さん（ピンク・指さし） -->
+      <g transform="translate(78,84)">
+        <ellipse cx="0" cy="116" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-10 35 Q0 41 10 35" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M24 60 L70 52" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="74" cy="51" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- コック（水色・コック帽・笑顔） -->
+      <g transform="translate(292,86)">
+        <ellipse cx="0" cy="114" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="62" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-20 -10 C-31 -12 -29 -27 -18 -29 C-22 -41 -8 -43 -2 -35 C4 -45 21 -43 18 -30 C31 -26 27 -12 16 -10 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-12" width="37" height="11" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 43 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- セリフ吹き出し -->
+      <g transform="translate(98,12)">
+        <rect x="0" y="0" width="150" height="62" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M24 60 L12 82 L48 60Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="28" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">目玉焼きを</text>
+        <text x="75" y="49" text-anchor="middle" font-size="17" font-weight="700" fill="var(--ink)">作って！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">リクエスト</span>その状態を実現するため、コックさんに<b>「目玉焼きを作って」</b>と依頼する。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="コックがすぐ目玉焼きを出し、お客さんが満足">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- コック（水色・帽子・提供） -->
+      <g transform="translate(78,84)">
+        <ellipse cx="0" cy="116" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-20 -10 C-31 -12 -29 -27 -18 -29 C-22 -41 -8 -43 -2 -35 C4 -45 21 -43 18 -30 C31 -26 27 -12 16 -10 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-12" width="37" height="11" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 43 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M26 66 L66 80" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="70" cy="82" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- お皿＋目玉焼き -->
+      <g transform="translate(176,152)">
+        <ellipse cx="0" cy="10" rx="42" ry="12" fill="#e3e9ee" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="0" cy="3" rx="31" ry="9" fill="#f2f5f8"/>
+        <ellipse cx="0" cy="-2" rx="23" ry="14" fill="#fffdf7" stroke="#efe7d2" stroke-width="1.5"/>
+        <circle cx="0" cy="-2" r="9" fill="#ffce4a"/>
+        <circle cx="-3" cy="-5" r="2.5" fill="#fff2c2" opacity=".85"/>
+      </g>
+      <!-- お客さん（ピンク・笑顔・手を挙げる） -->
+      <g transform="translate(288,86)">
+        <ellipse cx="0" cy="114" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="62" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M-28 56 Q-46 44 -44 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- きらきら -->
+      <g fill="var(--accent)">
+        <path d="M232 62 l3.5 9 l9 3.5 l-9 3.5 l-3.5 9 l-3.5 -9 l-9 -3.5 l9 -3.5Z"/>
+        <path d="M150 70 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z"/>
+      </g>
+      <!-- セリフ吹き出し -->
+      <g transform="translate(118,10)">
+        <rect x="0" y="0" width="150" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M116 46 L134 66 L102 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">わぁ、これこれ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">すぐ伝わる</span>目玉焼きなら、<b>短いお願いだけで</b>ちゃんと出てくる。お客さんも満足。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="同じ調子でプログラマに完成したソフトを作ってと頼む">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe2ee"/>
+      <!-- 場面転換バッジ -->
+      <g transform="translate(12,12)">
+        <rect x="0" y="0" width="96" height="26" rx="13" fill="var(--ink)"/>
+        <text x="48" y="18" text-anchor="middle" font-size="12.5" font-weight="700" fill="#fff">ソフト開発へ</text>
+      </g>
+      <!-- お客さん（ピンク・指さし） -->
+      <g transform="translate(78,88)">
+        <ellipse cx="0" cy="114" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="62" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-10 35 Q0 41 10 35" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M24 60 L70 52" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="74" cy="51" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- プログラマ（水色・メガネ） -->
+      <g transform="translate(292,90)">
+        <ellipse cx="0" cy="112" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="60" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4" fill="#3a3a44"/>
+        <g stroke="var(--ink)" stroke-width="2" fill="none">
+          <circle cx="-12" cy="22" r="8"/>
+          <circle cx="12" cy="22" r="8"/>
+          <path d="M-4 22 h8"/>
+        </g>
+        <path d="M-8 36 Q0 40 8 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- ノートPC -->
+      <g transform="translate(302,184)">
+        <rect x="-24" y="-18" width="48" height="30" rx="3" fill="#dfe7ef" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-14" width="40" height="22" rx="2" fill="#eef3fb"/>
+        <path d="M-30 14 h60 l-6 -3 h-48 Z" fill="#c7d0da" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <!-- セリフ吹き出し -->
+      <g transform="translate(114,12)">
+        <rect x="0" y="0" width="156" height="60" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M12 58 L-2 80 L34 58Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="78" y="27" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">完成したソフトを</text>
+        <text x="78" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">作って！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">同じ頼み方でも…</span>同じ調子でプログラマに<b>「完成したソフトを作って」</b>と頼むと……</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="プログラマが情報が足りず困る">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- ？マーク -->
+      <text x="60" y="70" font-size="30" font-weight="800" fill="#9aa3c0">？</text>
+      <text x="95" y="46" font-size="20" font-weight="800" fill="#b5bcd4">？</text>
+      <!-- プログラマ（水色・メガネ・困り顔） -->
+      <g transform="translate(120,86)">
+        <ellipse cx="0" cy="112" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="60" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <g stroke="var(--ink)" stroke-width="2" fill="none">
+          <circle cx="-12" cy="23" r="8"/>
+          <circle cx="12" cy="23" r="8"/>
+          <path d="M-4 23 h8"/>
+        </g>
+        <path d="M-9 39 Q0 34 9 39" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 31 l-3 8 M0 31 l0 8 M8 31 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <!-- ノートPC -->
+      <g transform="translate(250,178)">
+        <rect x="-26" y="-20" width="52" height="34" rx="3" fill="#dfe7ef" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-22" y="-16" width="44" height="26" rx="2" fill="#eef3fb"/>
+        <text x="0" y="2" text-anchor="middle" font-size="17" font-weight="800" fill="#9aa3c0">…</text>
+        <path d="M-32 16 h64 l-6 -3 h-52 Z" fill="#c7d0da" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <!-- 思考の吹き出し -->
+      <g transform="translate(178,16)">
+        <rect x="0" y="0" width="168" height="66" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="26" cy="78" r="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="16" cy="90" r="3.5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="84" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">「完成」って、</text>
+        <text x="84" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="var(--child-d)">どこまで…？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">情報が足りない</span>プログラマは<b>即答できない</b>。「“完成したソフト”ってどんなもの？」── 情報が足りない。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="目玉焼きとソフトは伝わり方が違う">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 左：目玉焼き（作り方は共通イメージ） -->
+      <g transform="translate(74,100)">
+        <ellipse cx="0" cy="16" rx="36" ry="10" fill="#dfe6ec"/>
+        <ellipse cx="0" cy="0" rx="31" ry="20" fill="#fffdf7" stroke="#efe7d2" stroke-width="2"/>
+        <circle cx="0" cy="0" r="13" fill="#ffce4a"/>
+        <circle cx="-4" cy="-4" r="3.5" fill="#fff2c2" opacity=".85"/>
+      </g>
+      <text x="74" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="var(--parent-d)">「作って」で伝わる</text>
+      <!-- 右：ソフト（完成が決まらない） -->
+      <g transform="translate(286,96)">
+        <rect x="-35" y="-26" width="70" height="48" rx="4" fill="#dfe7ef" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="-30" y="-21" width="60" height="38" rx="2" fill="#eef3fb"/>
+        <text x="0" y="9" text-anchor="middle" font-size="28" font-weight="800" fill="var(--child-d)">？</text>
+        <path d="M-45 32 h90 l-8 -5 h-74 Z" fill="#c7d0da" stroke="var(--ink)" stroke-width="2.5"/>
+      </g>
+      <text x="286" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">「完成」が決まらない</text>
+      <!-- ≠ -->
+      <g transform="translate(180,100)">
+        <circle r="24" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="0" y="9" text-anchor="middle" font-size="24" font-weight="800" fill="#e7607c">≠</text>
+      </g>
+      <!-- 結論テキスト -->
+      <text x="180" y="196" text-anchor="middle" font-size="14.5" font-weight="700" fill="var(--ink)">ソフトは“完成の姿”を伝えないと作れない</text>
+      <text x="180" y="222" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">その情報こそが <tspan fill="#e7607c">「要件」</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">必要なのは“完成の姿”</span>目玉焼きと違い、ソフトは<b>“完成の姿”を伝えないと作れない</b>。その情報が<b>要件</b>。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="要件のひとつめ UI 画面と帳票">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- バッジ -->
+      <g transform="translate(14,14)">
+        <rect x="0" y="0" width="120" height="28" rx="14" fill="var(--child)"/>
+        <text x="60" y="19" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">要件① UI</text>
+      </g>
+      <!-- 画面（モニタ） -->
+      <g transform="translate(98,120)">
+        <rect x="-52" y="-52" width="104" height="74" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="-46" y="-46" width="92" height="54" rx="3" fill="#eaf1fb"/>
+        <rect x="-46" y="-46" width="92" height="14" rx="3" fill="var(--child)"/>
+        <rect x="-38" y="-24" width="34" height="8" rx="2" fill="#cfd9e6"/>
+        <rect x="4" y="-24" width="34" height="8" rx="4" fill="#fff" stroke="var(--line)" stroke-width="1.5"/>
+        <rect x="-38" y="-8" width="34" height="8" rx="2" fill="#cfd9e6"/>
+        <rect x="4" y="-8" width="34" height="8" rx="4" fill="#fff" stroke="var(--line)" stroke-width="1.5"/>
+        <rect x="8" y="8" width="30" height="10" rx="5" fill="var(--accent)"/>
+        <rect x="-10" y="22" width="20" height="10" fill="#c7d0da" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-24" y="32" width="48" height="6" rx="3" fill="#c7d0da" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <text x="98" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">画面</text>
+      <!-- 帳票（プリンタ＋印刷物） -->
+      <g transform="translate(266,120)">
+        <rect x="-40" y="4" width="80" height="34" rx="5" fill="#d7dee7" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="-30" y="12" width="60" height="6" rx="3" fill="#9aa6b5"/>
+        <rect x="-30" y="-52" width="60" height="58" rx="2" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <g stroke="#b9c3d0" stroke-width="2.5" stroke-linecap="round">
+          <path d="M-22 -42 h44"/><path d="M-22 -33 h44"/><path d="M-22 -24 h30"/>
+          <path d="M-22 -13 h44"/><path d="M-22 -4 h24"/>
+        </g>
+      </g>
+      <text x="266" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">帳票（印刷物）</text>
+      <!-- 補足 -->
+      <text x="180" y="214" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--ink)">ユーザーが<tspan fill="#e7607c">見る・受け取る</tspan>もの</text>
+    </svg>
+    <div class="cap"><span class="tag">要件① UI</span><b>UI</b>＝ユーザーが見る<b>画面</b>や、プリンタから出る<b>帳票（印刷物）</b>のこと。</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="要件のふたつめ 機能 コンピュータの仕事">
+      <rect width="360" height="240" fill="#f0f7ee"/>
+      <!-- バッジ -->
+      <g transform="translate(14,14)">
+        <rect x="0" y="0" width="132" height="28" rx="14" fill="var(--child)"/>
+        <text x="66" y="19" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">要件② 機能</text>
+      </g>
+      <!-- 大きい歯車 -->
+      <g transform="translate(150,110)">
+        <g stroke="var(--child-d)" stroke-width="10" stroke-linecap="round">
+          <path d="M0 -34 V-20"/><path d="M0 34 V20"/>
+          <path d="M-34 0 H-20"/><path d="M34 0 H20"/>
+          <path d="M-24 -24 L-14 -14"/><path d="M24 24 L14 14"/>
+          <path d="M24 -24 L14 -14"/><path d="M-24 24 L-14 14"/>
+        </g>
+        <circle r="22" fill="var(--child)" stroke="var(--ink)" stroke-width="2.5"/>
+      </g>
+      <!-- 小さい歯車 -->
+      <g transform="translate(216,152)">
+        <g stroke="var(--child-d)" stroke-width="7" stroke-linecap="round">
+          <path d="M0 -22 V-13"/><path d="M0 22 V13"/><path d="M-22 0 H-13"/><path d="M22 0 H13"/>
+          <path d="M-16 -16 L-9 -9"/><path d="M16 16 L9 9"/><path d="M16 -16 L9 -9"/><path d="M-16 16 L-9 9"/>
+        </g>
+        <circle r="14" fill="var(--accent)" stroke="var(--ink)" stroke-width="2.5"/>
+        <circle r="5" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <!-- 処理ラベル -->
+      <text x="150" y="116" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">処理</text>
+      <text x="180" y="214" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--ink)">計算・登録・検索などの<tspan fill="#e7607c">仕事</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">要件② 機能</span><b>機能</b>＝<b>コンピュータが行う仕事</b>（計算・登録・検索などの処理）のこと。</div>
+  </section>
+
+  <!-- ============ コマ9 ============ -->
+  <section class="panel">
+    <div class="num">9</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="要件のみっつめ データ 数値や出力">
+      <rect width="360" height="240" fill="#fbf1ef"/>
+      <!-- バッジ -->
+      <g transform="translate(14,14)">
+        <rect x="0" y="0" width="142" height="28" rx="14" fill="var(--child)"/>
+        <text x="71" y="19" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">要件③ データ</text>
+      </g>
+      <!-- データベース（円柱） -->
+      <g transform="translate(116,104)">
+        <rect x="-32" y="-34" width="64" height="68" fill="#e2eefb"/>
+        <ellipse cx="0" cy="34" rx="32" ry="11" fill="#e2eefb" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="-32" y1="-34" x2="-32" y2="34" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="32" y1="-34" x2="32" y2="34" stroke="var(--ink)" stroke-width="2.5"/>
+        <ellipse cx="0" cy="-13" rx="32" ry="11" fill="none" stroke="var(--ink)" stroke-width="1.5" opacity=".45"/>
+        <ellipse cx="0" cy="8" rx="32" ry="11" fill="none" stroke="var(--ink)" stroke-width="1.5" opacity=".45"/>
+        <ellipse cx="0" cy="-34" rx="32" ry="11" fill="#cfe0f2" stroke="var(--ink)" stroke-width="2.5"/>
+      </g>
+      <text x="116" y="166" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">数値・記録</text>
+      <!-- 出力される書類 -->
+      <g transform="translate(232,96)">
+        <rect x="-30" y="-40" width="60" height="80" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <text x="0" y="-16" text-anchor="middle" font-size="16" font-weight="800" fill="var(--child-d)">¥1,200</text>
+        <g stroke="#c3ccd8" stroke-width="2.5" stroke-linecap="round">
+          <path d="M-20 -2 h40"/><path d="M-20 8 h40"/><path d="M-20 18 h28"/>
+        </g>
+        <text x="0" y="34" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">42 個</text>
+      </g>
+      <text x="232" y="166" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">出力されたもの</text>
+      <text x="180" y="214" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--ink)">仕事に必要な<tspan fill="#e7607c">数値や、出力</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">要件③ データ</span><b>データ</b>＝コンピュータが仕事を行うために必要な<b>数値や、出力されたもの</b>。</div>
+  </section>
+
+  <!-- ============ コマ10 ============ -->
+  <section class="panel">
+    <div class="num">10</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UI 機能 データの3つで完成の姿を共有する 要件定義">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <!-- 共有の仕様書（UI/機能/データ） -->
+      <g transform="translate(140,44)">
+        <rect x="0" y="0" width="80" height="112" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="40" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">完成の姿</text>
+        <g stroke="#3aa86b" stroke-width="3" fill="none" stroke-linecap="round">
+          <path d="M9 40 l5 6 l9 -12"/>
+          <path d="M9 66 l5 6 l9 -12"/>
+          <path d="M9 92 l5 6 l9 -12"/>
+        </g>
+        <text x="30" y="44" font-size="12.5" font-weight="700" fill="var(--ink)">UI</text>
+        <text x="30" y="70" font-size="12.5" font-weight="700" fill="var(--ink)">機能</text>
+        <text x="30" y="96" font-size="12.5" font-weight="700" fill="var(--ink)">データ</text>
+      </g>
+      <!-- お客さん（ミニ・ピンク） -->
+      <g transform="translate(90,120)">
+        <circle cx="0" cy="0" r="30" fill="var(--parent)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="var(--parent-d)">頼む人</text>
+      </g>
+      <!-- プログラマ（ミニ・水色・メガネ） -->
+      <g transform="translate(270,120)">
+        <circle cx="0" cy="0" r="30" fill="var(--child)"/>
+        <circle cx="0" cy="-2" r="20" fill="#ffe1c4"/>
+        <circle cx="-7" cy="-4" r="3" fill="#3a3a44"/><circle cx="7" cy="-4" r="3" fill="#3a3a44"/>
+        <g stroke="var(--ink)" stroke-width="1.5" fill="none">
+          <circle cx="-7" cy="-4" r="5"/><circle cx="7" cy="-4" r="5"/><path d="M-2 -4 h4"/>
+        </g>
+        <path d="M-6 5 Q0 11 6 5" stroke="#b5594f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="0" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">作る人</text>
+      </g>
+      <text x="180" y="206" text-anchor="middle" font-size="14.5" font-weight="800" fill="var(--ink)">3つで“完成の姿”を共有＝<tspan fill="#e7607c">要件定義</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">これが要件定義</span><b>UI・機能・データ</b>の3つがそろえば“完成の姿”を共有できる。これが<b>要件定義</b>。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ──「完成したソフト」を絵にするのが要件定義</h2>
+    <p class="lead">「目玉焼きを作って」は短いお願いで伝わる。でも「ソフトを作って」は、<strong>“完成の姿”を伝えないと作れない</strong>。プログラマがソフトを完成させるために必要な情報を先に書き出す、それが要件定義です。</p>
+    <ul>
+      <li><b>目玉焼きの場合</b>：作り方は共通イメージがあるから、「作って」の一言で通じる。</li>
+      <li><b>ソフトの場合</b>：「完成」の中身は決まっていない。だから<b>UI・機能・データ</b>を書き出して伝える。</li>
+      <li><b>3つの要件</b>：<b>UI</b>＝画面・帳票／<b>機能</b>＝コンピュータの仕事／<b>データ</b>＝仕事に必要な数値・出力。</li>
+    </ul>
+    <p class="map">物語の流れ： ①目玉焼きがある状態 → ②依頼 → ③すぐ完成 ／ ④ソフトを依頼 → ⑤情報不足 → ⑥必要なのは“完成の姿”＝要件 → ⑦UI・⑧機能・⑨データ → ⑩3つで完成の姿を共有＝要件定義</p>
+  </section>
+
+</main>
+
+</body>
+</html>
