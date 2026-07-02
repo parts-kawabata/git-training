@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自動販売機でわかる「UIと機能」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親役（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 受け手役（やる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>自動販売機でわかる、<span class="hl">「UIと機能」</span>のはなし</h1>
+  <p>ボタンが無ければ押せない。押しても中身が動かなければ出てこない。──UIと機能はセットで初めて役に立つ</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ボタンも投入口も無い自販機に客が戸惑う">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- 自販機（UIなし＝のっぺり） -->
+      <g transform="translate(206,24)">
+        <rect x="0" y="0" width="120" height="168" rx="10" fill="#dbe7ec" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="10" y="12" width="100" height="56" rx="5" fill="#eef7fb" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="17" y="22" width="15" height="30" rx="3" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="40" y="22" width="15" height="30" rx="3" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="63" y="22" width="15" height="30" rx="3" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="86" y="22" width="15" height="30" rx="3" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="60" y="118" text-anchor="middle" font-size="12" font-weight="700" fill="#9fb0b7">ボタンも</text>
+        <text x="60" y="136" text-anchor="middle" font-size="12" font-weight="700" fill="#9fb0b7">投入口も無い</text>
+      </g>
+      <!-- 客キャラ（困り顔・手を挙げる） -->
+      <g transform="translate(78,74)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M28 56 Q46 44 44 30" stroke="#ffe1c4" stroke-width="11" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(16,10)">
+        <rect x="0" y="0" width="158" height="46" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M62 44 L54 64 L84 44Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="79" y="29" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">どうやって買うの…？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">UIが無い</span>中に飲み物は<b>ちゃんとある</b>のに、ボタンも投入口も無い。＝<b>操作する手段がない</b>ので、客は何もできない。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ボタンと投入口が付き客が操作できる">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- 自販機（UIあり） -->
+      <g transform="translate(206,24)">
+        <rect x="0" y="0" width="120" height="168" rx="10" fill="#dbe7ec" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="10" y="12" width="100" height="56" rx="5" fill="#eef7fb" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="17" y="22" width="15" height="30" rx="3" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="40" y="22" width="15" height="30" rx="3" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="63" y="22" width="15" height="30" rx="3" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="86" y="22" width="15" height="30" rx="3" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        <!-- ボタン(UI) -->
+        <circle cx="24" cy="84" r="7" fill="#ff6f7d" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="84" r="7" fill="#ffd166" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="24" cy="104" r="7" fill="#6fd0d9" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="104" r="7" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.8"/>
+        <!-- 投入口 -->
+        <rect x="72" y="80" width="30" height="7" rx="3.5" fill="#2f2f38"/>
+        <text x="87" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">¥</text>
+        <!-- 取り出し口 -->
+        <rect x="14" y="140" width="92" height="22" rx="4" fill="#2f2f38"/>
+      </g>
+      <!-- 投入するコイン＋きらきら -->
+      <circle cx="300" cy="70" r="7" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.5"/>
+      <text x="300" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#5a4a10">¥</text>
+      <path d="M172 66 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <!-- 客キャラ（笑顔・指さし） -->
+      <g transform="translate(78,74)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M24 60 L72 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="76" cy="76" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(16,10)">
+        <rect x="0" y="0" width="150" height="46" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M60 44 L52 64 L82 44Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="29" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">押せる！買えるぞ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">UIを付ける</span>ボタンと投入口（＝<b>UI</b>）が付いた。これでお金を入れ、押して<b>操作できる</b>ようになった。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ボタンを押しても中の機構が動かず何も出ない">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e7d6d6"/>
+      <!-- 自販機（UIあり・中の機構が停止） -->
+      <g transform="translate(206,24)">
+        <rect x="0" y="0" width="120" height="168" rx="10" fill="#dbe7ec" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="10" y="12" width="100" height="56" rx="5" fill="#eef7fb" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="17" y="22" width="15" height="30" rx="3" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="40" y="22" width="15" height="30" rx="3" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="63" y="22" width="15" height="30" rx="3" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="86" y="22" width="15" height="30" rx="3" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        <!-- ボタン(UI)：押されているが -->
+        <circle cx="24" cy="84" r="7" fill="#ff6f7d" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="84" r="7" fill="#ffd166" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="24" cy="104" r="7" fill="#6fd0d9" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="104" r="7" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="72" y="80" width="30" height="7" rx="3.5" fill="#2f2f38"/>
+        <!-- 停止した歯車（のぞき窓） -->
+        <circle cx="87" cy="116" r="16" fill="#f2eef0" stroke="var(--ink)" stroke-width="1.8"/>
+        <g transform="translate(87,116)">
+          <g fill="#b7b0b4" stroke="var(--ink)" stroke-width="1.2">
+            <rect x="-3" y="-13" width="6" height="7"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(60)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(120)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(180)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(240)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(300)"/>
+          </g>
+          <circle r="9" fill="#cfc7cb" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#e7607c" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- 取り出し口（空） -->
+        <rect x="14" y="140" width="92" height="22" rx="4" fill="#2f2f38"/>
+        <text x="60" y="156" text-anchor="middle" font-size="12" font-weight="700" fill="#9fb0b7">…空っぽ</text>
+      </g>
+      <text x="196" y="150" font-size="20">💢</text>
+      <!-- 客キャラ（驚き困り・指さしボタン） -->
+      <g transform="translate(78,74)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 38 Q0 34 8 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M2 31 l1 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M24 60 L72 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="76" cy="76" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(14,8)">
+        <rect x="0" y="0" width="164" height="46" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M62 44 L54 64 L84 44Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="82" y="29" text-anchor="middle" font-size="15" font-weight="700" fill="var(--child-d)">ポチッ…あれ、出ない！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">機能が動かない</span>ボタン（UI）はあるのに、中の機構（＝<b>機能</b>）が動いていない。押しても<b>何も起こらない</b>。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="操作できても結果が返らず客がモヤモヤ">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- モヤモヤ雲 -->
+      <g fill="#c9cee0" opacity=".8">
+        <circle cx="248" cy="60" r="16"/>
+        <circle cx="270" cy="52" r="20"/>
+        <circle cx="296" cy="62" r="15"/>
+        <circle cx="274" cy="72" r="17"/>
+      </g>
+      <text x="260" y="66" font-size="22">😞</text>
+      <!-- 客キャラ（困り顔・うなだれ） -->
+      <g transform="translate(150,74)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M0 30 l0 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(30,26)">
+        <rect x="0" y="0" width="176" height="48" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M132 46 L142 66 L112 46Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="88" y="30" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">押せるだけじゃ意味ないよ…</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">モヤモヤ</span>操作はできても<b>結果が返ってこない</b>。「ボタンが押せるだけ」では、役に立たない。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UIだけでも機能だけでも使えないと気づく">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 左：UIだけ（ボタンはあるが中身が無い） -->
+      <g transform="translate(72,96)">
+        <rect x="-36" y="-44" width="72" height="98" rx="8" fill="#dbe7ec" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-14" cy="-20" r="6" fill="#ff6f7d" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="8" cy="-20" r="6" fill="#ffd166" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="-14" cy="2" r="6" fill="#6fd0d9" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="8" cy="2" r="6" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-24" y="24" width="48" height="18" rx="3" fill="#2f2f38"/>
+        <text x="0" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">UIだけ</text>
+        <text x="0" y="88" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">（中身が動かない）</text>
+      </g>
+      <!-- 右：機能だけ（歯車は回るが押す所が無い） -->
+      <g transform="translate(286,88)">
+        <g transform="translate(-6,-6)">
+          <g fill="#9fb3ba" stroke="var(--ink)" stroke-width="1.5">
+            <rect x="-4" y="-25" width="8" height="11"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(45)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(90)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(135)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(180)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(225)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(270)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(315)"/>
+          </g>
+          <circle r="17" fill="#c7d3d8" stroke="var(--ink)" stroke-width="2"/>
+          <circle r="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        </g>
+        <g transform="translate(24,20) scale(.7)">
+          <g fill="#9fb3ba" stroke="var(--ink)" stroke-width="1.8">
+            <rect x="-4" y="-25" width="8" height="11"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(45)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(90)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(135)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(180)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(225)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(270)"/>
+            <rect x="-4" y="-25" width="8" height="11" transform="rotate(315)"/>
+          </g>
+          <circle r="17" fill="#c7d3d8" stroke="var(--ink)" stroke-width="2.4"/>
+          <circle r="6" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        </g>
+        <text x="4" y="70" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">機能だけ</text>
+        <text x="4" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">（押す所が無い）</text>
+      </g>
+      <!-- ≠ -->
+      <g transform="translate(180,92)">
+        <circle r="26" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="800" fill="#e7607c">≠</text>
+      </g>
+      <text x="180" y="210" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">どちらか片方だけでは「使える」にならない</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>原因は<b>「UI」と「機能」のどちらかが欠けていた</b>こと。片方だけでは、ボタンを押しても何も起こらない。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UIと機能がそろい押したら飲み物が出る">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 自販機（UI＋機能そろう） -->
+      <g transform="translate(206,24)">
+        <rect x="0" y="0" width="120" height="168" rx="10" fill="#dbe7ec" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="10" y="12" width="100" height="56" rx="5" fill="#eef7fb" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="17" y="22" width="15" height="30" rx="3" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="40" y="22" width="15" height="30" rx="3" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="63" y="22" width="15" height="30" rx="3" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="86" y="22" width="15" height="30" rx="3" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        <!-- ボタン(UI) -->
+        <circle cx="24" cy="84" r="7" fill="#ff6f7d" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="84" r="7" fill="#ffd166" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="24" cy="104" r="7" fill="#6fd0d9" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="48" cy="104" r="7" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="72" y="80" width="30" height="7" rx="3.5" fill="#2f2f38"/>
+        <!-- 動く歯車（のぞき窓） -->
+        <circle cx="87" cy="116" r="16" fill="#eef7ee" stroke="var(--ink)" stroke-width="1.8"/>
+        <g transform="translate(87,116)">
+          <g fill="#8bc79a" stroke="var(--ink)" stroke-width="1.2">
+            <rect x="-3" y="-13" width="6" height="7"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(60)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(120)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(180)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(240)"/>
+            <rect x="-3" y="-13" width="6" height="7" transform="rotate(300)"/>
+          </g>
+          <circle r="9" fill="#a7d3a0" stroke="var(--ink)" stroke-width="1.5"/>
+        </g>
+        <path d="M104 104 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2Z" fill="var(--accent)"/>
+        <!-- 取り出し口（缶が出る） -->
+        <rect x="14" y="140" width="92" height="22" rx="4" fill="#2f2f38"/>
+        <rect x="48" y="132" width="18" height="24" rx="4" fill="var(--child)" stroke="var(--ink)" stroke-width="1.8"/>
+      </g>
+      <text x="188" y="150" font-size="15" font-weight="700" fill="var(--child-d)">ゴトン♪</text>
+      <!-- 客キャラ（笑顔・指さしボタン） -->
+      <g transform="translate(78,74)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M24 60 L72 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="76" cy="76" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- きらきら＋吹き出し -->
+      <path d="M150 60 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <g transform="translate(16,10)">
+        <rect x="0" y="0" width="150" height="46" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M60 44 L52 64 L82 44Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="29" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">出てきた！これだ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">これが完成</span><b>操作できる入口（UI）</b>と<b>正しく動く中身（機能）</b>がそろって、はじめて「押したら出る」＝役に立つ状態になる。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ── UIと機能は「両方そろって」はじめて動く</h2>
+    <p class="lead">自動販売機は、ボタンや投入口（＝UI）が無ければ、中に飲み物があっても買えません。逆にボタンがあっても、中の機構（＝機能）が動かなければ、押しても何も出てきません。<strong>UI（操作の入口）と機能（中身の動き）は、両方そろってはじめて役に立ちます</strong>。</p>
+    <ul>
+      <li><b>自販機の場合</b>：ボタン・投入口＝<b>UI</b>（人が操作する接点）／缶を落とす中の機構＝<b>機能</b>（操作に応える中身）。片方だけでは買えない。</li>
+      <li><b>システムの場合</b>：画面やボタン＝<b>UI</b>、その裏で正しく処理する仕組み＝<b>機能</b>。UIが無ければ完成を確認できず、機能が無ければ押しても何も起こらない。</li>
+      <li><b>ポイント</b>：だから要件は <b>UI → 機能 → データ</b> の順で決める。まず「操作できる入口」を用意し、次に「押したらちゃんと動く中身」を固める。</li>
+    </ul>
+    <p class="map">物語の流れ： ①UIが無い＝操作できない → ②UIを付ける＝操作できる → ③でも機能が動かず出てこない → ④モヤモヤ → ⑤UIだけ／機能だけ≠使える → ⑥両方そろって完成</p>
+  </section>
+
+</main>
+
+</body>
+</html>
