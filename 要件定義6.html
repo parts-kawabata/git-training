@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅のしおりでわかる「伝わる企画書」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親役（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 受け手役（やる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>旅のしおりでわかる、<span class="hl">「伝わる企画書」</span>のはなし</h1>
+  <p>「行きます」の一言では、一緒に動く仲間は準備できない。──企画書は"通すため"ではなく"みんなが理解するため"に書く</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="幹事が一言メモだけ渡す">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e2dccb"/>
+      <!-- 幹事(pink)・左 -->
+      <g transform="translate(66,90)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/><circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M26 58 L60 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/><circle cx="64" cy="75" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 一言メモ -->
+      <g transform="translate(120,118)">
+        <rect x="0" y="0" width="66" height="50" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2" transform="rotate(-6)"/>
+        <text x="30" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" transform="rotate(-6)">京都に</text>
+        <text x="30" y="37" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" transform="rotate(-6)">行きます！</text>
+      </g>
+      <!-- メンバー(blue)・右、戸惑い -->
+      <g transform="translate(300,96)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 36 Q0 32 8 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="300" y="46" text-anchor="middle" font-size="22" font-weight="800" fill="var(--child-d)">？</text>
+      <!-- 幹事の吹き出し -->
+      <g transform="translate(16,8)">
+        <rect x="0" y="0" width="160" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M40 50 L34 70 L60 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="80" y="23" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">旅行、決まった！</text>
+        <text x="80" y="42" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">あとはヨロシク！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">一言メモ</span>幹事が渡したのは「行きます」だけの<b>一言メモ</b>。承認を取るには足りても、動く仲間には情報が足りない。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="メンバーが疑問だらけで困る">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- メンバー(blue)・困り、メモを持つ -->
+      <g transform="translate(92,92)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M26 58 L54 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <rect x="52" y="66" width="26" height="20" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+      </g>
+      <!-- 疑問の吹き出し ×3 -->
+      <g transform="translate(180,26)">
+        <rect x="0" y="0" width="96" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="14" cy="42" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="48" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">どこに集合？</text>
+      </g>
+      <g transform="translate(232,86)">
+        <rect x="0" y="0" width="96" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="12" cy="42" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="48" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">何泊するの？</text>
+      </g>
+      <g transform="translate(180,146)">
+        <rect x="0" y="0" width="104" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="16" cy="-6" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">何を持ってく？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">伝わらない</span>受け取ったメンバーは<b>中身が分からない</b>。集合場所も日数も持ち物も、これでは動けない。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="各自バラバラに解釈して山と海に割れる">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e7d6d6"/>
+      <!-- 左メンバー：山の準備 -->
+      <g transform="translate(80,98)">
+        <ellipse cx="0" cy="114" rx="34" ry="8" fill="#00000010"/>
+        <!-- リュック -->
+        <rect x="18" y="44" width="22" height="34" rx="7" fill="#c98a5a" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-9 36 Q0 40 9 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 右メンバー：海の準備（浮き輪） -->
+      <g transform="translate(280,98)">
+        <ellipse cx="0" cy="114" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#5a4636"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-9 36 Q0 40 9 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 浮き輪 -->
+        <ellipse cx="0" cy="80" rx="30" ry="14" fill="#ff8a8a" stroke="var(--ink)" stroke-width="1.8"/>
+        <ellipse cx="0" cy="80" rx="14" ry="6" fill="#fdeef0"/>
+        <path d="M-30 80 a30 14 0 0 1 60 0" fill="none" stroke="#fff" stroke-width="4" opacity=".7"/>
+      </g>
+      <!-- 衝突マーク -->
+      <text x="176" y="86" text-anchor="middle" font-size="26">💥</text>
+      <!-- セリフ（左上・右上に分けて頭と重ならないよう配置） -->
+      <g transform="translate(26,14)">
+        <rect x="0" y="0" width="82" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M34 32 L28 50 L54 32Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="41" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">山だよね？</text>
+      </g>
+      <g transform="translate(238,14)">
+        <rect x="0" y="0" width="82" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M48 32 L54 50 L28 32Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="41" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">海でしょ？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">解釈バラバラ</span>各自が勝手に解釈して準備。<b>山の人と海の人</b>に割れてしまい、話がかみ合わない。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="曖昧な企画書で全員やり直しになる">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- モヤモヤ雲 -->
+      <g fill="#c9cee0" opacity=".8">
+        <circle cx="168" cy="46" r="16"/><circle cx="190" cy="38" r="20"/><circle cx="216" cy="48" r="15"/><circle cx="194" cy="58" r="17"/>
+      </g>
+      <text x="180" y="52" font-size="22">😞</text>
+      <!-- やり直しアイコン＋ラベル（縦に並べて重なり回避） -->
+      <text x="180" y="142" text-anchor="middle" font-size="30">🔁</text>
+      <text x="180" y="174" text-anchor="middle" font-size="14" font-weight="700" fill="#7a7e8c">やり直し…</text>
+      <!-- 幹事(pink)・困り -->
+      <g transform="translate(80,96)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <!-- メンバー(blue)・困り -->
+      <g transform="translate(280,96)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手戻り</span>結局みんなで<b>やり直し</b>。曖昧な企画書のままでは、時間も労力もムダになってしまう。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="企画書は通すためではなく理解するためと気づく図解">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 左：通すための紙（ハンコ） -->
+      <g transform="translate(74,86)">
+        <rect x="-30" y="-34" width="60" height="76" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="-20" y1="-20" x2="20" y2="-20" stroke="var(--line)" stroke-width="3"/>
+        <line x1="-20" y1="-8" x2="20" y2="-8" stroke="var(--line)" stroke-width="3"/>
+        <circle cx="10" cy="22" r="14" fill="none" stroke="#e7607c" stroke-width="3"/>
+        <text x="10" y="27" text-anchor="middle" font-size="13" font-weight="800" fill="#e7607c">承</text>
+        <text x="0" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="var(--parent-d)">通すための紙</text>
+        <text x="0" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">（承認をもらう）</text>
+      </g>
+      <!-- 右：理解のための紙（項目＋みんな） -->
+      <g transform="translate(286,86)">
+        <rect x="-30" y="-34" width="60" height="76" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <g stroke="#3aa86b" stroke-width="2.5" fill="none" stroke-linecap="round">
+          <path d="M-20 -22 l4 5 l7 -9"/><path d="M-20 -8 l4 5 l7 -9"/><path d="M-20 6 l4 5 l7 -9"/><path d="M-20 20 l4 5 l7 -9"/>
+        </g>
+        <line x1="-4" y1="-20" x2="20" y2="-20" stroke="var(--line)" stroke-width="3"/>
+        <line x1="-4" y1="-6" x2="20" y2="-6" stroke="var(--line)" stroke-width="3"/>
+        <line x1="-4" y1="8" x2="20" y2="8" stroke="var(--line)" stroke-width="3"/>
+        <line x1="-4" y1="22" x2="20" y2="22" stroke="var(--line)" stroke-width="3"/>
+        <text x="0" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">みんなが動く紙</text>
+        <text x="0" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">（関係者が理解する）</text>
+      </g>
+      <!-- ≠ -->
+      <g transform="translate(180,80)">
+        <circle r="26" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="0" y="9" text-anchor="middle" font-size="26" font-weight="800" fill="#e7607c">≠</text>
+      </g>
+      <text x="180" y="212" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">企画書は「通すため」ではなく「理解するため」</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>企画書のゴールは<b>承認を得ること</b>ではなく、関係者が<b>中身を理解して動けること</b>だった。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="8項目そろったしおりで全員が理解して動ける">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 8項目のしおり（中央） -->
+      <g transform="translate(122,32)">
+        <rect x="0" y="0" width="116" height="176" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="116" height="26" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="16" width="116" height="10" fill="var(--accent)"/>
+        <text x="58" y="18" text-anchor="middle" font-size="13" font-weight="800" fill="#5a4a10">旅のしおり</text>
+        <g font-size="10" font-weight="700" fill="var(--ink)">
+          <g stroke="#3aa86b" stroke-width="2.4" fill="none" stroke-linecap="round">
+            <path d="M10 45 l4 5 l8 -10"/><path d="M10 62 l4 5 l8 -10"/><path d="M10 79 l4 5 l8 -10"/><path d="M10 96 l4 5 l8 -10"/>
+            <path d="M10 113 l4 5 l8 -10"/><path d="M10 130 l4 5 l8 -10"/><path d="M10 147 l4 5 l8 -10"/><path d="M10 164 l4 5 l8 -10"/>
+          </g>
+          <text x="30" y="48">旅行の名前</text>
+          <text x="30" y="65">目的</text>
+          <text x="30" y="82">行き先・行程</text>
+          <text x="30" y="99">どんな旅か</text>
+          <text x="30" y="116">参加メンバー</text>
+          <text x="30" y="133">得られる思い出</text>
+          <text x="30" y="150">係の分担</text>
+          <text x="30" y="167">日程</text>
+        </g>
+      </g>
+      <!-- きらきら -->
+      <path d="M96 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M262 46 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <!-- 幹事(pink)・笑顔 左 -->
+      <g transform="translate(52,110)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- メンバー(blue)・笑顔 右 -->
+      <g transform="translate(308,110)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#3a3a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 吹き出し（右メンバーの頭と重ならない上部へ） -->
+      <g transform="translate(240,6)">
+        <rect x="0" y="0" width="104" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M62 32 L66 50 L86 32Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">これで分かる！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">解決</span>名称・目的・作るもの…と<b>8項目</b>をそろえた企画書なら、関係者全員が<b>同じ絵</b>を見て動ける。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ── 企画書は「通すため」ではなく「理解してもらうため」に書く</h2>
+    <p class="lead">「京都に行きます」の一言では、一緒に動く仲間はどこへ何を持って行けばいいのか分かりません。旅のしおりに必要な項目をそろえて初めて、全員が同じ旅をイメージできます。企画書も同じで、<strong>「企画を通すための企画書」ではなく、企画を実現する関係者が"通った企画がどのようなものか"を理解するための企画書</strong>を作ることが大切です。</p>
+    <ul>
+      <li><b>旅のしおりの場合</b>：旅行の名前／目的／行き先・行程／どんな旅か／参加メンバー／得られる思い出／係の分担／日程。これがそろえば全員が迷わず動ける。</li>
+      <li><b>企画書の場合（最低8項目）</b>：①<b>プロジェクトの名称</b> ②<b>目的</b> ③<b>目的達成のために作るもの</b> ④<b>作るものの説明</b> ⑤<b>作るものを利用する人</b> ⑥<b>利用する人が得られる便益</b> ⑦<b>作るための体制</b> ⑧<b>期限</b>。</li>
+      <li><b>ポイント</b>：読み手は「作業する関係者」。承認を取るゴールで書くと曖昧になり、手戻りを生む。関係者が<b>理解して動ける</b>かを基準に書く。</li>
+    </ul>
+    <p class="map">物語の流れ： ①一言メモを渡す → ②中身が分からない → ③各自バラバラに準備 → ④全員やり直し → ⑤「通すため≠理解するため」と気づく → ⑥8項目で全員が同じ絵</p>
+  </section>
+
+</main>
+
+</body>
+</html>
