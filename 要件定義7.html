@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>間取りスケッチでわかる「全体像を描く」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親役（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 受け手役（やる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>間取りスケッチでわかる、<span class="hl">「全体像を描く」</span>のはなし</h1>
+  <p>企画メモを材料に、いきなり詳細ではなく“全体像”をざっくり描く。──描くうちに湧いた疑問は、その場で確かめて前後の工程に書き戻す</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：企画を材料に全体像を描き始める ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="設計者が企画メモを材料に全体像のラフを描き始める">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 企画メモ（前工程の成果物・材料） -->
+      <g transform="translate(150,12)">
+        <rect x="0" y="0" width="70" height="50" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2" transform="rotate(-5)"/>
+        <rect x="0" y="0" width="70" height="15" rx="4" fill="var(--parent)" transform="rotate(-5)"/>
+        <text x="35" y="12" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" transform="rotate(-5)">企画</text>
+        <line x1="8" y1="28" x2="58" y2="26" stroke="var(--line)" stroke-width="3" transform="rotate(-5)"/>
+        <line x1="8" y1="38" x2="58" y2="36" stroke="var(--line)" stroke-width="3" transform="rotate(-5)"/>
+      </g>
+      <!-- 製図ボード（全体像ラフ） -->
+      <g transform="translate(158,58)">
+        <rect x="0" y="0" width="150" height="128" rx="7" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="150" height="22" rx="7" fill="var(--accent)"/>
+        <rect x="0" y="14" width="150" height="8" fill="var(--accent)"/>
+        <text x="75" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">全体像（ラフ）</text>
+        <!-- 家のざっくり間取り -->
+        <path d="M32 62 L75 38 L118 62" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="32" y="62" width="86" height="54" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="75" y1="62" x2="75" y2="116" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="4 4"/>
+        <line x1="32" y1="90" x2="75" y2="90" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="4 4"/>
+        <path d="M100 116 a12 12 0 0 1 12 -12" fill="none" stroke="var(--ink)" stroke-width="1.6"/>
+      </g>
+      <!-- 設計者(blue)左・集中して描く -->
+      <g transform="translate(72,96)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 42 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/><circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <!-- 鉛筆を持つ腕 -->
+        <path d="M26 58 L60 68" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="64" cy="69" r="7" fill="#ffe1c4"/>
+        <line x1="62" y1="68" x2="90" y2="54" stroke="#ffcf5a" stroke-width="5" stroke-linecap="round"/>
+        <path d="M90 54 l7 -3 l-2 7Z" fill="#7a5a44"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(18,8)">
+        <rect x="0" y="0" width="132" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M44 50 L40 70 L64 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="66" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">企画を材料に、</text>
+        <text x="66" y="41" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">まず全体像から！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">全体像を描く</span>確認した<b>企画を材料</b>に、いきなり詳細ではなく、これから作るソフトの<b>全体像</b>をざっくり描き始める。</div>
+  </section>
+
+  <!-- ============ コマ2：描くうちに疑問がわく ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="全体像を描くうちにいろいろな疑問がわいてくる">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- 設計者(blue)・考えながら描く -->
+      <g transform="translate(92,92)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 36 Q0 32 8 36" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- 図面の切れ端を持つ -->
+        <path d="M26 58 L54 74" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <rect x="50" y="64" width="26" height="20" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+      </g>
+      <!-- 疑問の吹き出し ×3 -->
+      <g transform="translate(178,24)">
+        <rect x="0" y="0" width="104" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="14" cy="42" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">家族は何人？</text>
+      </g>
+      <g transform="translate(230,86)">
+        <rect x="0" y="0" width="98" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="12" cy="42" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="49" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">車は何台？</text>
+      </g>
+      <g transform="translate(178,146)">
+        <rect x="0" y="0" width="98" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="16" cy="-6" r="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="49" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">和室はいる？</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">疑問</span>描いていくうちに「家族は？車は？」と、いろいろな<b>疑問が次々わいてくる</b>。</div>
+  </section>
+
+  <!-- ============ コマ3：要件定義の前でも確認できる（気づき） ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="要件定義の前でも確認できることがたくさんあると気づく図解">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 工程タイムライン -->
+      <line x1="46" y1="150" x2="306" y2="150" stroke="var(--ink)" stroke-width="3"/>
+      <path d="M306 150 l-14 -7 l0 14Z" fill="var(--ink)"/>
+      <!-- ステップ1：全体像（今ここ） -->
+      <circle cx="104" cy="150" r="14" fill="var(--accent)" stroke="var(--ink)" stroke-width="2.5"/>
+      <text x="104" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">全体像を描く</text>
+      <text x="104" y="192" text-anchor="middle" font-size="11" font-weight="700" fill="#e7607c">（今ここ）</text>
+      <!-- ステップ2：要件定義 -->
+      <circle cx="250" cy="150" r="14" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+      <text x="250" y="176" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">要件定義</text>
+      <text x="250" y="192" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">（この後）</text>
+      <!-- 気づきの吹き出し -->
+      <g transform="translate(30,22)">
+        <rect x="0" y="0" width="192" height="66" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M64 64 L74 100 L92 64Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="96" y="27" text-anchor="middle" font-size="14" font-weight="800" fill="var(--ink)">今この時点でも、</text>
+        <text x="96" y="50" text-anchor="middle" font-size="14" font-weight="800" fill="var(--child-d)">確かめられることが多い！</text>
+      </g>
+      <text x="284" y="46" text-anchor="middle" font-size="28">💡</text>
+      <text x="180" y="222" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)">要件定義の前でも、確認できることはたくさんある</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>その疑問には、<b>要件定義の前（今この時点）でも確認できること</b>がたくさんある。</div>
+  </section>
+
+  <!-- ============ コマ4：きちんと確認する ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="設計者が施主に疑問をきちんと確認し施主が答える">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 設計者(blue)・左、確認する -->
+      <g transform="translate(80,100)">
+        <ellipse cx="0" cy="116" rx="32" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#3a3a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 42 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 手を挙げて質問 -->
+        <path d="M28 56 Q46 44 44 30" stroke="#ffe1c4" stroke-width="12" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 施主(pink)・右、答える -->
+      <g transform="translate(282,100)">
+        <ellipse cx="0" cy="116" rx="32" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/><circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 42 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/><circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 設計者の吹き出し（左上） -->
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="150" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M42 50 L36 70 L62 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">ここ、確認しても</text>
+        <text x="75" y="41" text-anchor="middle" font-size="13" font-weight="700" fill="var(--child-d)">いいですか？</text>
+      </g>
+      <!-- 施主の吹き出し（右上） -->
+      <g transform="translate(200,10)">
+        <rect x="0" y="0" width="150" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M108 50 L114 70 L88 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--parent-d)">4人家族で、</text>
+        <text x="75" y="41" text-anchor="middle" font-size="13" font-weight="700" fill="var(--parent-d)">車は2台だよ！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">確認</span>だから思い込みで進めず、生じた疑問は<b>きちんと相手に確認</b>を取る。</div>
+  </section>
+
+  <!-- ============ コマ5：前工程と本工程の両方に反映 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="確認した結果を企画書と全体像の両方に反映する">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 中央：確認できた事実カード -->
+      <g transform="translate(120,20)">
+        <rect x="0" y="0" width="120" height="52" rx="8" fill="#fff" stroke="var(--accent)" stroke-width="3"/>
+        <text x="60" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">確認できた事実</text>
+        <text x="60" y="42" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">4人家族・車2台</text>
+      </g>
+      <path d="M92 34 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M258 34 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <!-- 反映の矢印（両方へ） -->
+      <path d="M150 74 Q108 92 82 108" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="5 4"/>
+      <path d="M82 108 l11 -2 l-6 -9Z" fill="var(--ink)"/>
+      <path d="M210 74 Q252 92 278 108" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="5 4"/>
+      <path d="M278 108 l-5 -10 l11 2Z" fill="var(--ink)"/>
+      <text x="96" y="96" text-anchor="middle" font-size="11" font-weight="800" fill="var(--parent-d)">反映</text>
+      <text x="264" y="96" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">反映</text>
+      <!-- 左：企画書（前工程） -->
+      <g transform="translate(24,108)">
+        <rect x="0" y="0" width="94" height="72" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="0" y="0" width="94" height="18" rx="6" fill="var(--parent)"/>
+        <text x="47" y="13" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">企画書</text>
+        <line x1="10" y1="32" x2="84" y2="32" stroke="var(--line)" stroke-width="3"/>
+        <line x1="10" y1="44" x2="84" y2="44" stroke="var(--line)" stroke-width="3"/>
+        <path d="M10 58 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/>
+        <line x1="30" y1="58" x2="84" y2="58" stroke="#3aa86b" stroke-width="3"/>
+      </g>
+      <text x="71" y="200" text-anchor="middle" font-size="12" font-weight="800" fill="var(--parent-d)">前工程</text>
+      <!-- 右：全体像（本工程） -->
+      <g transform="translate(242,108)">
+        <rect x="0" y="0" width="94" height="72" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="0" y="0" width="94" height="18" rx="6" fill="var(--accent)"/>
+        <text x="47" y="13" text-anchor="middle" font-size="11" font-weight="800" fill="#5a4a10">全体像</text>
+        <path d="M24 50 L47 34 L70 50" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="24" y="50" width="46" height="16" fill="none" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M12 40 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/>
+      </g>
+      <text x="289" y="200" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">本工程</text>
+    </svg>
+    <div class="cap"><span class="tag">反映</span>確認した結果は、<b>前工程の企画書</b>と<b>本工程の全体像</b>の両方に書き足して反映する。</div>
+  </section>
+
+  <!-- ============ コマ6：ズレのない全体像で次工程へ ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ズレのない全体像が完成し安心して要件定義へ進む">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 完成した全体像ボード（中央） -->
+      <g transform="translate(120,30)">
+        <rect x="0" y="0" width="120" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="120" height="24" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="15" width="120" height="9" fill="var(--accent)"/>
+        <text x="60" y="17" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">全体像（ズレなし）</text>
+        <path d="M26 62 L60 40 L94 62" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="26" y="62" width="68" height="52" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="60" y1="62" x2="60" y2="114" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="26" y1="88" x2="60" y2="88" stroke="var(--ink)" stroke-width="1.6"/>
+        <!-- 大きなチェック -->
+        <path d="M42 128 l10 12 l22 -26" fill="none" stroke="#3aa86b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <!-- きらきら -->
+      <path d="M98 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M260 46 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <!-- 施主(pink)・笑顔 左 -->
+      <g transform="translate(52,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 設計者(blue)・笑顔 右 -->
+      <g transform="translate(308,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#3a3a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 吹き出し（右上・番号バッジと重ならない位置、設計者を指す） -->
+      <g transform="translate(244,6)">
+        <rect x="0" y="0" width="112" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M58 32 L64 50 L78 32Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="56" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">認識ぴったり！</text>
+      </g>
+      <text x="180" y="212" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">→ 要件定義へ</text>
+    </svg>
+    <div class="cap"><span class="tag">解決</span>認識のズレがない全体像ができ、<b>安心して次工程（要件定義）</b>へ進める。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🏠 まとめ ── 「全体像を描く」段階で疑問を確かめ、前後の工程に書き戻す</h2>
+    <p class="lead">家を建てる設計者は、施主の企画メモを材料に、いきなり詳細図面ではなく<strong>まず家の全体像（ラフな間取り）を描きます</strong>。描くうちに「家族は何人？車は何台？」と疑問が生まれ、それらは<strong>本格的な設計（要件定義）の前でも確認できる</strong>ことばかり。だから確認を取り、その答えを<strong>元の企画書（前工程）と全体像（本工程）の両方に反映</strong>してから先へ進みます。</p>
+    <ul>
+      <li><b>間取りスケッチの場合</b>：企画メモを材料に全体像を描く → 描くうちに疑問がわく → 詳細設計の前に施主へ確認 → 答えを企画メモと間取りの両方に書き足す。</li>
+      <li><b>ソフト開発の場合</b>：確認した<b>企画を材料</b>に、これから作るソフトの<b>全体像</b>を描く。描く過程で生じた疑問は、<b>要件定義の前でも確認できる</b>ものが多い。</li>
+      <li><b>ポイント</b>：疑問を<b>思い込みで放置しない</b>。確認結果は<b>前工程の企画書</b>と<b>本工程の全体像</b>の両方に反映し、土台のズレをなくしてから要件定義へ進む。</li>
+    </ul>
+    <p class="map">物語の流れ： ①企画を材料に全体像を描く → ②疑問が生じる → ③要件定義の前でも確認できる → ④きちんと確認する → ⑤企画書と全体像の両方へ反映 → ⑥ズレのない全体像で次工程へ</p>
+  </section>
+
+</main>
+
+</body>
+</html>
