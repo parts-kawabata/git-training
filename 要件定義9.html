@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家づくりの工法決めでわかる「アーキテクチャ設計」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 施主（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 棟梁・設計者（つくる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>家づくりの工法決めでわかる、<span class="hl">「アーキテクチャ設計」</span>のはなし</h1>
+  <p>大工に渡す図面は“そのまま建てられる”具体さが要る。──だから図面を描く前に「どう建てるか（工法）」を、大枠→各部の2段階で決めておく</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：図面は「そのまま建てられる」具体さが要る ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="大工に渡す図面はそのまま建てられる具体さがなければならない">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 図面ボード -->
+      <g transform="translate(104,26)">
+        <rect x="0" y="0" width="152" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="152" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="152" height="8" fill="var(--accent)"/>
+        <text x="76" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">図面（要件定義）</text>
+        <!-- 家の断面図・寸法入り -->
+        <path d="M28 108 L28 60 L76 34 L124 60 L124 108" fill="#eaf6f8" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+        <line x1="28" y1="80" x2="124" y2="80" stroke="var(--ink)" stroke-width="1.4"/>
+        <line x1="62" y1="80" x2="62" y2="108" stroke="var(--ink)" stroke-width="1.4"/>
+        <line x1="92" y1="80" x2="92" y2="108" stroke="var(--ink)" stroke-width="1.4"/>
+        <!-- 寸法線 -->
+        <line x1="28" y1="120" x2="124" y2="120" stroke="var(--child-d)" stroke-width="1.4"/>
+        <path d="M28 116 L28 124 M124 116 L124 124" stroke="var(--child-d)" stroke-width="1.4"/>
+        <text x="76" y="134" text-anchor="middle" font-size="10" font-weight="700" fill="var(--child-d)">3640mm</text>
+      </g>
+      <!-- 大工(blue)・左 -->
+      <g transform="translate(52,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#3a3a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(238,18)">
+        <rect x="0" y="0" width="116" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M38 50 L32 70 L58 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="58" y="22" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">これなら、その</text>
+        <text x="58" y="41" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">まま建てられる！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">具体さ</span>大工に渡す<b>図面</b>は、迷わず<b>そのまま建てられる</b>具体さが要る。＝要件定義は、後工程でそのまま<b>プログラミングできる情報</b>でなければならない。</div>
+  </section>
+
+  <!-- ============ コマ2：建て方が未定だと図面が描けない ============ -->
+  <section class="panel flip">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="木造か鉄骨か建て方が決まっていないと具体的な図面が描けない">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- ？だらけの図面 -->
+      <g transform="translate(112,28)">
+        <rect x="0" y="0" width="150" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="7 5"/>
+        <text x="75" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#9aa0ad">図面が描けない…</text>
+        <text x="40" y="70" text-anchor="middle" font-size="30" font-weight="800" fill="#c3c8d4">？</text>
+        <text x="108" y="58" text-anchor="middle" font-size="22" font-weight="800" fill="#c3c8d4">？</text>
+        <text x="72" y="112" text-anchor="middle" font-size="26" font-weight="800" fill="#c3c8d4">？</text>
+        <text x="118" y="118" text-anchor="middle" font-size="18" font-weight="800" fill="#c3c8d4">？</text>
+      </g>
+      <!-- 選択肢：木造 / 鉄骨（未定） -->
+      <g transform="translate(20,30)">
+        <rect x="0" y="0" width="72" height="30" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="36" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🪵 木造？</text>
+      </g>
+      <g transform="translate(20,150)">
+        <rect x="0" y="0" width="72" height="30" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="36" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🔩 鉄骨？</text>
+      </g>
+      <!-- 設計者(blue)・困り顔 右下 -->
+      <g transform="translate(306,120)">
+        <ellipse cx="0" cy="100" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-25" y="42" width="50" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#3a3a44"/>
+        <path d="M-15 18 Q-10 14 -5 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M5 18 Q10 14 15 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 33 Q0 29 8 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 27 l-3 8 M8 27 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="300" y="42" text-anchor="middle" font-size="24">💦</text>
+    </svg>
+    <div class="cap"><span class="tag">つまずき</span>でも<b>木造か鉄骨か</b>――建て方が決まっていないと、寸法も柱の位置も定まらず<b>具体的な図面が描けない</b>。＝技術方針が未定では要件が定まらない。</div>
+  </section>
+
+  <!-- ============ コマ3：図面の前に「どう建てるか」を先に決める ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="図面を描く前に建て方を先に決めておくと気づく">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 順序の矢印：工法決め → 図面 -->
+      <g transform="translate(40,86)">
+        <rect x="0" y="0" width="118" height="60" rx="10" fill="#fff" stroke="var(--child-d)" stroke-width="2.4"/>
+        <text x="59" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">① 工法決め</text>
+        <text x="59" y="46" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">どう建てるか</text>
+      </g>
+      <path d="M164 116 L204 116" stroke="var(--ink)" stroke-width="3" marker-end="url(#ar3)"/>
+      <defs>
+        <marker id="ar3" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto">
+          <path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/>
+        </marker>
+      </defs>
+      <g transform="translate(210,86)">
+        <rect x="0" y="0" width="118" height="60" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="59" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">② 図面</text>
+        <text x="59" y="46" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">＝要件定義</text>
+      </g>
+      <!-- 気づきの吹き出し -->
+      <g transform="translate(34,14)">
+        <rect x="0" y="0" width="256" height="42" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M60 40 L52 60 L82 40Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="128" y="27" text-anchor="middle" font-size="14" font-weight="800" fill="var(--child-d)">図面の“前に”建て方を決めておこう！</text>
+      </g>
+      <text x="316" y="40" text-anchor="middle" font-size="26">💡</text>
+      <text x="180" y="196" text-anchor="middle" font-size="13.5" font-weight="700" fill="var(--ink)">工法（技術的な選定・方式の方針）を先に固める</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>そこで、図面を描く<b>前に「どう建てるか」を先に決めておく</b>。＝技術的な選定・方式の方針決定を、<b>要件定義を行う前まで</b>に済ませておく。</div>
+  </section>
+
+  <!-- ============ コマ4：現場監督の段取りで「建て方の設計」を実施 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="現場監督の段取りのもと棟梁が建て方の設計を行う">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 現場監督(pink)・段取り 左 -->
+      <g transform="translate(58,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+        <!-- ヘルメット -->
+        <path d="M-32 4 Q0 -34 32 4 L-32 4Z" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+      </g>
+      <text x="58" y="48" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--parent-d)">現場監督</text>
+      <text x="58" y="64" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">＝プロジェクト管理</text>
+      <!-- 段取りボード（中央〜右） -->
+      <g transform="translate(140,40)">
+        <rect x="0" y="0" width="196" height="120" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="196" height="24" rx="10" fill="var(--child)"/>
+        <rect x="0" y="15" width="196" height="9" fill="var(--child)"/>
+        <text x="98" y="17" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">建て方の設計＝アーキテクチャ設計</text>
+        <path d="M16 46 l7 8 l12 -15" fill="none" stroke="var(--child-d)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="44" y="50" font-size="12" font-weight="700" fill="var(--ink)">段取り・工程を管理</text>
+        <path d="M16 74 l7 8 l12 -15" fill="none" stroke="var(--child-d)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="44" y="78" font-size="12" font-weight="700" fill="var(--ink)">工法の方針を決定</text>
+        <path d="M16 102 l7 8 l12 -15" fill="none" stroke="var(--child-d)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="44" y="106" font-size="12" font-weight="700" fill="var(--ink)">図面の前に固める</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">段取り</span><b>現場監督（＝プロジェクトマネジメント）</b>の段取りのもとで、「どう建てるか」を設計する。この作業が<b>アーキテクチャ設計</b>にあたる。</div>
+  </section>
+
+  <!-- ============ コマ5：第1段階＝家全体の構造方式を決める ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第1段階として家全体の構造方式を木造か鉄骨か決める">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 段階ラベル -->
+      <g transform="translate(20,16)">
+        <rect x="0" y="0" width="120" height="30" rx="15" fill="var(--child)" />
+        <text x="60" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">第1段階</text>
+      </g>
+      <text x="248" y="35" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">家全体の構造方式</text>
+      <!-- 家の骨組み（大枠） -->
+      <g transform="translate(112,58)">
+        <rect x="0" y="0" width="150" height="128" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <!-- 屋根と柱の骨組み -->
+        <path d="M20 108 L20 52 L75 20 L130 52 L130 108" fill="none" stroke="var(--child-d)" stroke-width="4" stroke-linejoin="round"/>
+        <line x1="20" y1="80" x2="130" y2="80" stroke="var(--child-d)" stroke-width="3.5"/>
+        <line x1="52" y1="80" x2="52" y2="108" stroke="var(--child-d)" stroke-width="3.5"/>
+        <line x1="98" y1="80" x2="98" y2="108" stroke="var(--child-d)" stroke-width="3.5"/>
+        <text x="75" y="124" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">全体の骨組み</text>
+      </g>
+      <!-- 選択：木造 or 鉄骨（木造に決定） -->
+      <g transform="translate(272,60)">
+        <rect x="0" y="0" width="78" height="34" rx="9" fill="#e7f7ea" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="39" y="16" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--ink)">🪵 木造</text>
+        <text x="39" y="28" text-anchor="middle" font-size="10" font-weight="700" fill="#3aa86b">← これに決定</text>
+      </g>
+      <g transform="translate(272,104)">
+        <rect x="0" y="0" width="78" height="30" rx="9" fill="#f1f3f8" stroke="#c3c8d4" stroke-width="1.8"/>
+        <text x="39" y="20" text-anchor="middle" font-size="11.5" font-weight="700" fill="#9aa0ad">🔩 鉄骨</text>
+      </g>
+      <text x="311" y="176" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">＝基本的な</text>
+      <text x="311" y="190" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">システム構成</text>
+    </svg>
+    <div class="cap"><span class="tag">第1段階</span>まず<b>家全体をどう建てるか（木造／鉄骨など）</b>という大枠の構造を決める。＝<b>基本的なシステムアーキテクチャ</b>を決める。</div>
+  </section>
+
+  <!-- ============ コマ6：第2段階＝各部の建材・工法を決める ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第2段階として各部屋や各設備の建材と工法を個別に決める">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 段階ラベル -->
+      <g transform="translate(20,16)">
+        <rect x="0" y="0" width="120" height="30" rx="15" fill="var(--child)" />
+        <text x="60" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">第2段階</text>
+      </g>
+      <text x="250" y="35" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">各部の建材・工法</text>
+      <!-- 各部ごとの個別技術カード -->
+      <g transform="translate(24,58)">
+        <rect x="0" y="0" width="150" height="40" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="10" y="17" font-size="11.5" font-weight="800" fill="var(--child-d)">🧱 外壁</text>
+        <text x="10" y="33" font-size="11" font-weight="700" fill="var(--ink)">断熱サイディング</text>
+      </g>
+      <g transform="translate(186,58)">
+        <rect x="0" y="0" width="150" height="40" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="10" y="17" font-size="11.5" font-weight="800" fill="var(--child-d)">🚿 水まわり</text>
+        <text x="10" y="33" font-size="11" font-weight="700" fill="var(--ink)">ユニットバス採用</text>
+      </g>
+      <g transform="translate(24,108)">
+        <rect x="0" y="0" width="150" height="40" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="10" y="17" font-size="11.5" font-weight="800" fill="var(--child-d)">🪟 窓</text>
+        <text x="10" y="33" font-size="11" font-weight="700" fill="var(--ink)">二重サッシ</text>
+      </g>
+      <g transform="translate(186,108)">
+        <rect x="0" y="0" width="150" height="40" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="10" y="17" font-size="11.5" font-weight="800" fill="var(--child-d)">🏠 屋根</text>
+        <text x="10" y="33" font-size="11" font-weight="700" fill="var(--ink)">ガルバリウム鋼板</text>
+      </g>
+      <!-- きらきら -->
+      <path d="M180 168 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <text x="180" y="212" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--child-d)">各部を、それぞれ最適な作り方で決めていく</text>
+    </svg>
+    <div class="cap"><span class="tag">第2段階</span>次に<b>外壁・水まわり・窓…と各部をどんな建材・工法で作るか</b>を個別に決める。＝<b>各部の個別の実装技術</b>を決定する。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🏗️ まとめ ── 図面（要件定義）の“前”に、工法（アーキテクチャ）を2段階で固める</h2>
+    <p class="lead">大工に渡す図面は、迷わず<strong>そのまま建てられる</strong>具体さが要ります。要件定義も同じで、後工程でそのまま<strong>プログラミングできる情報</strong>でなければなりません。ところが「木造か鉄骨か」という建て方が未定では図面が描けないのと同じで、技術方針が決まっていないと要件は定まりません。そこで<strong>図面を描く前に「どう建てるか」を先に決めておく</strong>――これがアーキテクチャ設計です。</p>
+    <ul>
+      <li><b>家づくりの場合</b>：図面はそのまま建てられる具体さが要る → でも建て方が未定だと描けない → 図面の前に工法を決める → 現場監督の段取りで建て方を設計 → 第1段階で家全体の構造（木造/鉄骨）→ 第2段階で各部の建材・工法。</li>
+      <li><b>ソフト開発の場合</b>：要件定義は<b>プログラミングできる情報</b>である必要 → だから技術的な<b>選定・方式の方針決定</b>を要件定義の<b>前まで</b>に済ませる → <b>プロジェクトマネジメント</b>に基づき<b>アーキテクチャ設計</b>を実施 → 第1段階＝<b>基本的なシステムアーキテクチャ</b> → 第2段階＝<b>各部の個別の実装技術</b>。</li>
+      <li><b>ポイント</b>：順序は「工法決め → 図面」。アーキテクチャは<b>大枠（全体構造）→ 各部（個別技術）</b>の2段階で決めると、要件がそのまま実装できる情報になる。</li>
+    </ul>
+    <p class="map">物語の流れ： ①図面はそのまま建てられる具体さが要る → ②建て方が未定だと描けない → ③図面の前に工法を決める → ④現場監督の段取りでアーキテクチャ設計 → ⑤第1段階：全体の構造方式 → ⑥第2段階：各部の実装技術</p>
+  </section>
+
+</main>
+
+</body>
+</html>
