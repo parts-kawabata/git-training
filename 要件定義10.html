@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家づくりの要望ヒアリングでわかる「要望を文書化する」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 施主（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 設計者（つくる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>家づくりの要望ヒアリングでわかる、<span class="hl">「要望を文書化する」</span>のはなし</h1>
+  <p>企画書も全体像も工法も揃った。──でも「どんな暮らしがしたいか」は施主の胸の中。その願いを聞き取り、紙に書き出して共有する</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：ここまでの成果が机に揃った ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="企画書と全体像と実装手段の3つの成果が机の上に揃っている">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="182" width="360" height="58" fill="#e3cbb0"/>
+      <text x="180" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">ここまでに揃った3つ</text>
+      <!-- 企画書 -->
+      <g transform="translate(30,52)">
+        <rect x="0" y="0" width="90" height="118" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="90" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="90" height="8" fill="var(--accent)"/>
+        <text x="45" y="16" text-anchor="middle" font-size="11" font-weight="800" fill="#5a4a10">企画書</text>
+        <line x1="14" y1="42" x2="76" y2="42" stroke="var(--line)" stroke-width="3"/>
+        <line x1="14" y1="58" x2="76" y2="58" stroke="var(--line)" stroke-width="3"/>
+        <line x1="14" y1="74" x2="60" y2="74" stroke="var(--line)" stroke-width="3"/>
+        <text x="45" y="104" text-anchor="middle" font-size="20">📋</text>
+      </g>
+      <!-- 全体像（間取り） -->
+      <g transform="translate(135,52)">
+        <rect x="0" y="0" width="90" height="118" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="90" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="90" height="8" fill="var(--accent)"/>
+        <text x="45" y="16" text-anchor="middle" font-size="11" font-weight="800" fill="#5a4a10">全体像</text>
+        <rect x="14" y="34" width="30" height="34" fill="#eaf6f8" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="46" y="34" width="30" height="34" fill="#fdeef0" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="14" y="70" width="30" height="30" fill="#fff5da" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="46" y="70" width="30" height="30" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+      </g>
+      <!-- 実装手段（工法） -->
+      <g transform="translate(240,52)">
+        <rect x="0" y="0" width="90" height="118" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="90" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="90" height="8" fill="var(--accent)"/>
+        <text x="45" y="16" text-anchor="middle" font-size="11" font-weight="800" fill="#5a4a10">実装手段</text>
+        <text x="45" y="60" text-anchor="middle" font-size="24">🪛</text>
+        <text x="45" y="88" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">工法・技術</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">おさらい</span>ここまでに<b>企画書</b>・<b>全体像</b>・<b>実装手段（工法）</b>が机に揃った。家を建てる準備は着々と進んでいる。</div>
+  </section>
+
+  <!-- ============ コマ2：でも「どんな暮らしがしたいか」はまだ紙にない ============ -->
+  <section class="panel flip">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="目指すものはあるが具体的にどんな暮らしがしたいかはまだ紙になっていない">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- 白紙の要望シート -->
+      <g transform="translate(110,30)">
+        <rect x="0" y="0" width="150" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="150" height="24" rx="8" fill="#e7ebf3"/>
+        <rect x="0" y="15" width="150" height="9" fill="#e7ebf3"/>
+        <text x="75" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#9aa0ad">要望シート</text>
+        <line x1="18" y1="46" x2="132" y2="46" stroke="#e3e6ee" stroke-width="2.4"/>
+        <line x1="18" y1="70" x2="132" y2="70" stroke="#e3e6ee" stroke-width="2.4"/>
+        <line x1="18" y1="94" x2="132" y2="94" stroke="#e3e6ee" stroke-width="2.4"/>
+        <line x1="18" y1="118" x2="132" y2="118" stroke="#e3e6ee" stroke-width="2.4"/>
+        <text x="75" y="98" text-anchor="middle" font-size="15" font-weight="800" fill="#c3c8d4">（まだ空っぽ）</text>
+      </g>
+      <!-- 設計者(blue)・困り顔 右下 -->
+      <g transform="translate(306,120)">
+        <ellipse cx="0" cy="100" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-25" y="42" width="50" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#3a3a44"/>
+        <path d="M-15 18 Q-10 14 -5 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M5 18 Q10 14 15 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 33 Q0 29 8 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 27 l-3 8 M8 27 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="300" y="42" text-anchor="middle" font-size="22">❓</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>でも「どんな暮らしがしたいか」という<b>具体的な要望はまだ紙になっていない</b>。目指すものはあるのに、明文化されたものが少ない。</div>
+  </section>
+
+  <!-- ============ コマ3：施主の胸には願いが確かにある ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="施主の胸にはこんな家に住みたいという願いが確かにある">
+      <rect width="360" height="240" fill="#fdeef2"/>
+      <rect x="0" y="190" width="360" height="50" fill="#f4d7de"/>
+      <!-- 施主(pink)・中央、胸に手を当てる -->
+      <g transform="translate(96,108)">
+        <ellipse cx="0" cy="106" rx="32" ry="8" fill="#00000010"/>
+        <rect x="-28" y="44" width="56" height="62" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+        <!-- 胸のハート -->
+        <path d="M0 66 c-6 -10 -22 -6 -22 6 c0 10 16 18 22 24 c6 -6 22 -14 22 -24 c0 -12 -16 -16 -22 -6Z" fill="#fff" stroke="var(--parent-d)" stroke-width="2"/>
+      </g>
+      <!-- 想像の吹き出し（願い） -->
+      <g transform="translate(178,26)">
+        <rect x="0" y="0" width="168" height="132" rx="16" fill="#fff" stroke="var(--parent-d)" stroke-width="2.2"/>
+        <circle cx="20" cy="150" r="8" fill="#fff" stroke="var(--parent-d)" stroke-width="2"/>
+        <circle cx="8" cy="166" r="5" fill="#fff" stroke="var(--parent-d)" stroke-width="2"/>
+        <text x="84" y="30" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--parent-d)">こんな家に住みたい…</text>
+        <text x="18" y="58" font-size="12" font-weight="700" fill="var(--ink)">☀ 日当たりのいいリビング</text>
+        <text x="18" y="82" font-size="12" font-weight="700" fill="var(--ink)">🍳 広いキッチン</text>
+        <text x="18" y="106" font-size="12" font-weight="700" fill="var(--ink)">📚 静かな書斎がほしい</text>
+      </g>
+      <text x="40" y="44" text-anchor="middle" font-size="22">💗</text>
+    </svg>
+    <div class="cap"><span class="tag">要望</span>それでも施主の胸には「<b>こんな暮らしを実現したい</b>」という気持ち・願望＝<b>要望</b>が確かにある。まだ言葉になっていないだけ。</div>
+  </section>
+
+  <!-- ============ コマ4：聞き取って要望シートに書き出し共有 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="設計者が施主の願いを聞き取って要望シートに書き出し共有する">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 施主(pink)・左・話す -->
+      <g transform="translate(50,116)">
+        <ellipse cx="0" cy="98" rx="26" ry="6" fill="#00000010"/>
+        <rect x="-24" y="40" width="48" height="56" rx="17" fill="var(--parent)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#7a5a44"/>
+        <circle cx="-10" cy="18" r="3.6" fill="#3a3a44"/><circle cx="10" cy="18" r="3.6" fill="#3a3a44"/>
+        <path d="M-9 28 Q0 36 9 28" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="50" y="52" text-anchor="middle" font-size="11" font-weight="800" fill="var(--parent-d)">施主が語る</text>
+      <!-- 要望シート（記入済み）中央 -->
+      <g transform="translate(118,34)">
+        <rect x="0" y="0" width="130" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="130" height="24" rx="8" fill="var(--child)"/>
+        <rect x="0" y="15" width="130" height="9" fill="var(--child)"/>
+        <text x="65" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#fff">要望シート</text>
+        <path d="M14 44 l6 7 l10 -12" fill="none" stroke="var(--child-d)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="47" font-size="10.5" font-weight="700" fill="var(--ink)">日当たり重視</text>
+        <path d="M14 70 l6 7 l10 -12" fill="none" stroke="var(--child-d)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="73" font-size="10.5" font-weight="700" fill="var(--ink)">広いキッチン</text>
+        <path d="M14 96 l6 7 l10 -12" fill="none" stroke="var(--child-d)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="99" font-size="10.5" font-weight="700" fill="var(--ink)">静かな書斎</text>
+        <path d="M14 122 l6 7 l10 -12" fill="none" stroke="var(--child-d)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="36" y="125" font-size="10.5" font-weight="700" fill="var(--ink)">収納たっぷり</text>
+      </g>
+      <!-- 設計者(blue)・右・書き取る -->
+      <g transform="translate(308,116)">
+        <ellipse cx="0" cy="98" rx="26" ry="6" fill="#00000010"/>
+        <rect x="-24" y="40" width="48" height="56" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <circle cx="-10" cy="18" r="3.6" fill="#3a3a44"/><circle cx="10" cy="18" r="3.6" fill="#3a3a44"/>
+        <path d="M-9 28 Q0 36 9 28" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="24" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="24" r="4" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="308" y="52" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">聞き取る</text>
+      <text x="183" y="206" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">＝文書化して共有</text>
+    </svg>
+    <div class="cap"><span class="tag">文書化</span>そこで胸の願いを<b>聞き取って要望シートに書き出す</b>。心の中にあった要望を<b>文書化して、みんなで共有できる</b>ようにする。</div>
+  </section>
+
+  <!-- ============ コマ5：全部は一度に出ないし途中で変わってもいい ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="要望は全部が一度に出揃うわけではなく進めるうちに増えたり変わったりする">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 進んでいく要望シート -->
+      <g transform="translate(18,44)">
+        <rect x="0" y="0" width="110" height="140" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="110" height="22" rx="8" fill="var(--child)"/>
+        <rect x="0" y="14" width="110" height="8" fill="var(--child)"/>
+        <text x="55" y="16" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">最初の要望</text>
+        <text x="14" y="46" font-size="10.5" font-weight="700" fill="var(--ink)">・日当たり</text>
+        <text x="14" y="68" font-size="10.5" font-weight="700" fill="var(--ink)">・広いキッチン</text>
+        <text x="14" y="90" font-size="11" font-weight="800" fill="#c3c8d4">…まだ途中</text>
+      </g>
+      <!-- 矢印（変化・追加） -->
+      <path d="M146 120 L194 120" fill="none" stroke="var(--ink)" stroke-width="2.6" marker-end="url(#ar5)"/>
+      <defs>
+        <marker id="ar5" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto">
+          <path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/>
+        </marker>
+      </defs>
+      <text x="170" y="74" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">進める中で</text>
+      <text x="170" y="92" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">変わる・増える</text>
+      <!-- 更新後シート -->
+      <g transform="translate(212,44)">
+        <rect x="0" y="0" width="128" height="140" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="128" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="128" height="8" fill="var(--accent)"/>
+        <text x="64" y="16" text-anchor="middle" font-size="10.5" font-weight="800" fill="#5a4a10">更新した要望</text>
+        <text x="12" y="44" font-size="10.5" font-weight="700" fill="var(--ink)">・日当たり</text>
+        <text x="12" y="65" font-size="10.5" font-weight="700" fill="#9aa0ad" text-decoration="line-through">・広いキッチン</text>
+        <text x="12" y="86" font-size="10.5" font-weight="700" fill="var(--child-d)">・対面キッチンに変更</text>
+        <text x="12" y="107" font-size="10.5" font-weight="700" fill="var(--child-d)">＋ペット用スペース</text>
+        <text x="12" y="128" font-size="10.5" font-weight="700" fill="var(--child-d)">＋在宅ワーク部屋</text>
+      </g>
+      <text x="180" y="210" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--child-d)">一度に出揃わなくてOK・変わってもOK</text>
+    </svg>
+    <div class="cap"><span class="tag">変容OK</span>要望は<b>一度に全部出揃うわけではない</b>し、進める中で<b>変わったり増えたりする</b>のも自然なこと。それでかまわない。</div>
+  </section>
+
+  <!-- ============ コマ6：でも何も書いてないと迷子になる ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="どこにも具体的な要望が書かれていないと何を建てればいいか分からず迷子になる">
+      <rect width="360" height="240" fill="#f7eef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd7dc"/>
+      <!-- 空っぽのシート（バツ） -->
+      <g transform="translate(30,44)">
+        <rect x="0" y="0" width="120" height="140" rx="8" fill="#fff" stroke="#d98a8a" stroke-width="2.5" stroke-dasharray="7 5"/>
+        <text x="60" y="20" text-anchor="middle" font-size="10.5" font-weight="800" fill="#c98"/>
+        <line x1="16" y1="40" x2="104" y2="40" stroke="#eee2e2" stroke-width="2.4"/>
+        <line x1="16" y1="64" x2="104" y2="64" stroke="#eee2e2" stroke-width="2.4"/>
+        <line x1="16" y1="88" x2="104" y2="88" stroke="#eee2e2" stroke-width="2.4"/>
+        <line x1="16" y1="112" x2="104" y2="112" stroke="#eee2e2" stroke-width="2.4"/>
+        <text x="60" y="80" text-anchor="middle" font-size="13" font-weight="800" fill="#d98a8a">要望ゼロ</text>
+        <!-- 大きなバツ -->
+        <path d="M22 22 L98 118 M98 22 L22 118" stroke="#e07a7a" stroke-width="3" opacity=".55"/>
+      </g>
+      <!-- 迷子の設計者(blue) -->
+      <g transform="translate(238,118)">
+        <ellipse cx="0" cy="98" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-25" y="42" width="50" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#3a3a44"/>
+        <path d="M-15 18 Q-10 14 -5 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M5 18 Q10 14 15 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 32 Q0 28 8 32" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- 吹き出し（迷い） -->
+      <g transform="translate(196,22)">
+        <rect x="0" y="0" width="150" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M46 50 L38 70 L66 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">何を目指して</text>
+        <text x="75" y="41" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">建てればいいの…？</text>
+      </g>
+      <text x="200" y="212" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--parent-d)">具体的な要望がゼロだと、方向を見失う</text>
+    </svg>
+    <div class="cap"><span class="tag">危険</span>でも<b>どこを見ても具体的な要望が書かれていない</b>と、いったい<b>何を目指し、何を実現すればいいのか分からなくなる</b>。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📝 まとめ ── 心の中の願いを「文書化して共有」する。不完全でも“ゼロ”は危険</h2>
+    <p class="lead">企画書・全体像・実装手段が揃っても、「<strong>どんな暮らしがしたいか</strong>」という具体的な要望はまだ紙になっていません。目指すものはあっても明文化されたものは少ない。それでも施主の胸には「これを実現したい」という気持ち＝<strong>要望</strong>が確かにあります。だから、それを<strong>聞き取って書き出し、文書化して共有</strong>します。要望は一度に出揃わず途中で変わってもかまいませんが、<strong>具体的な要望がどこにもないと、何を目指せばいいか分からなくなります</strong>。</p>
+    <ul>
+      <li><b>家づくりの場合</b>：企画書・全体像・工法は揃った → でも要望シートは空っぽ → 施主の胸には「日当たり・広いキッチン…」の願いがある → 聞き取って書き出し共有 → 途中で変わってもOK → でも何も書いてないと何を建てるか分からず迷子。</li>
+      <li><b>ソフト開発の場合</b>：企画レベルの目標はあるが<b>明文化はまだ</b> → 「実現したい」という<b>要望は心中に確かにある</b> → それを<b>文書化して共有</b>する → 全要求が出揃うわけではなく<b>進行中に変容</b>もする → でも<b>具体的な要求がゼロ</b>だと何を目指し何を実現すべきか分からなくなる。</li>
+      <li><b>ポイント</b>：要望は<b>心の中→文書へ</b>。完璧・完全でなくてよいし変わってもよい。ただし<b>「どこにも書かれていない」状態だけは避ける</b>――それが進む先を照らす道しるべになる。</li>
+    </ul>
+    <p class="map">物語の流れ： ①成果が揃った → ②要望はまだ紙にない → ③でも胸に願いは確かにある → ④聞き取って文書化・共有 → ⑤出揃わない・変わってもOK → ⑥でもゼロだと方向を見失う</p>
+  </section>
+
+</main>
+
+</body>
+</html>
