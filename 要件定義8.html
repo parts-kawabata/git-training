@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>間取りスケッチでわかる「サブブロック図」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 親役（頼む人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 受け手役（やる人）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>間取りスケッチでわかる、<span class="hl">「サブブロック図」</span>のはなし</h1>
+  <p>作るソフトは全体像では真ん中の“四角ひとつ”。──大きなものは四角の中を区画に分け、利用者のやることを大まかに括って見通しよくする</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：小さい家なら四角ひとつでOK ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="小さな家は全体像では真ん中の四角ひとつで足りる">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <!-- 全体像ボード -->
+      <g transform="translate(112,26)">
+        <rect x="0" y="0" width="136" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="136" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="136" height="8" fill="var(--accent)"/>
+        <text x="68" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">全体像</text>
+        <!-- 真ん中に四角ひとつ（=作るソフト＝家） -->
+        <rect x="38" y="52" width="60" height="60" rx="4" fill="#eaf6f8" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M38 52 L68 32 L98 52" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+        <text x="68" y="88" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">作る家</text>
+        <text x="68" y="134" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">＝作るソフト</text>
+      </g>
+      <!-- 設計者(blue) 左・満足 -->
+      <g transform="translate(56,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#3a3a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 吹き出し -->
+      <g transform="translate(232,20)">
+        <rect x="0" y="0" width="118" height="52" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M40 50 L34 70 L60 50Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="59" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">小さい家なら、</text>
+        <text x="59" y="41" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">四角ひとつでOK</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">全体像</span>全体像では、作るソフト（家）は真ん中に<b>大きな四角ひとつ</b>で描く。規模が小さければ、これで十分見通せる。</div>
+  </section>
+
+  <!-- ============ コマ2：大きな家だと見通しが悪い ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="大きな家だと四角ひとつに部屋も家具もぎっしりで見通しが悪い">
+      <rect width="360" height="240" fill="#eef0f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d8dbe7"/>
+      <!-- 大きな四角ひとつ（中身ぎっしり） -->
+      <g transform="translate(118,22)">
+        <rect x="0" y="0" width="176" height="158" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="176" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="176" height="8" fill="var(--accent)"/>
+        <text x="88" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">大きな家（大規模）</text>
+        <!-- ぎっしり詰まった小物：仕切りなしでごちゃごちゃ -->
+        <rect x="12" y="32" width="26" height="20" rx="2" fill="#ffe0e6" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="44" y="34" width="22" height="26" rx="2" fill="#e3f3f5" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="86" cy="44" r="12" fill="#fff2cc" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="104" y="30" width="30" height="18" rx="2" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="140" y="34" width="24" height="24" rx="2" fill="#ffe0e6" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="16" y="62" width="24" height="24" rx="2" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="60" cy="76" r="11" fill="#ffe0e6" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="80" y="66" width="30" height="20" rx="2" fill="#e3f3f5" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="118" y="64" width="20" height="26" rx="2" fill="#fff2cc" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="146" y="66" width="20" height="20" rx="2" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="14" y="96" width="30" height="20" rx="2" fill="#fff2cc" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="66" cy="106" r="12" fill="#e3f3f5" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="88" y="96" width="24" height="24" rx="2" fill="#ffe0e6" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="120" y="98" width="26" height="18" rx="2" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="150" y="96" width="16" height="24" rx="2" fill="#fff2cc" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="18" y="126" width="24" height="20" rx="2" fill="#e3f3f5" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="48" y="128" width="28" height="16" rx="2" fill="#ffe0e6" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="96" cy="136" r="10" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="116" y="126" width="22" height="20" rx="2" fill="#fff2cc" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="144" y="128" width="22" height="16" rx="2" fill="#e3f3f5" stroke="var(--ink)" stroke-width="1.6"/>
+      </g>
+      <!-- 設計者(blue) 困り顔・左下 -->
+      <g transform="translate(56,120)">
+        <ellipse cx="0" cy="100" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-25" y="42" width="50" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#3a3a44"/>
+        <path d="M-15 18 Q-10 14 -5 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M5 18 Q10 14 15 18" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 33 Q0 29 8 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 27 l-3 8 M8 27 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="300" y="40" text-anchor="middle" font-size="24">💦</text>
+    </svg>
+    <div class="cap"><span class="tag">大規模</span>でも<b>大規模</b>になると、一つの四角に部屋も家具もぎっしり。仕切りがなく<b>ごちゃごちゃで見通しが悪い</b>。</div>
+  </section>
+
+  <!-- ============ コマ3：四角の中を区画に分ける（気づき） ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="四角の中を区画に区分けするというアイデアに気づく">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <!-- 中央の大きな四角に仕切り線を引く -->
+      <g transform="translate(96,52)">
+        <rect x="0" y="0" width="168" height="128" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <!-- 区画の仕切り（点線→実線化のイメージ） -->
+        <line x1="84" y1="0" x2="84" y2="128" stroke="var(--child-d)" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <line x1="0" y1="64" x2="168" y2="64" stroke="var(--child-d)" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <text x="42" y="36" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">区画</text>
+        <text x="126" y="36" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">区画</text>
+        <text x="42" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">区画</text>
+        <text x="126" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">区画</text>
+      </g>
+      <!-- 気づきの吹き出し -->
+      <g transform="translate(28,14)">
+        <rect x="0" y="0" width="196" height="40" rx="14" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M52 38 L44 58 L74 38Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="98" y="25" text-anchor="middle" font-size="14" font-weight="800" fill="var(--child-d)">四角の“中”を区画に分けよう！</text>
+      </g>
+      <text x="300" y="40" text-anchor="middle" font-size="26">💡</text>
+      <text x="180" y="222" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">四角の中をいくつかの区画に区分けして見通しよく</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>そこで、四角の<b>“中”をいくつかの区画に区分け</b>して、見通しを良くしておくとよいと気づく。</div>
+  </section>
+
+  <!-- ============ コマ4：利用者のやることを似たものどうしで括る ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="住む人がやることを似たものどうしで大まかに括る">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 施主(pink)・左、やることを挙げる -->
+      <g transform="translate(58,110)">
+        <ellipse cx="0" cy="104" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-25" y="42" width="50" height="58" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 39 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="58" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="var(--parent-d)">住む人がやること</text>
+      <!-- やること→括り 3グループ -->
+      <!-- グループ1：料理する系 → キッチン -->
+      <g transform="translate(112,30)">
+        <rect x="0" y="0" width="132" height="52" rx="9" fill="#fff" stroke="var(--child-d)" stroke-width="2.2"/>
+        <text x="8" y="20" font-size="11.5" font-weight="800" fill="var(--child-d)">🍳 キッチンゾーン</text>
+        <text x="8" y="40" font-size="11" font-weight="700" fill="var(--ink)">料理する・食べる・洗う</text>
+      </g>
+      <!-- グループ2：体を清める系 → 水まわり -->
+      <g transform="translate(112,90)">
+        <rect x="0" y="0" width="132" height="52" rx="9" fill="#fff" stroke="var(--child-d)" stroke-width="2.2"/>
+        <text x="8" y="20" font-size="11.5" font-weight="800" fill="var(--child-d)">🛁 水まわりゾーン</text>
+        <text x="8" y="40" font-size="11" font-weight="700" fill="var(--ink)">お風呂・洗面・洗濯</text>
+      </g>
+      <!-- グループ3：くつろぐ系 → 居住 -->
+      <g transform="translate(112,150)">
+        <rect x="0" y="0" width="132" height="46" rx="9" fill="#fff" stroke="var(--child-d)" stroke-width="2.2"/>
+        <text x="8" y="19" font-size="11.5" font-weight="800" fill="var(--child-d)">🛋 居住ゾーン</text>
+        <text x="8" y="37" font-size="11" font-weight="700" fill="var(--ink)">くつろぐ・寝る</text>
+      </g>
+      <!-- 括る矢印 -->
+      <path d="M252 52 q18 0 18 20 v50 q0 20 -18 20" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="314" y="104" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">似たもの</text>
+      <text x="314" y="122" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">どうしで括る</text>
+    </svg>
+    <div class="cap"><span class="tag">括る</span>区分けの基準は、<b>利用者（住む人）がやること</b>を、似たものどうしで<b>大まかに括る</b>こと。</div>
+  </section>
+
+  <!-- ============ コマ5：収まるべきところに収まる（サブブロック図完成） ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="括ると各ブロックが収まるべき区画に収まりサブブロック図が完成する">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <!-- サブブロック図（四角の中が名前つき区画に整理） -->
+      <g transform="translate(70,26)">
+        <rect x="0" y="0" width="220" height="162" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="220" height="24" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="15" width="220" height="9" fill="var(--accent)"/>
+        <text x="110" y="17" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">サブブロック図</text>
+        <!-- 区画1 キッチン -->
+        <rect x="12" y="34" width="94" height="52" rx="5" fill="#e7f7ea" stroke="var(--ink)" stroke-width="2"/>
+        <text x="59" y="55" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🍳 キッチン</text>
+        <text x="59" y="73" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5f6472">料理・食事</text>
+        <!-- 区画2 水まわり -->
+        <rect x="114" y="34" width="94" height="52" rx="5" fill="#e3f1f9" stroke="var(--ink)" stroke-width="2"/>
+        <text x="161" y="55" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🛁 水まわり</text>
+        <text x="161" y="73" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5f6472">風呂・洗面</text>
+        <!-- 区画3 居住 -->
+        <rect x="12" y="94" width="94" height="52" rx="5" fill="#fdeef0" stroke="var(--ink)" stroke-width="2"/>
+        <text x="59" y="115" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🛋 居住</text>
+        <text x="59" y="133" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5f6472">くつろぐ・寝る</text>
+        <!-- 区画4 玄関 -->
+        <rect x="114" y="94" width="94" height="52" rx="5" fill="#fff5da" stroke="var(--ink)" stroke-width="2"/>
+        <text x="161" y="115" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🚪 玄関</text>
+        <text x="161" y="133" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5f6472">出入り・収納</text>
+      </g>
+      <!-- きらきら -->
+      <path d="M300 44 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M42 150 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <text x="180" y="222" text-anchor="middle" font-size="14" font-weight="800" fill="var(--child-d)">それぞれが、収まるべき区画に収まった</text>
+    </svg>
+    <div class="cap"><span class="tag">サブブロック図</span>括っていくと、各ブロックが<b>収まるべき区画に自然と収まる</b>。これがサブブロック図。</div>
+  </section>
+
+  <!-- ============ コマ6：見通しの良い全体像へ ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="見通しの良い全体像になり設計者と施主が笑顔で次工程へ進む">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <!-- 整理された全体像ボード（中央） -->
+      <g transform="translate(122,26)">
+        <rect x="0" y="0" width="116" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="0" y="0" width="116" height="22" rx="8" fill="var(--accent)"/>
+        <rect x="0" y="14" width="116" height="8" fill="var(--accent)"/>
+        <text x="58" y="16" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5a4a10">見通しの良い全体像</text>
+        <!-- 4区画すっきり -->
+        <rect x="12" y="32" width="44" height="42" rx="4" fill="#e7f7ea" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="60" y="32" width="44" height="42" rx="4" fill="#e3f1f9" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="12" y="80" width="44" height="42" rx="4" fill="#fdeef0" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="60" y="80" width="44" height="42" rx="4" fill="#fff5da" stroke="var(--ink)" stroke-width="1.8"/>
+        <path d="M40 134 l10 12 l22 -26" fill="none" stroke="#3aa86b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <!-- きらきら -->
+      <path d="M100 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M262 46 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <!-- 施主(pink)・笑顔 左 -->
+      <g transform="translate(54,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#7a5a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 設計者(blue)・笑顔 右 -->
+      <g transform="translate(306,112)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="30" fill="#ffe1c4"/>
+        <path d="M-30 7 Q0 -30 30 7 Q30 -18 0 -21 Q-30 -18 -30 7Z" fill="#3a3a44"/>
+        <circle cx="-11" cy="20" r="4" fill="#3a3a44"/><circle cx="11" cy="20" r="4" fill="#3a3a44"/>
+        <path d="M-10 31 Q0 40 10 31" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <!-- 吹き出し（右上・番号バッジと重ならない位置） -->
+      <g transform="translate(244,6)">
+        <rect x="0" y="0" width="112" height="34" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M58 32 L64 50 L78 32Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="56" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">ひと目で分かる！</text>
+      </g>
+      <text x="180" y="212" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">→ 大規模でも安心して次工程へ</text>
+    </svg>
+    <div class="cap"><span class="tag">解決</span>大規模でも<b>ひと目で構造が分かる全体像</b>になり、設計者も施主も安心して先へ進める。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🏠 まとめ ── 大きな四角は「区画に分け」「やることで括る」と見通せる</h2>
+    <p class="lead">家の全体像は、はじめ<strong>真ん中の四角ひとつ</strong>で描きます。小さな家ならそれで十分ですが、大きな家では中身がぎっしりで見通せません。そこで<strong>四角の中を区画に区分け</strong>し、住む人が<strong>やることを似たものどうしで大まかに括る</strong>と、それぞれが収まるべき区画に自然と収まります。これがサブブロック図です。</p>
+    <ul>
+      <li><b>間取りスケッチの場合</b>：全体像は家の四角ひとつ → 大きい家はごちゃつく → 中を区画に分ける → 住む人のやること（料理・入浴・くつろぐ）で括る → キッチン/水まわり/居住…に収まる。</li>
+      <li><b>ソフト開発の場合</b>：作るソフトは全体像では真ん中の<b>四角ひとつ</b>。<b>大規模</b>なら四角の中を区画に区分けし、<b>利用者がやること</b>を大まかに括って<b>サブブロック図</b>にする。</li>
+      <li><b>ポイント</b>：区分けの軸は機能の都合ではなく<b>利用者の行動</b>。似たものを括れば<b>収まるべきところに収まり</b>、大規模でも全体像の見通しが良くなる。</li>
+    </ul>
+    <p class="map">物語の流れ： ①四角ひとつでOK（小規模） → ②大規模はごちゃつく → ③中を区画に分ける → ④やることで括る → ⑤収まるべき区画に収まる → ⑥見通しの良い全体像へ</p>
+  </section>
+
+</main>
+
+</body>
+</html>
