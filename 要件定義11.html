@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>定食屋の厨房でわかる「利用者の行動シナリオ」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* お客さん（利用者）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 厨房スタッフ（ソフト＝仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <h1>定食屋の厨房でわかる、<span class="hl">「利用者の行動シナリオ」</span>のはなし</h1>
+  <p>お客さんの“食べたい”があって、はじめて厨房の段取りが決まる。──ソフトも、利用者の行動を先に描いてから中身を決める</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：前提 — お店は利用者の行動を支えるためにある ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="お客さんの食事という行動を支えるために厨房が動いている">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">お店＝利用者の行動を支える場</text>
+      <!-- お客(pink) 左・食事 -->
+      <g transform="translate(66,92)">
+        <ellipse cx="0" cy="104" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="60" rx="18" fill="var(--parent)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#7a5a44"/>
+        <circle cx="-10" cy="20" r="3.8" fill="#3a3a44"/><circle cx="10" cy="20" r="3.8" fill="#3a3a44"/>
+        <path d="M-9 30 Q0 38 9 30" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="26" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="26" r="4" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="66" y="50" text-anchor="middle" font-size="11" font-weight="800" fill="var(--parent-d)">お客さん＝利用者</text>
+      <!-- テーブルと皿 -->
+      <g transform="translate(28,150)">
+        <rect x="0" y="14" width="92" height="12" rx="4" fill="#e6cdb2"/>
+        <ellipse cx="46" cy="14" rx="30" ry="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="46" y="19" text-anchor="middle" font-size="15">🍚</text>
+      </g>
+      <!-- カウンター -->
+      <rect x="176" y="120" width="12" height="80" fill="#cdb79c"/>
+      <!-- スタッフ(blue) 右・調理 -->
+      <g transform="translate(272,98)">
+        <ellipse cx="0" cy="102" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-28 6 Q0 -28 28 6 Q28 -17 0 -20 Q-28 -17 -28 6Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-22" rx="20" ry="12" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="-20" y="-13" width="40" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.4"/>
+        <circle cx="-10" cy="20" r="3.8" fill="#3a3a44"/><circle cx="10" cy="20" r="3.8" fill="#3a3a44"/>
+        <path d="M-9 30 Q0 38 9 30" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="272" y="50" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">厨房＝ソフト</text>
+      <!-- 支える矢印 -->
+      <defs><marker id="ar1" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M232 158 L150 158" fill="none" stroke="var(--ink)" stroke-width="2.4" marker-end="url(#ar1)"/>
+      <text x="191" y="150" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">支える</text>
+    </svg>
+    <div class="cap"><span class="tag">前提</span>ソフトは<b>利用者の行動・便益を支えるため</b>にある。お店の厨房と同じで、まず<b>お客さん（利用者）が何をするか</b>を想定しないと、裏側の仕事は決められない。</div>
+  </section>
+
+  <!-- ============ コマ2：助走 — 先に「行動シナリオ」を描く ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="いきなり厨房を設計せず先にお客さんの行動シナリオを描いて三つのことを掴む">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="150" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">まず“行動シナリオ”を描く</text>
+      <!-- ボード -->
+      <g transform="translate(20,36)">
+        <rect x="0" y="0" width="238" height="152" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="238" height="26" rx="10" fill="var(--child)"/>
+        <rect x="0" y="16" width="238" height="10" fill="var(--child)"/>
+        <text x="119" y="18" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">お客さんの行動シナリオ</text>
+        <!-- 付箋3枚 -->
+        <g transform="translate(12,38)">
+          <rect x="0" y="0" width="68" height="102" rx="6" fill="#fde3e9" stroke="var(--parent-d)" stroke-width="1.8"/>
+          <text x="34" y="30" text-anchor="middle" font-size="22">🕒</text>
+          <text x="34" y="60" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">いつ使う</text>
+          <text x="34" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#7a7e8c">タイミング</text>
+        </g>
+        <g transform="translate(85,38)">
+          <rect x="0" y="0" width="68" height="102" rx="6" fill="#fff4d6" stroke="#c9a43a" stroke-width="1.8"/>
+          <text x="34" y="30" text-anchor="middle" font-size="22">💡</text>
+          <text x="34" y="60" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">なぜ使う</text>
+          <text x="34" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#7a7e8c">理由</text>
+        </g>
+        <g transform="translate(158,38)">
+          <rect x="0" y="0" width="68" height="102" rx="6" fill="#e3f3ec" stroke="var(--child-d)" stroke-width="1.8"/>
+          <text x="34" y="30" text-anchor="middle" font-size="22">✅</text>
+          <text x="34" y="60" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">何をする</text>
+          <text x="34" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a7e8c">達成する仕事</text>
+        </g>
+      </g>
+      <!-- スタッフ(blue) 右・指さし -->
+      <g transform="translate(316,108)">
+        <ellipse cx="0" cy="92" rx="24" ry="6" fill="#00000010"/>
+        <rect x="-22" y="38" width="44" height="52" rx="16" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="24" fill="#ffe1c4"/>
+        <path d="M-24 5 Q0 -24 24 5 Q24 -15 0 -18 Q-24 -15 -24 5Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-19" rx="17" ry="10" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-17" y="-11" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="-9" cy="17" r="3.4" fill="#3a3a44"/><circle cx="9" cy="17" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 27 Q0 34 8 27" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M-20 54 L-52 38" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="-54" cy="37" r="6" fill="#ffe1c4"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">助走</span>いきなり厨房の設計（要件）に入らない。先に「お客さんの<b>行動シナリオ</b>」を描き、そこから<b>いつ使う（タイミング）</b>・<b>なぜ使う（理由）</b>・<b>何を達成するか（具体的な仕事）</b>を掴む。</div>
+  </section>
+
+  <!-- ============ コマ3：仕事とは — 成果＋活動のまとまり ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="仕事とは成果とその成果を出すための活動のまとまりのこと">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">「仕事」＝ 活動のまとまり ＋ 成果</text>
+      <!-- 活動のまとまり -->
+      <g transform="translate(22,54)">
+        <rect x="0" y="0" width="158" height="120" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2.2" stroke-dasharray="6 5"/>
+        <text x="79" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">活動のまとまり</text>
+        <text x="30" y="54" font-size="18">🔪</text><text x="52" y="54" font-size="11" font-weight="700" fill="var(--ink)">切る</text>
+        <text x="30" y="82" font-size="18">🔥</text><text x="52" y="82" font-size="11" font-weight="700" fill="var(--ink)">焼く</text>
+        <text x="30" y="110" font-size="18">🍽</text><text x="52" y="110" font-size="11" font-weight="700" fill="var(--ink)">盛る</text>
+      </g>
+      <!-- 矢印 -->
+      <defs><marker id="ar3" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M186 114 L226 114" fill="none" stroke="var(--ink)" stroke-width="2.6" marker-end="url(#ar3)"/>
+      <text x="206" y="102" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">まとめて</text>
+      <!-- 成果：定食 -->
+      <g transform="translate(238,58)">
+        <rect x="0" y="24" width="108" height="66" rx="10" fill="#f0d7b8" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="33" cy="50" rx="22" ry="13" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="33" y="56" text-anchor="middle" font-size="16">🍖</text>
+        <circle cx="82" cy="50" r="14" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="82" y="56" text-anchor="middle" font-size="14">🍚</text>
+        <text x="54" y="82" text-anchor="middle" font-size="10.5" font-weight="800" fill="#5a4a10">ハンバーグ定食</text>
+        <text x="54" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">成果</text>
+      </g>
+      <text x="180" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">利用者が行う行動の“ひとまとまり”＝仕事</text>
+    </svg>
+    <div class="cap"><span class="tag">仕事とは</span>利用者が行う行動の単位を<b>「仕事」</b>と呼ぶ。仕事とは「<b>何らかの成果</b>と、その<b>成果を出すために行う活動のまとまり</b>」のこと。厨房なら“一皿を仕上げる”がひとつの仕事。</div>
+  </section>
+
+  <!-- ============ コマ4：成果を出す3要素 — 材料・道具・手順 ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="材料と道具と手順の三つが揃って初めて成果が出る">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">成果を出す3要素</text>
+      <!-- 材料 -->
+      <g transform="translate(18,44)">
+        <rect x="0" y="0" width="104" height="112" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="104" height="24" rx="10" fill="var(--accent)"/>
+        <rect x="0" y="15" width="104" height="9" fill="var(--accent)"/>
+        <text x="52" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5a4a10">材料</text>
+        <text x="52" y="66" text-anchor="middle" font-size="30">🥩🥚</text>
+        <text x="52" y="98" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">食材</text>
+      </g>
+      <!-- 道具 -->
+      <g transform="translate(128,44)">
+        <rect x="0" y="0" width="104" height="112" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="104" height="24" rx="10" fill="var(--accent)"/>
+        <rect x="0" y="15" width="104" height="9" fill="var(--accent)"/>
+        <text x="52" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5a4a10">道具</text>
+        <text x="52" y="70" text-anchor="middle" font-size="32">🍳</text>
+        <text x="52" y="98" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">フライパン</text>
+      </g>
+      <!-- 手順 -->
+      <g transform="translate(238,44)">
+        <rect x="0" y="0" width="104" height="112" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="104" height="24" rx="10" fill="var(--accent)"/>
+        <rect x="0" y="15" width="104" height="9" fill="var(--accent)"/>
+        <text x="52" y="17" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5a4a10">手順</text>
+        <text x="16" y="50" font-size="10.5" font-weight="700" fill="var(--ink)">1. 切る</text>
+        <text x="16" y="70" font-size="10.5" font-weight="700" fill="var(--ink)">2. 焼く</text>
+        <text x="16" y="90" font-size="10.5" font-weight="700" fill="var(--ink)">3. 盛る</text>
+        <text x="86" y="52" text-anchor="middle" font-size="16">📋</text>
+      </g>
+      <text x="180" y="208" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">この3つが揃って、はじめて“一皿（成果）”が出る</text>
+    </svg>
+    <div class="cap"><span class="tag">3要素</span>仕事は成果を出す。その成果を出すための3要素が<b>「材料」「道具」「手順」</b>。食材・フライパン・レシピが揃って、はじめて一皿ができあがる。</div>
+  </section>
+
+  <!-- ============ コマ5：仕事が始まるタイミングは2種類 ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="仕事が始まるのは注文というリクエストが来たときと条件を満たしたと検知したとき">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dde3ee"/>
+      <line x1="180" y1="30" x2="180" y2="184" stroke="var(--line)" stroke-width="2" stroke-dasharray="5 5"/>
+      <!-- 左：リクエスト -->
+      <text x="90" y="24" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--parent-d)">① リクエストが来た</text>
+      <g transform="translate(28,42)">
+        <rect x="0" y="0" width="124" height="76" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M0 76 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l10 8 l10 -8 l4 3 L124 76Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="62" y="24" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">🧾 注文票</text>
+        <line x1="16" y1="36" x2="108" y2="36" stroke="var(--line)" stroke-width="1.6"/>
+        <text x="62" y="56" text-anchor="middle" font-size="12" font-weight="800" fill="var(--parent-d)">ハンバーグ定食 ×1</text>
+      </g>
+      <text x="90" y="150" text-anchor="middle" font-size="16" font-weight="800" fill="var(--ink)">▼</text>
+      <g transform="translate(44,158)"><rect x="0" y="0" width="92" height="26" rx="13" fill="var(--parent)"/><text x="46" y="17" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">仕事スタート</text></g>
+      <!-- 右：条件検知 -->
+      <text x="270" y="24" text-anchor="middle" font-size="11.5" font-weight="800" fill="var(--child-d)">② 条件を検知した</text>
+      <g transform="translate(212,40)">
+        <rect x="0" y="18" width="120" height="58" rx="12" fill="#e7ebf3" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="12" y="6" width="96" height="20" rx="8" fill="#cfd6e4" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="98" cy="44" r="6" fill="#57c785" stroke="var(--ink)" stroke-width="1.4"/>
+        <text x="52" y="50" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">🍚 炊けた！</text>
+        <text x="60" y="68" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a7e8c">（在庫が減った等も）</text>
+      </g>
+      <text x="270" y="150" text-anchor="middle" font-size="16" font-weight="800" fill="var(--ink)">▼</text>
+      <g transform="translate(224,158)"><rect x="0" y="0" width="92" height="26" rx="13" fill="var(--child)"/><text x="46" y="17" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">仕事スタート</text></g>
+    </svg>
+    <div class="cap"><span class="tag">開始の合図</span>仕事が始まるタイミングは2つ。<b>他からのリクエストがあったとき</b>（注文票が入る）と、<b>ある条件を満たしたと検知したとき</b>（「ごはんが炊けた」「在庫が減った」に気づく）。</div>
+  </section>
+
+  <!-- ============ コマ6：成果は次の仕事の材料 — 無いと止まる（気づき） ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="焼き場が成果を先に出しておかないと盛り付けの仕事は止まってしまう">
+      <rect width="360" height="240" fill="#f7eef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd7dc"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">前の成果が無いと、次の仕事は動けない</text>
+      <!-- 焼き場：空のフライパン -->
+      <g transform="translate(34,86)">
+        <ellipse cx="34" cy="34" rx="34" ry="14" fill="#cfd3dd" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="34" cy="30" rx="26" ry="10" fill="#e7ebf3"/>
+        <rect x="66" y="30" width="48" height="8" rx="4" fill="#8a8f9c"/>
+        <text x="34" y="35" text-anchor="middle" font-size="14" font-weight="800" fill="#9aa0ad">…空</text>
+      </g>
+      <text x="66" y="70" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--parent-d)">焼き場：まだ成果なし</text>
+      <!-- 切れた矢印＋✕ -->
+      <path d="M150 128 L206 128" fill="none" stroke="#d98a8a" stroke-width="2.6" stroke-dasharray="6 5"/>
+      <g transform="translate(178,128)"><circle r="13" fill="#fff" stroke="#e07a7a" stroke-width="2.4"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#e07a7a" stroke-width="2.6" stroke-linecap="round"/></g>
+      <text x="178" y="100" text-anchor="middle" font-size="10.5" font-weight="800" fill="#c05c5c">渡せない</text>
+      <!-- 盛り付け係(橙)困り＋空皿 -->
+      <g transform="translate(288,96)">
+        <ellipse cx="0" cy="96" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="54" rx="17" fill="#f4a259"/>
+        <circle cx="0" cy="18" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <path d="M-14 18 Q-9 14 -4 18" stroke="#3a3a44" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M4 18 Q9 14 14 18" stroke="#3a3a44" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M-7 32 Q0 28 7 32" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M-8 26 l-3 8 M8 26 l3 8" stroke="#9fb6c9" stroke-width="2.4" stroke-linecap="round"/>
+      </g>
+      <ellipse cx="288" cy="150" rx="22" ry="7" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+      <text x="288" y="70" text-anchor="middle" font-size="10.5" font-weight="800" fill="#d17d34">盛り付けが止まる</text>
+    </svg>
+    <div class="cap"><span class="tag">連鎖の前提</span>ある仕事の成果は、<b>別の仕事の材料</b>になる。焼き場が“焼けたハンバーグ”を<b>その仕事の前に出しておかないと</b>、盛り付けは始められず<b>止まってしまう</b>。</div>
+  </section>
+
+  <!-- ============ コマ7：連鎖①「受け渡し」 ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="焼き場から盛り付け係へ皿を手渡す受け渡しという作業でつながる">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">仕事は勝手には連鎖しない</text>
+      <!-- 焼き場スタッフ(blue) 左 -->
+      <g transform="translate(64,100)">
+        <ellipse cx="0" cy="98" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="56" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-19" rx="18" ry="11" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-18" y="-11" width="36" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="-9" cy="16" r="3.4" fill="#3a3a44"/><circle cx="9" cy="16" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 27 Q0 34 8 27" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M20 52 L54 60" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <text x="64" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">焼き場</text>
+      <!-- 受け渡す皿 -->
+      <g transform="translate(150,150)">
+        <ellipse cx="30" cy="10" rx="30" ry="9" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="30" y="15" text-anchor="middle" font-size="16">🍖</text>
+      </g>
+      <text x="180" y="118" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">受け渡し</text>
+      <defs><marker id="ar7" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M140 134 Q180 122 220 134" fill="none" stroke="var(--ink)" stroke-width="2.6" marker-end="url(#ar7)"/>
+      <!-- 盛り付け係(橙) 右 -->
+      <g transform="translate(296,100)">
+        <ellipse cx="0" cy="98" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="56" rx="17" fill="#f4a259"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-19" rx="18" ry="11" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-18" y="-11" width="36" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="-9" cy="16" r="3.4" fill="#3a3a44"/><circle cx="9" cy="16" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 27 Q0 34 8 27" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/>
+        <path d="M-20 52 L-54 60" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <text x="296" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="#d17d34">盛り付け</text>
+    </svg>
+    <div class="cap"><span class="tag">連鎖①</span>でも仕事は<b>勝手には連鎖しない</b>。焼けた皿を盛り付け係へ<b>手渡す＝「受け渡し」</b>という作業があって、はじめて次の仕事へつながる。</div>
+  </section>
+
+  <!-- ============ コマ8：連鎖②「保管とピックアップ」 ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="仕込みを棚に保管しておき必要な人が取りに行くピックアップでも渡せる">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6ecdd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">時間差でも渡せる「保管とピックアップ」</text>
+      <!-- 置く人(blue) 左 -->
+      <g transform="translate(52,104)">
+        <ellipse cx="0" cy="94" rx="26" ry="6" fill="#00000010"/>
+        <rect x="-23" y="40" width="46" height="54" rx="16" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="25" fill="#ffe1c4"/>
+        <path d="M-25 5 Q0 -25 25 5 Q25 -15 0 -18 Q-25 -15 -25 5Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-18" rx="17" ry="10" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-17" y="-11" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="-9" cy="16" r="3.4" fill="#3a3a44"/><circle cx="9" cy="16" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 27 Q0 33 8 27" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M18 50 L46 44" stroke="#ffe1c4" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <text x="52" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">保管する</text>
+      <defs><marker id="ar8" markerWidth="9" markerHeight="9" refX="6" refY="4" orient="auto"><path d="M0 0 L7 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <text x="112" y="136" text-anchor="middle" font-size="10" font-weight="800" fill="var(--ink)">置く</text>
+      <path d="M100 148 L122 148" fill="none" stroke="var(--ink)" stroke-width="2.4" marker-end="url(#ar8)"/>
+      <!-- 棚（保温棚／冷蔵庫） -->
+      <g transform="translate(128,44)">
+        <rect x="0" y="0" width="104" height="140" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <line x1="0" y1="47" x2="104" y2="47" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="0" y1="94" x2="104" y2="94" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="18" y="14" width="30" height="24" rx="4" fill="#ffe3b0" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="56" y="14" width="30" height="24" rx="4" fill="#ffd9d0" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="18" y="61" width="30" height="24" rx="4" fill="#d8f0dd" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="56" y="61" width="30" height="24" rx="4" fill="#d6ebf5" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="52" y="120" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">仕込みの棚</text>
+        <text x="52" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#7a7e8c">保温／冷蔵</text>
+      </g>
+      <!-- 取りに来る人(橙) 右 -->
+      <g transform="translate(308,104)">
+        <ellipse cx="0" cy="94" rx="26" ry="6" fill="#00000010"/>
+        <rect x="-23" y="40" width="46" height="54" rx="16" fill="#f4a259"/>
+        <circle cx="0" cy="16" r="25" fill="#ffe1c4"/>
+        <path d="M-25 5 Q0 -25 25 5 Q25 -15 0 -18 Q-25 -15 -25 5Z" fill="#3a3a44"/>
+        <ellipse cx="0" cy="-18" rx="17" ry="10" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="-17" y="-11" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.3"/>
+        <circle cx="-9" cy="16" r="3.4" fill="#3a3a44"/><circle cx="9" cy="16" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 27 Q0 33 8 27" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/>
+        <path d="M-18 50 L-46 44" stroke="#ffe1c4" stroke-width="9" stroke-linecap="round"/>
+      </g>
+      <text x="308" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="#d17d34">ピックアップ</text>
+      <text x="248" y="136" text-anchor="middle" font-size="10" font-weight="800" fill="var(--ink)">取る</text>
+      <path d="M238 148 L260 148" fill="none" stroke="var(--ink)" stroke-width="2.4" marker-end="url(#ar8)"/>
+    </svg>
+    <div class="cap"><span class="tag">連鎖②</span>もう一つは<b>「保管とピックアップ」</b>。仕込み（作り置き）を保温棚や冷蔵庫に<b>保管</b>しておき、必要になった人が<b>取りに行く（ピックアップ）</b>。時間差でも成果を渡せる。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🍳 まとめ ── 要件の前に「利用者の行動シナリオ」。行動は“仕事”の連鎖でできている</h2>
+    <p class="lead">ソフトは<strong>利用者の行動・便益を支えるため</strong>にあります。だから要件を決める前に、助走として<strong>利用者の行動シナリオ</strong>を描き、「<strong>いつ使う（タイミング）</strong>」「<strong>なぜ使う（理由）</strong>」「<strong>何を達成するか（具体的な仕事）</strong>」を掴みます。行動の単位が<strong>「仕事」＝成果＋その活動のまとまり</strong>で、成果は<strong>材料・道具・手順</strong>で生まれ、<strong>リクエスト</strong>か<strong>条件の検知</strong>で始まります。仕事は連鎖しますが勝手にはつながらず、<strong>受け渡し</strong>や<strong>保管とピックアップ</strong>という作業でバトンを渡します。</p>
+    <ul>
+      <li><b>定食屋の場合</b>：お客の食事を支えるため厨房がある → 先に“お客さんの行動”を想定 → 一皿を仕上げる＝<b>仕事（成果＋活動）</b> → 食材・フライパン・レシピ → 注文票か「炊けた／在庫減」の検知で開始 → 焼けた皿が無いと盛り付けは止まる → 手渡し（受け渡し）や仕込み棚（保管とピックアップ）でつなぐ。</li>
+      <li><b>ソフト開発の場合</b>：ソフトは<b>利用者の行動・便益を支える</b>ためにある → 要件の前に<b>行動シナリオ</b>（タイミング／理由／達成する仕事） → 仕事＝<b>成果＋活動</b>、要素は<b>材料・道具・手順</b> → <b>リクエスト</b>／<b>条件検知</b>で起動 → 前の仕事の成果が後続の入力 → <b>受け渡し・保管とピックアップ</b>で連鎖させる。</li>
+      <li><b>ポイント</b>：要件は<b>利用者の行動から逆算</b>する。行動は独立した機能ではなく<b>“仕事の連鎖”</b>であり、成果を<b>いつ・どう渡すか</b>まで含めて設計してはじめて回りだす。</li>
+    </ul>
+    <p class="map">物語の流れ： ①お店は利用者の行動を支える → ②先に行動シナリオを描く → ③仕事＝成果＋活動 → ④材料・道具・手順で成果 → ⑤リクエスト／条件検知で開始 → ⑥成果が無いと次が止まる → ⑦受け渡し → ⑧保管とピックアップで連鎖</p>
+  </section>
+
+</main>
+
+</body>
+</html>
