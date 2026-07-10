@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登場人物の相関図でわかる「概念データモデル」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* お客さん（利用者）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 厨房スタッフ（ソフト＝仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;background:#ffd166;color:#5a4a10;border-radius:999px;padding:3px 14px;">Chapter-12</span></p>
+  <h1>登場人物の相関図でわかる、<span class="hl">「概念データモデル」</span>のはなし</h1>
+  <p>ドラマを書く前に描く“ざっくり相関図”。──要件を考える前に、登場する「モノと関係」を下書きしておく</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：前提 — 行動シナリオの次は「相関図（概念データモデル）」 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="行動シナリオを確認し終えたら次に登場人物の相関図のようなラフ図を描く">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">行動シナリオの“次”にやること</text>
+      <!-- 行動シナリオ：確認済み -->
+      <g transform="translate(20,44)">
+        <rect x="0" y="0" width="128" height="128" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="128" height="24" rx="10" fill="var(--parent)"/>
+        <rect x="0" y="15" width="128" height="9" fill="var(--parent)"/>
+        <text x="64" y="17" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">行動シナリオ</text>
+        <line x1="16" y1="48" x2="112" y2="48" stroke="var(--line)" stroke-width="1.6"/>
+        <line x1="16" y1="70" x2="112" y2="70" stroke="var(--line)" stroke-width="1.6"/>
+        <line x1="16" y1="92" x2="112" y2="92" stroke="var(--line)" stroke-width="1.6"/>
+        <g transform="translate(96,104)"><circle r="15" fill="#57c785"/><path d="M-7 0 L-2 6 L8 -6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <text x="40" y="120" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--parent-d)">確認ずみ</text>
+      </g>
+      <!-- 矢印 -->
+      <defs><marker id="ar1" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M154 108 L184 108" fill="none" stroke="var(--ink)" stroke-width="2.4" marker-end="url(#ar1)"/>
+      <text x="169" y="90" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">次は</text>
+      <!-- 相関図（ラフ） -->
+      <g transform="translate(196,44)">
+        <rect x="0" y="0" width="144" height="128" rx="10" fill="#fffdf5" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="144" height="24" rx="10" fill="var(--child)"/>
+        <rect x="0" y="15" width="144" height="9" fill="var(--child)"/>
+        <text x="72" y="17" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">概念データモデル</text>
+        <!-- ドラム缶3つ＋線 -->
+        <path d="M22,52 v22 a12,5 0 0 0 24,0 v-22" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.8"/>
+        <ellipse cx="34" cy="52" rx="12" ry="5" fill="#ffc2d0" stroke="var(--ink)" stroke-width="1.8"/>
+        <path d="M98,52 v22 a12,5 0 0 0 24,0 v-22" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.8"/>
+        <ellipse cx="110" cy="52" rx="12" ry="5" fill="#ffe6a0" stroke="var(--ink)" stroke-width="1.8"/>
+        <path d="M60,92 v22 a12,5 0 0 0 24,0 v-22" fill="var(--child)" stroke="var(--ink)" stroke-width="1.8"/>
+        <ellipse cx="72" cy="92" rx="12" ry="5" fill="#aee6ec" stroke="var(--ink)" stroke-width="1.8"/>
+        <line x1="46" y1="66" x2="98" y2="62" stroke="var(--ink)" stroke-width="1.8"/>
+        <line x1="40" y1="76" x2="66" y2="92" stroke="var(--ink)" stroke-width="1.8"/>
+        <line x1="108" y1="76" x2="82" y2="94" stroke="var(--ink)" stroke-width="1.8"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">前提</span>利用者の<b>行動シナリオ</b>を確認し終えたら、次に<b>概念データモデル</b>を作る。ドラマを書く前の「<b>登場人物の相関図</b>」のように、出てくる“モノと関係”をざっくり下書きしておく。</div>
+  </section>
+
+  <!-- ============ コマ2：本来は不要 — 後の要件定義でもっと詳しくやる ============ -->
+  <section class="panel flip">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="この後の要件定義でもっと詳しくやるので本来的には不要な作業">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">じつは“本来は要らない”下書き</text>
+      <!-- いまのラフ相関図 -->
+      <g transform="translate(24,50)">
+        <rect x="0" y="0" width="120" height="120" rx="10" fill="#fffdf5" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="60" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">いま：ラフ相関図</text>
+        <path d="M24,44 v18 a10,4 0 0 0 20,0 v-18" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="34" cy="44" rx="10" ry="4" fill="#ffc2d0" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M78,44 v18 a10,4 0 0 0 20,0 v-18" fill="var(--child)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="88" cy="44" rx="10" ry="4" fill="#aee6ec" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M50,82 v18 a10,4 0 0 0 20,0 v-18" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="60" cy="82" rx="10" ry="4" fill="#ffe6a0" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="44" y1="56" x2="78" y2="54" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="36" y1="64" x2="56" y2="82" stroke="var(--ink)" stroke-width="1.6"/>
+      </g>
+      <!-- 矢印 のちほど -->
+      <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M148 120 L198 120" fill="none" stroke="#9aa0ad" stroke-width="2.4" stroke-dasharray="6 5" marker-end="url(#ar2)"/>
+      <text x="175" y="86" text-anchor="middle" font-size="10" font-weight="800" fill="#7a7e8c">要件定義で</text>
+      <text x="175" y="100" text-anchor="middle" font-size="10" font-weight="800" fill="#7a7e8c">どうせ詳しく</text>
+      <!-- あとで：きっちりERD -->
+      <g transform="translate(206,44)">
+        <rect x="0" y="0" width="132" height="132" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="66" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">あとで：詳細な設計</text>
+        <rect x="14" y="30" width="46" height="40" rx="4" fill="#f3f6fb" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="14" y1="40" x2="60" y2="40" stroke="var(--ink)" stroke-width="1.2"/><line x1="14" y1="50" x2="60" y2="50" stroke="var(--line)" stroke-width="1"/><line x1="14" y1="60" x2="60" y2="60" stroke="var(--line)" stroke-width="1"/>
+        <rect x="74" y="30" width="46" height="40" rx="4" fill="#f3f6fb" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="74" y1="40" x2="120" y2="40" stroke="var(--ink)" stroke-width="1.2"/><line x1="74" y1="50" x2="120" y2="50" stroke="var(--line)" stroke-width="1"/><line x1="74" y1="60" x2="120" y2="60" stroke="var(--line)" stroke-width="1"/>
+        <rect x="44" y="88" width="46" height="40" rx="4" fill="#f3f6fb" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="44" y1="98" x2="90" y2="98" stroke="var(--ink)" stroke-width="1.2"/><line x1="44" y1="108" x2="90" y2="108" stroke="var(--line)" stroke-width="1"/><line x1="44" y1="118" x2="90" y2="118" stroke="var(--line)" stroke-width="1"/>
+        <line x1="60" y1="55" x2="74" y2="52" stroke="var(--ink)" stroke-width="1.4"/>
+        <line x1="42" y1="70" x2="60" y2="88" stroke="var(--ink)" stroke-width="1.4"/>
+        <line x1="96" y1="70" x2="78" y2="88" stroke="var(--ink)" stroke-width="1.4"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">本来は不要</span>じつはこの相関図、<b>この後の要件定義でもっと詳しく作り込む</b>もの。だから<b>本来的には要らない</b>作業──ドラマの脚本を書けば人物の関係は自然に固まっていく、のと同じ。</div>
+  </section>
+
+  <!-- ============ コマ3：なぜやる — 旧来のクセへの対策・補助線 ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="脚本家がいきなり本文を書き出そうとするのを相関図を貼って補助線にする">
+      <rect width="360" height="240" fill="#f7eef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd7dc"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">“いきなり本文”を書きたがる人への対策</text>
+      <!-- 担当者(blue) 左・旧来のクセ吹き出し -->
+      <g transform="translate(66,108)">
+        <ellipse cx="0" cy="96" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="56" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <circle cx="-9" cy="16" r="3.4" fill="#3a3a44"/><circle cx="9" cy="16" r="3.4" fill="#3a3a44"/>
+        <path d="M-8 28 Q0 33 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="66" y="216" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">脚本家＝担当者</text>
+      <!-- 旧来のクセ 吹き出し -->
+      <g transform="translate(20,30)">
+        <rect x="0" y="0" width="152" height="50" rx="12" fill="#fff" stroke="#c9a0a8" stroke-width="1.8"/>
+        <path d="M24 50 l6 12 l12 -12Z" fill="#fff" stroke="#c9a0a8" stroke-width="1.8"/>
+        <text x="76" y="22" text-anchor="middle" font-size="9.5" font-weight="800" fill="#a86b74">「相関図はいいから、</text>
+        <text x="76" y="38" text-anchor="middle" font-size="9.5" font-weight="800" fill="#a86b74">いきなり本文を書くぞ！」</text>
+      </g>
+      <!-- 補助線として相関図を差し出す -->
+      <g transform="translate(196,58)">
+        <rect x="0" y="0" width="150" height="118" rx="10" fill="#fffdf5" stroke="var(--child-d)" stroke-width="2.4" stroke-dasharray="7 5"/>
+        <text x="75" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">補助線＝相関図</text>
+        <path d="M28,44 v20 a11,4.5 0 0 0 22,0 v-20" fill="var(--parent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="39" cy="44" rx="11" ry="4.5" fill="#ffc2d0" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M100,44 v20 a11,4.5 0 0 0 22,0 v-20" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="111" cy="44" rx="11" ry="4.5" fill="#ffe6a0" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M62,86 v20 a11,4.5 0 0 0 22,0 v-20" fill="var(--child)" stroke="var(--ink)" stroke-width="1.6"/>
+        <ellipse cx="73" cy="86" rx="11" ry="4.5" fill="#aee6ec" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="39" y="60" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">ヒ</text>
+        <text x="111" y="60" text-anchor="middle" font-size="8" font-weight="800" fill="#5a4a10">ラ</text>
+        <text x="73" y="102" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">主</text>
+        <line x1="50" y1="58" x2="100" y2="56" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="42" y1="68" x2="68" y2="86" stroke="var(--ink)" stroke-width="1.6"/>
+        <line x1="110" y1="68" x2="84" y2="88" stroke="var(--ink)" stroke-width="1.6"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">なぜやる</span>脚本家の中には「相関図はいいから、いきなり本文を書くぞ！」と急ぐ人がいる。筋を見失わないよう、ざっくり相関図を<b>補助線</b>として先に貼っておく。ソフトも同じで、担当者が<b>従来のシステム開発に染まりきっている</b>と細部から作り始めがちなので、その対策になる。</div>
+  </section>
+
+  <!-- ============ コマ4：ラフでいい — ドラム缶程度・正規化は厳密でなくてよい ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ざっくりした相関図で十分で細かい人物設定シートまで作り込む必要はない">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">相関図は“ドラム缶程度”のメモで十分</text>
+      <!-- これでOK：ざっくり相関図 -->
+      <g transform="translate(24,48)">
+        <rect x="0" y="0" width="150" height="140" rx="10" fill="#eefaf1" stroke="var(--child-d)" stroke-width="2.4"/>
+        <g transform="translate(112,16)"><circle r="13" fill="#57c785"/><path d="M-6 0 L-1 6 L7 -6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <text x="58" y="20" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">これでOK</text>
+        <path d="M26,54 v22 a13,5 0 0 0 26,0 v-22" fill="var(--parent)" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="39" cy="54" rx="13" ry="5" fill="#ffc2d0" stroke="var(--ink)" stroke-width="2"/>
+        <text x="39" y="70" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">恋人</text>
+        <path d="M96,54 v22 a13,5 0 0 0 26,0 v-22" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="109" cy="54" rx="13" ry="5" fill="#ffe6a0" stroke="var(--ink)" stroke-width="2"/>
+        <text x="109" y="70" text-anchor="middle" font-size="9" font-weight="800" fill="#5a4a10">敵役</text>
+        <path d="M60,96 v22 a13,5 0 0 0 26,0 v-22" fill="var(--child)" stroke="var(--ink)" stroke-width="2"/>
+        <ellipse cx="73" cy="96" rx="13" ry="5" fill="#aee6ec" stroke="var(--ink)" stroke-width="2"/>
+        <text x="73" y="112" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">主役</text>
+        <line x1="52" y1="68" x2="96" y2="66" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="44" y1="78" x2="66" y2="96" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="108" y1="78" x2="84" y2="98" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="134" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--child-d)">ざっくり相関図</text>
+      </g>
+      <!-- ここまで要らない：作り込みすぎた人物設定シート -->
+      <g transform="translate(198,48)">
+        <rect x="0" y="0" width="140" height="140" rx="10" fill="#fbeef0" stroke="#d98a8a" stroke-width="2.2"/>
+        <g transform="translate(118,16)"><circle r="13" fill="#fff" stroke="#e07a7a" stroke-width="2.4"/><path d="M-5 -5 L5 5 M5 -5 L-5 5" stroke="#e07a7a" stroke-width="2.6" stroke-linecap="round"/></g>
+        <text x="56" y="20" text-anchor="middle" font-size="10.5" font-weight="800" fill="#c05c5c">ここまでは要らない</text>
+        <!-- 人物設定シート1 -->
+        <rect x="16" y="30" width="110" height="44" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.4"/>
+        <circle cx="31" cy="53" r="11" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="27" cy="52" r="1.4" fill="#3a3a44"/><circle cx="35" cy="52" r="1.4" fill="#3a3a44"/>
+        <text x="49" y="40" font-size="7.5" font-weight="800" fill="var(--ink)">主役の設定</text>
+        <line x1="49" y1="48" x2="117" y2="48" stroke="var(--line)" stroke-width="1"/><line x1="49" y1="56" x2="107" y2="56" stroke="var(--line)" stroke-width="1"/><line x1="49" y1="64" x2="119" y2="64" stroke="var(--line)" stroke-width="1"/>
+        <!-- 人物設定シート2 -->
+        <rect x="16" y="80" width="110" height="44" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.4"/>
+        <circle cx="31" cy="103" r="11" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="27" cy="102" r="1.4" fill="#3a3a44"/><circle cx="35" cy="102" r="1.4" fill="#3a3a44"/>
+        <text x="49" y="90" font-size="7.5" font-weight="800" fill="var(--ink)">ヒロインの設定</text>
+        <line x1="49" y1="98" x2="115" y2="98" stroke="var(--line)" stroke-width="1"/><line x1="49" y1="106" x2="105" y2="106" stroke="var(--line)" stroke-width="1"/><line x1="49" y1="114" x2="119" y2="114" stroke="var(--line)" stroke-width="1"/>
+        <text x="70" y="136" text-anchor="middle" font-size="8" font-weight="700" fill="#c05c5c">設定を作り込みすぎ</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">ラフでいい</span>脚本家が細かい<b>人物設定シート</b>まで作り込まず、丸と線の相関図で済ませるのと同じ。ソフトでも<b>ドラム缶程度</b>で十分で、ERDを描いても<b>正規化などは厳密に考えなくていい</b>。あくまで<b>メモ書きくらいの意味合い</b>。</div>
+  </section>
+
+  <!-- ============ コマ5：相関図とは — エンティティ＝人物、線＝関係 ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="主人公ヒロインライバルという登場人物をドラム缶で描き誰と誰がどう関わるかを線で結ぶ">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">「登場人物」と「関係」だけを描く</text>
+      <!-- ヒロイン -->
+      <g transform="translate(46,66)">
+        <path d="M0,18 v40 a30,10 0 0 0 60,0 v-40" fill="var(--parent)" stroke="var(--ink)" stroke-width="2.2"/>
+        <ellipse cx="30" cy="18" rx="30" ry="10" fill="#ffc2d0" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="30" y="46" text-anchor="middle" font-size="11.5" font-weight="800" fill="#fff">ヒロイン</text>
+      </g>
+      <text x="76" y="60" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a7e8c">＝登場人物（モノ）</text>
+      <!-- ライバル -->
+      <g transform="translate(252,66)">
+        <path d="M0,18 v40 a30,10 0 0 0 60,0 v-40" fill="var(--accent)" stroke="var(--ink)" stroke-width="2.2"/>
+        <ellipse cx="30" cy="18" rx="30" ry="10" fill="#ffe6a0" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="30" y="46" text-anchor="middle" font-size="11.5" font-weight="800" fill="#5a4a10">ライバル</text>
+      </g>
+      <!-- 主人公 -->
+      <g transform="translate(148,132)">
+        <path d="M0,14 v30 a30,9 0 0 0 60,0 v-30" fill="var(--child)" stroke="var(--ink)" stroke-width="2.2"/>
+        <ellipse cx="30" cy="14" rx="30" ry="9" fill="#aee6ec" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="30" y="36" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">主人公</text>
+      </g>
+      <!-- 関係の線＋ラベル -->
+      <line x1="106" y1="94" x2="252" y2="94" stroke="var(--ink)" stroke-width="2"/>
+      <line x1="76" y1="134" x2="150" y2="142" stroke="var(--ink)" stroke-width="2"/>
+      <line x1="282" y1="134" x2="208" y2="142" stroke="var(--ink)" stroke-width="2"/>
+      <g transform="translate(150,84)"><rect x="0" y="0" width="58" height="18" rx="9" fill="#fff" stroke="var(--ink)" stroke-width="1.4"/><text x="29" y="13" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--ink)">幼なじみ</text></g>
+      <text x="118" y="150" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">恋心</text>
+      <text x="240" y="150" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">対立</text>
+      <text x="180" y="206" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a7e8c">＝ソフトなら「顧客・商品・注文」のようなモノと関係</text>
+    </svg>
+    <div class="cap"><span class="tag">相関図とは</span>やることは<b>ドラマの相関図</b>そのもの。登場人物を丸（ドラム缶）で描き、<b>誰と誰がどう関わるか＝関係</b>を線で結ぶだけ。ソフトでは、主人公たちが<b>「顧客・商品・注文」＝エンティティ</b>に変わるだけ。</div>
+  </section>
+
+  <!-- ============ コマ6：補助線の効果 — 要件を考える手がかりになる ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="脚本家が相関図を横目に脚本の本文を書けるように相関図が補助線になる">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6ecdd"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">相関図を横目に、脚本（本文）を書く</text>
+      <!-- 背景に薄い相関図（補助線） -->
+      <g opacity=".5">
+        <path d="M40,66 v26 a16,6 0 0 0 32,0 v-26" fill="none" stroke="var(--child-d)" stroke-width="1.8" stroke-dasharray="5 4"/>
+        <ellipse cx="56" cy="66" rx="16" ry="6" fill="none" stroke="var(--child-d)" stroke-width="1.8" stroke-dasharray="5 4"/>
+        <path d="M132,54 v26 a16,6 0 0 0 32,0 v-26" fill="none" stroke="var(--child-d)" stroke-width="1.8" stroke-dasharray="5 4"/>
+        <ellipse cx="148" cy="54" rx="16" ry="6" fill="none" stroke="var(--child-d)" stroke-width="1.8" stroke-dasharray="5 4"/>
+        <line x1="72" y1="78" x2="132" y2="70" stroke="var(--child-d)" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <line x1="70" y1="90" x2="120" y2="120" stroke="var(--child-d)" stroke-width="1.6" stroke-dasharray="5 4"/>
+      </g>
+      <text x="92" y="46" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">背景の補助線＝相関図</text>
+      <!-- 脚本家(blue) 右・脚本の本文を書く -->
+      <g transform="translate(268,104)">
+        <ellipse cx="0" cy="96" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="56" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <path d="M-14 15 Q-9 11 -4 15" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M4 15 Q9 11 14 15" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M-8 28 Q0 34 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="15" cy="22" r="4" fill="#ffb3b3" opacity=".6"/>
+        <path d="M-20 52 L-28 58" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+      </g>
+      <!-- 脚本原稿 -->
+      <g transform="translate(150,120)">
+        <rect x="0" y="0" width="86" height="60" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="43" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="var(--ink)">脚本（本文）</text>
+        <line x1="12" y1="30" x2="74" y2="30" stroke="var(--line)" stroke-width="1.4"/>
+        <line x1="12" y1="42" x2="74" y2="42" stroke="var(--line)" stroke-width="1.4"/>
+        <line x1="12" y1="54" x2="58" y2="54" stroke="var(--line)" stroke-width="1.4"/>
+      </g>
+      <text x="180" y="222" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">登場人物が見えていれば、脚本（要件）は書きやすい</text>
+    </svg>
+    <div class="cap"><span class="tag">補助線の効果</span>脚本家が相関図を横目に本文を書けるのと同じで、相関図は<b>薄い補助線</b>として効く。「誰が登場し、どう関わるか」が先に見えていれば、ソフトでも担当者は<b>落ち着いて要件を考えられる</b>。</div>
+  </section>
+
+  <!-- ============ コマ7：材料が揃った — 6つの成果物 ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="企画書全体像実装技術実現したいこと一覧行動シナリオ概念データモデルの六つが揃った">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">ここまでの“材料”が6つ揃った</text>
+      <!-- 6枚のカード -->
+      <g transform="translate(20,36)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="51" y="30" text-anchor="middle" font-size="20">📄</text>
+        <text x="51" y="52" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">企画書</text>
+      </g>
+      <g transform="translate(129,36)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="51" y="30" text-anchor="middle" font-size="20">🗺️</text>
+        <text x="51" y="52" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">全体像</text>
+      </g>
+      <g transform="translate(238,36)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="51" y="30" text-anchor="middle" font-size="20">🛠️</text>
+        <text x="51" y="52" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--ink)">実装技術</text>
+      </g>
+      <g transform="translate(20,110)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="51" y="30" text-anchor="middle" font-size="20">✅</text>
+        <text x="51" y="52" text-anchor="middle" font-size="9" font-weight="800" fill="var(--ink)">実現したいこと一覧</text>
+      </g>
+      <g transform="translate(129,110)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fff" stroke="var(--parent-d)" stroke-width="2"/>
+        <text x="51" y="30" text-anchor="middle" font-size="20">🎬</text>
+        <text x="51" y="52" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--parent-d)">行動シナリオ</text>
+      </g>
+      <g transform="translate(238,110)">
+        <rect x="0" y="0" width="102" height="66" rx="8" fill="#fffdf5" stroke="var(--child-d)" stroke-width="2.4"/>
+        <text x="51" y="28" text-anchor="middle" font-size="18">🔗</text>
+        <text x="51" y="50" text-anchor="middle" font-size="8.5" font-weight="800" fill="var(--child-d)">概念データモデル</text>
+        <text x="51" y="62" text-anchor="middle" font-size="7.5" font-weight="700" fill="#7a7e8c">（今つくった相関図）</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">材料が揃う</span>これで<b>企画書・全体像・実装技術・実現したいこと一覧・行動シナリオ・概念データモデル</b>の6点がそろった。ドラマでいえば、企画・世界観・撮影手段・やりたい場面・筋書き・相関図が出揃った状態。</div>
+  </section>
+
+  <!-- ============ コマ8：突入 — 材料を手に要件定義へ ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="そろった材料を手に脚本家が脚本執筆の扉へ進んでいく">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dde3ee"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">材料を手に、いざ“脚本執筆”へ</text>
+      <!-- 担当者(blue) 左・資料を抱える -->
+      <g transform="translate(96,104)">
+        <ellipse cx="0" cy="96" rx="30" ry="7" fill="#00000010"/>
+        <rect x="-26" y="42" width="52" height="58" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 5 Q0 -26 26 5 Q26 -16 0 -19 Q-26 -16 -26 5Z" fill="#3a3a44"/>
+        <path d="M-14 14 Q-9 10 -4 14" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M4 14 Q9 10 14 14" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M-9 28 Q0 35 9 28" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="22" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="22" r="4" fill="#ffb3b3" opacity=".6"/>
+        <!-- 抱えた資料束 -->
+        <rect x="-30" y="52" width="60" height="30" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="0" y="72" text-anchor="middle" font-size="9" font-weight="800" fill="var(--child-d)">6つの材料</text>
+      </g>
+      <!-- 進む矢印 -->
+      <defs><marker id="ar8" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M150 150 L214 150" fill="none" stroke="var(--ink)" stroke-width="2.6" marker-end="url(#ar8)"/>
+      <text x="182" y="140" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--ink)">突入</text>
+      <!-- 要件定義の扉 -->
+      <g transform="translate(232,52)">
+        <rect x="0" y="0" width="96" height="132" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="10" y="12" width="76" height="108" rx="4" fill="#eaf1fb" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="74" cy="66" r="4" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.4"/>
+        <text x="48" y="56" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">脚本</text>
+        <text x="48" y="76" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">執筆</text>
+        <text x="48" y="104" text-anchor="middle" font-size="9" font-weight="800" fill="#7a7e8c">＝要件定義</text>
+      </g>
+      <text x="180" y="222" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">材料がそろえば、脚本（＝要件定義）は迷わず書き出せる</text>
+    </svg>
+    <div class="cap"><span class="tag">突入</span>脚本家が材料をそろえて<b>執筆</b>に入るように、担当者も材料を手に<b>要件定義に突入</b>する。相関図はあくまで補助線。ここから先で、モノも関係も<b>より詳しく</b>固めていく。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🔗 まとめ ── 要件の前に“ざっくり相関図”。あくまで補助線、ドラム缶程度でいい</h2>
+    <p class="lead">行動シナリオを確認したら、次に<strong>概念データモデル</strong>を作ります。ドラマを書く前の<strong>登場人物の相関図</strong>と同じで、出てくる「モノ（エンティティ）」と「関係」をざっくり描くだけ。じつは<strong>この後の要件定義でもっと詳しくやる</strong>ので本来は不要ですが、担当者が<strong>従来のシステム開発に染まりきっている場合の対策</strong>として、要件を考える<strong>補助線（メモ書き）</strong>に置きます。<strong>ドラム缶程度</strong>で十分、ERDでも<strong>正規化は厳密でなくてよい</strong>。これで6つの材料がそろい、<strong>要件定義へ突入</strong>します。</p>
+    <ul>
+      <li><b>相関図の場合</b>：脚本を書く前に、登場人物（モノ）を丸で描き、誰と誰がどう関わるかを線で結ぶ → きれいに整理しなくてよい → 脚本を書けば関係は自然に固まる → でも下書きがあると筋を考えやすい。</li>
+      <li><b>ソフト開発の場合</b>：要件定義の前に、<b>エンティティ</b>をドラム缶で描き<b>関係</b>を線で結ぶ（＝概念データモデル） → <b>正規化は厳密に不要</b>・メモ書きでよい → 後の要件定義で詳細化するので本来は不要 → だが<b>旧来のクセへの対策＝補助線</b>として効く。</li>
+      <li><b>ポイント</b>：概念データモデルは<b>成果物ではなく補助線</b>。<b>企画書・全体像・実装技術・実現したいこと一覧・行動シナリオ・概念データモデル</b>の6点を材料に、迷わず<b>要件定義に突入</b>する。</li>
+    </ul>
+    <p class="map">物語の流れ： ①行動シナリオの次は相関図 → ②本来は不要（後で詳しくやる） → ③旧来のクセへの対策＝補助線 → ④ドラム缶程度・正規化は厳密でなく → ⑤モノ＝エンティティ／線＝関係 → ⑥補助線として要件を考えやすく → ⑦材料が6つ揃う → ⑧材料を手に要件定義へ突入</p>
+  </section>
+
+</main>
+
+</body>
+</html>
