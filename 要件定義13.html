@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>レストランのメニュー表でわかる「UIの定義」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* お客さん（利用者）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 厨房スタッフ（ソフト＝仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;background:#ffd166;color:#5a4a10;border-radius:999px;padding:3px 14px;">Chapter-13</span></p>
+  <h1>レストランのメニュー表でわかる、<span class="hl">「UIの定義」</span>のはなし</h1>
+  <p>お客さんは厨房を見られない。──メニューと接客＝UIだけが、店（ソフト）の良し悪しを伝える</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1：なぜ最重要 — 厨房は見えない、UIだけで判断される ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="お客さんは厨房の中身を見られずメニューや接客というUIだけで店の良し悪しを判断する">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">お客さんは厨房（中身）を見られない</text>
+      <!-- お客さん -->
+      <g transform="translate(50,92)">
+        <ellipse cx="0" cy="108" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-23" y="40" width="46" height="60" rx="17" fill="var(--parent)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-26 6 Q0 -27 26 6 Q26 -15 0 -18 Q-26 -15 -26 6Z" fill="#7a5a44"/>
+        <circle cx="-9" cy="18" r="3.5" fill="#3a3a44"/><circle cx="9" cy="18" r="3.5" fill="#3a3a44"/>
+        <path d="M-8 29 Q0 35 8 29" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="24" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="24" r="4" fill="#ffb3b3" opacity=".6"/>
+        <path d="M20 50 L42 42" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/><circle cx="45" cy="41" r="6" fill="#ffe1c4"/>
+      </g>
+      <text x="50" y="222" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--parent-d)">お客さん＝利用者</text>
+      <!-- 見えるUI：メニュー表 -->
+      <g transform="translate(110,54)">
+        <rect x="0" y="0" width="90" height="118" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="90" height="24" rx="8" fill="var(--parent)"/>
+        <rect x="0" y="15" width="90" height="9" fill="var(--parent)"/>
+        <text x="45" y="17" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">メニュー</text>
+        <line x1="12" y1="42" x2="78" y2="42" stroke="var(--line)" stroke-width="1.6"/>
+        <line x1="12" y1="60" x2="78" y2="60" stroke="var(--line)" stroke-width="1.6"/>
+        <line x1="12" y1="78" x2="78" y2="78" stroke="var(--line)" stroke-width="1.6"/>
+        <line x1="12" y1="96" x2="58" y2="96" stroke="var(--line)" stroke-width="1.6"/>
+      </g>
+      <text x="155" y="186" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--parent-d)">見える＝UI</text>
+      <!-- 見えない壁 -->
+      <line x1="228" y1="40" x2="228" y2="184" stroke="#9aa0ad" stroke-width="2.2" stroke-dasharray="6 5"/>
+      <!-- 見えない厨房 -->
+      <g transform="translate(246,54)">
+        <rect x="0" y="0" width="98" height="118" rx="8" fill="#e3e6ec" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="0" y="0" width="98" height="26" rx="8" fill="var(--child)"/>
+        <rect x="0" y="17" width="98" height="9" fill="var(--child)"/>
+        <path d="M24 0 v26 M74 0 v26" stroke="#fff" stroke-width="1.6" opacity=".6"/>
+        <text x="49" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="var(--ink)">のれん</text>
+        <text x="49" y="72" text-anchor="middle" font-size="34" font-weight="800" fill="#aab0bd">？</text>
+        <text x="49" y="104" text-anchor="middle" font-size="10" font-weight="800" fill="#7a7e8c">厨房＝中身</text>
+      </g>
+      <text x="295" y="186" text-anchor="middle" font-size="10.5" font-weight="800" fill="#7a7e8c">見えない</text>
+    </svg>
+    <div class="cap"><span class="tag">最重要</span>お客さんは<b>厨房（プログラムの中身）</b>を直接のぞけない。メニューや接客＝<b>UI</b>だけで店の良し悪しを判断する。だから要件定義の<b>3要素のなかでもUIが最重要</b>で、利用者がソフトを評価できる<b>ほぼ唯一の接点</b>になる。</div>
+  </section>
+
+  <!-- ============ コマ2：だからUIから — 価値はUIを通してしか届かない ============ -->
+  <section class="panel flip">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="厨房が作った価値はUIという受け渡し口を通してしかお客さんに届かない">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">価値は「UI」を通してしか届かない</text>
+      <!-- 厨房スタッフ（ソフト） -->
+      <g transform="translate(52,94)">
+        <ellipse cx="0" cy="106" rx="27" ry="7" fill="#00000010"/>
+        <rect x="-22" y="40" width="44" height="58" rx="16" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="25" fill="#ffe1c4"/>
+        <path d="M-25 6 Q0 -26 25 6 Q25 -14 0 -17 Q-25 -14 -25 6Z" fill="#3a3a44"/>
+        <path d="M-14 15 Q-9 11 -4 15" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M4 15 Q9 11 14 15" stroke="#3a3a44" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M-8 28 Q0 34 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <!-- お皿 -->
+        <path d="M20 48 L44 44" stroke="#ffe1c4" stroke-width="10" stroke-linecap="round"/>
+        <ellipse cx="52" cy="44" rx="14" ry="5" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M46 40 l3 8 l6 4 l-6 4 l-3 8 l-3 -8 l-6 -4 l6 -4Z" fill="var(--accent)"/>
+      </g>
+      <text x="52" y="220" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">厨房＝ソフト</text>
+      <!-- UIの受け渡し口 -->
+      <g transform="translate(150,58)">
+        <rect x="0" y="0" width="70" height="120" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="8" y="46" width="54" height="34" rx="4" fill="#eef7f0" stroke="var(--ink)" stroke-width="2"/>
+        <text x="35" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">UI</text>
+        <text x="35" y="102" text-anchor="middle" font-size="8.5" font-weight="800" fill="#7a7e8c">受け渡し口</text>
+      </g>
+      <!-- 価値が口を通って届く -->
+      <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--child-d)"/></marker></defs>
+      <path d="M120 92 L150 92" fill="none" stroke="var(--child-d)" stroke-width="2.4" marker-end="url(#ar2)"/>
+      <path d="M220 92 L262 92" fill="none" stroke="var(--child-d)" stroke-width="2.4" marker-end="url(#ar2)"/>
+      <text x="185" y="82" text-anchor="middle" font-size="12">✨</text>
+      <!-- お客さん -->
+      <g transform="translate(304,96)">
+        <ellipse cx="0" cy="104" rx="26" ry="7" fill="#00000010"/>
+        <rect x="-22" y="40" width="44" height="56" rx="16" fill="var(--parent)"/>
+        <circle cx="0" cy="16" r="25" fill="#ffe1c4"/>
+        <path d="M-25 6 Q0 -26 25 6 Q25 -14 0 -17 Q-25 -14 -25 6Z" fill="#7a5a44"/>
+        <circle cx="-9" cy="17" r="3.5" fill="#3a3a44"/><circle cx="9" cy="17" r="3.5" fill="#3a3a44"/>
+        <path d="M-8 28 Q0 35 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="23" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="23" r="4" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="180" y="222" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7a7e8c">だから、ゴール具現化の第一歩は「UIの定義」</text>
+    </svg>
+    <div class="cap"><span class="tag">第一歩</span>どんなに厨房（中身）が優れていても、その<b>価値はUIを通してしか</b>お客さんに届かない。だから<b>実現すべきゴールを形にする第一歩は、UIを定義する</b>こと。ここが決まって初めて「良いソフト」を届けられる。</div>
+  </section>
+
+  <!-- ============ コマ3：UIの3基本要素 — データ項目・操作項目・レイアウト ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UIの基本要素はデータ項目と操作項目とレイアウトの三つ">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">UIの基本要素は、この3つ</text>
+      <!-- データ項目 -->
+      <g transform="translate(16,40)">
+        <rect x="0" y="0" width="104" height="136" rx="9" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">データ項目</text>
+        <rect x="14" y="34" width="76" height="18" rx="3" fill="#f3f6fb" stroke="var(--line)" stroke-width="1.2"/>
+        <text x="20" y="47" font-size="9" font-weight="700" fill="var(--ink)">ハンバーグ</text>
+        <rect x="14" y="58" width="76" height="18" rx="3" fill="#f3f6fb" stroke="var(--line)" stroke-width="1.2"/>
+        <text x="20" y="71" font-size="9" font-weight="700" fill="var(--ink)">￥1,200</text>
+        <rect x="14" y="82" width="76" height="30" rx="3" fill="#f3f6fb" stroke="var(--line)" stroke-width="1.2"/>
+        <text x="52" y="101" text-anchor="middle" font-size="16">🍔</text>
+        <text x="52" y="128" text-anchor="middle" font-size="9" font-weight="700" fill="#7a7e8c">見せる情報</text>
+      </g>
+      <!-- 操作項目 -->
+      <g transform="translate(128,40)">
+        <rect x="0" y="0" width="104" height="136" rx="9" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">操作項目</text>
+        <rect x="18" y="38" width="68" height="26" rx="13" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="52" y="55" text-anchor="middle" font-size="10.5" font-weight="800" fill="#5a4a10">注文する</text>
+        <circle cx="52" cy="92" r="14" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <path d="M44 92 a8 8 0 0 1 16 0" fill="none" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="49" y="76" width="6" height="4" rx="2" fill="var(--ink)"/>
+        <path d="M40 96 h24" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
+        <text x="52" y="128" text-anchor="middle" font-size="9" font-weight="700" fill="#7a7e8c">呼び出しベル等</text>
+      </g>
+      <!-- レイアウト -->
+      <g transform="translate(240,40)">
+        <rect x="0" y="0" width="104" height="136" rx="9" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="52" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">レイアウト</text>
+        <rect x="16" y="34" width="72" height="14" rx="2" fill="var(--child)" opacity=".5"/>
+        <rect x="16" y="54" width="34" height="52" rx="2" fill="#eef4f7" stroke="var(--line)" stroke-width="1.4"/>
+        <rect x="54" y="54" width="34" height="52" rx="2" fill="#eef4f7" stroke="var(--line)" stroke-width="1.4"/>
+        <rect x="16" y="112" width="72" height="10" rx="2" fill="var(--child)" opacity=".5"/>
+        <text x="52" y="134" text-anchor="middle" font-size="9" font-weight="700" fill="#7a7e8c">配置・並び</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">基本要素</span>UIを組み立てる基本は3つ。<b>データ項目</b>（料理名や値段など見せる情報）、<b>操作項目</b>（注文ボタンや呼び出しベルなど利用者が動かすもの）、そして<b>レイアウト</b>（それらの配置）。この3つでUIはできている。</div>
+  </section>
+
+  <!-- ============ コマ4：作る順番 — ラフ→動線→遷移→操作と機能 ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ラフを描き動線を考えレイアウトと画面遷移が固まったら操作と機能を織り込む">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dde3ee"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">ラフ → 動線 → 遷移が固まったら“機能”を織り込む</text>
+      <defs><marker id="ar4" markerWidth="9" markerHeight="9" refX="6.5" refY="4" orient="auto"><path d="M0 0 L7 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <!-- ① ラフ -->
+      <g transform="translate(8,58)">
+        <rect x="0" y="0" width="76" height="102" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="38" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">①ラフ</text>
+        <path d="M14 32 h48 M14 46 h36 M14 60 h48 M14 74 h28" stroke="#c9cee0" stroke-width="3" stroke-linecap="round"/>
+        <text x="38" y="96" text-anchor="middle" font-size="8" font-weight="700" fill="#7a7e8c">ざっくり描く</text>
+      </g>
+      <path d="M86 109 L98 109" fill="none" stroke="var(--ink)" stroke-width="2.2" marker-end="url(#ar4)"/>
+      <!-- ② 動線 -->
+      <g transform="translate(100,58)">
+        <rect x="0" y="0" width="76" height="102" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="38" y="18" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">②動線</text>
+        <path d="M14 78 C24 40 52 88 62 44" fill="none" stroke="var(--parent)" stroke-width="2.4" stroke-dasharray="4 4" marker-end="url(#ar4)"/>
+        <circle cx="14" cy="78" r="3.5" fill="var(--parent)"/>
+        <text x="38" y="96" text-anchor="middle" font-size="8" font-weight="700" fill="#7a7e8c">流れを考える</text>
+      </g>
+      <path d="M178 109 L190 109" fill="none" stroke="var(--ink)" stroke-width="2.2" marker-end="url(#ar4)"/>
+      <!-- ③ レイアウト＆画面遷移 -->
+      <g transform="translate(192,58)">
+        <rect x="0" y="0" width="76" height="102" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="38" y="16" text-anchor="middle" font-size="9" font-weight="800" fill="var(--child-d)">③遷移が固まる</text>
+        <rect x="10" y="26" width="24" height="30" rx="3" fill="#eef4f7" stroke="var(--ink)" stroke-width="1.4"/>
+        <rect x="42" y="46" width="24" height="30" rx="3" fill="#eef4f7" stroke="var(--ink)" stroke-width="1.4"/>
+        <path d="M34 40 L42 52" fill="none" stroke="var(--ink)" stroke-width="1.8" marker-end="url(#ar4)"/>
+        <text x="38" y="96" text-anchor="middle" font-size="8" font-weight="700" fill="#7a7e8c">画面のつながり</text>
+      </g>
+      <path d="M270 109 L282 109" fill="none" stroke="var(--ink)" stroke-width="2.2" marker-end="url(#ar4)"/>
+      <!-- ④ 操作と機能 -->
+      <g transform="translate(284,58)">
+        <rect x="0" y="0" width="72" height="102" rx="8" fill="#fff8e6" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="36" y="16" text-anchor="middle" font-size="9" font-weight="800" fill="#5a4a10">④操作＋機能</text>
+        <rect x="14" y="26" width="44" height="18" rx="9" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="36" y="39" text-anchor="middle" font-size="8.5" font-weight="800" fill="#5a4a10">注文</text>
+        <g transform="translate(36,68)"><circle r="12" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><path d="M-6 0 h12 M0 -6 v12" stroke="var(--child-d)" stroke-width="2" stroke-linecap="round"/></g>
+        <text x="36" y="96" text-anchor="middle" font-size="8" font-weight="700" fill="#7a7e8c">織り込む</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手順</span>まず<b>ラフイメージ</b>を描きながら利用者の<b>動線</b>を考える。<b>レイアウトと画面遷移</b>のイメージが固まってきたら、そこへ<b>操作と機能</b>を織り込んでいく。いきなり機能から作らないのがコツ。</div>
+  </section>
+
+  <!-- ============ コマ5：表示項目を列挙 — 変わらないもの（ロゴ・バナー）も書き出す ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ロゴやバナーのように変化しないものも表示項目として列挙しておくと便利">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe7dd"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">変わらないもの（ロゴ・バナー）も書き出す</text>
+      <!-- 店構え -->
+      <g transform="translate(24,44)">
+        <rect x="0" y="26" width="132" height="118" rx="6" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <!-- ロゴ看板 -->
+        <rect x="18" y="6" width="96" height="26" rx="6" fill="var(--child)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="66" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">◎ ロゴ看板</text>
+        <!-- バナー（のれん） -->
+        <rect x="14" y="40" width="104" height="20" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.6"/>
+        <text x="66" y="54" text-anchor="middle" font-size="9" font-weight="800" fill="#5a4a10">本日のおすすめ ＝ バナー</text>
+        <!-- 中身（変わる部分） -->
+        <rect x="16" y="70" width="100" height="60" rx="4" fill="#eef7f0" stroke="var(--line)" stroke-width="1.4"/>
+        <path d="M28 86 h76 M28 100 h60 M28 114 h76" stroke="#c9cee0" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <text x="90" y="222" text-anchor="middle" font-size="9.5" font-weight="700" fill="#7a7e8c">ロゴ・バナーは基本的に変化しない</text>
+      <!-- 表示項目リスト -->
+      <g transform="translate(196,44)">
+        <rect x="0" y="0" width="150" height="132" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="75" y="22" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">表示項目リスト</text>
+        <g font-size="10" font-weight="700" fill="var(--ink)">
+          <path d="M14 38 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/><text x="34" y="42">データ項目</text>
+          <path d="M14 60 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/><text x="34" y="64">操作項目</text>
+          <path d="M14 82 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/><text x="34" y="86" fill="var(--child-d)">ロゴ（変わらない）</text>
+          <path d="M14 104 l5 6 l9 -12" fill="none" stroke="#3aa86b" stroke-width="2.6" stroke-linecap="round"/><text x="34" y="108" fill="var(--child-d)">バナー（変わらない）</text>
+        </g>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">表示項目</span>データ項目・操作項目はもちろん、<b>ロゴやバナーのように基本的に変化しないもの</b>も、まとめて<b>「表示項目」として列挙</b>しておくと便利。あとで抜け漏れに気づかずに済む。</div>
+  </section>
+
+  <!-- ============ コマ6：導出項目 — 他の項目からルールで導く値 ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="小計や税込や合計のように別の項目から一定のルールで導き出される値が導出項目">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe3ea"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--ink)">他の項目から“ルールで導く”値＝導出項目</text>
+      <!-- 伝票 -->
+      <g transform="translate(30,40)">
+        <rect x="0" y="0" width="180" height="150" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <text x="90" y="22" text-anchor="middle" font-size="11" font-weight="800" fill="var(--ink)">お会計</text>
+        <line x1="14" y1="30" x2="166" y2="30" stroke="var(--line)" stroke-width="1.4"/>
+        <text x="14" y="48" font-size="10" font-weight="700" fill="#7a7e8c">単価 ￥1,200 ×  数量 2</text>
+        <line x1="14" y1="58" x2="166" y2="58" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <text x="14" y="78" font-size="10.5" font-weight="800" fill="var(--child-d)">小計　　￥2,400</text>
+        <text x="14" y="100" font-size="10.5" font-weight="800" fill="var(--child-d)">税(10%)　￥240</text>
+        <line x1="14" y1="110" x2="166" y2="110" stroke="var(--line)" stroke-width="1.2"/>
+        <text x="14" y="132" font-size="12" font-weight="800" fill="var(--child-d)">合計　　￥2,640</text>
+      </g>
+      <!-- ルールの歯車＋矢印 -->
+      <g transform="translate(250,68)">
+        <circle r="24" fill="#fff8e6" stroke="var(--ink)" stroke-width="2"/>
+        <g fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round">
+          <path d="M0 -24 v-7 M0 24 v7 M-24 0 h-7 M24 0 h7 M-17 -17 l-5 -5 M17 -17 l5 -5 M-17 17 l-5 5 M17 17 l5 5"/>
+        </g>
+        <circle r="10" fill="var(--accent)" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="0" y="46" text-anchor="middle" font-size="9.5" font-weight="800" fill="#5a4a10">一定のルール</text>
+      </g>
+      <defs><marker id="ar6" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--child-d)"/></marker></defs>
+      <path d="M212 72 L223 72" fill="none" stroke="var(--child-d)" stroke-width="2.2" marker-end="url(#ar6)"/>
+      <text x="285" y="150" text-anchor="middle" font-size="9" font-weight="700" fill="#7a7e8c">小計・税・合計は</text>
+      <text x="285" y="164" text-anchor="middle" font-size="9" font-weight="800" fill="var(--child-d)">＝ 導出項目</text>
+    </svg>
+    <div class="cap"><span class="tag">導出項目</span>「小計・税込・合計」のように、<b>別の項目をもとに一定のルールに従って導き出される値</b>がある。これを<b>導出項目</b>として意識し、「どの値から・どう計算するか」の認識をきちんと定義しておく。</div>
+  </section>
+
+  <!-- ============ コマ7：エラーメッセージ — 現象・原因・対処方法の3つ ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="エラーメッセージは現象と原因と対処方法の三つを必ず用意して対処を促す">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd7dc"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">エラーは「通知」で終わらせず、対処まで促す</text>
+      <!-- 悪い例 -->
+      <g transform="translate(20,44)">
+        <rect x="0" y="0" width="118" height="132" rx="8" fill="#fff" stroke="#d98a8a" stroke-width="2"/>
+        <g transform="translate(59,30)"><circle r="15" fill="#fff" stroke="#e07a7a" stroke-width="2.4"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#e07a7a" stroke-width="2.6" stroke-linecap="round"/></g>
+        <text x="59" y="70" text-anchor="middle" font-size="11" font-weight="800" fill="#c05c5c">「エラー」</text>
+        <text x="59" y="90" text-anchor="middle" font-size="9.5" font-weight="700" fill="#c05c5c">だけ…</text>
+        <text x="59" y="118" text-anchor="middle" font-size="9" font-weight="700" fill="#a86b74">どうすれば？</text>
+      </g>
+      <text x="79" y="222" text-anchor="middle" font-size="9.5" font-weight="800" fill="#c05c5c">✕ 通知だけ</text>
+      <!-- 良い例：3項目 -->
+      <g transform="translate(160,40)">
+        <rect x="0" y="0" width="182" height="140" rx="8" fill="#fff" stroke="var(--child-d)" stroke-width="2.4"/>
+        <text x="91" y="20" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">必ず3つを用意する</text>
+        <rect x="12" y="28" width="158" height="30" rx="5" fill="#f7fafc" stroke="var(--line)" stroke-width="1.4"/>
+        <text x="20" y="41" font-size="9" font-weight="800" fill="var(--ink)">現象</text>
+        <text x="20" y="53" font-size="8.5" font-weight="700" fill="#7a7e8c">本日は満席です</text>
+        <rect x="12" y="62" width="158" height="30" rx="5" fill="#f7fafc" stroke="var(--line)" stroke-width="1.4"/>
+        <text x="20" y="75" font-size="9" font-weight="800" fill="var(--ink)">原因</text>
+        <text x="20" y="87" font-size="8.5" font-weight="700" fill="#7a7e8c">ご予約が多数のため</text>
+        <rect x="12" y="96" width="158" height="34" rx="5" fill="#fff8e6" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="20" y="110" font-size="9" font-weight="800" fill="#5a4a10">対処方法</text>
+        <text x="20" y="123" font-size="8.5" font-weight="700" fill="#5a4a10">30分後に再度お尋ねください</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">見落とし注意</span>UIで疎かになりがちなのが<b>エラーメッセージ</b>。ただ通知するだけでなく<b>何らかの対処を促す</b>役目もある。だから<b>現象・原因・対処方法</b>の3項目を必ず用意する（例：満席／予約多数／30分後に）。</div>
+  </section>
+
+  <!-- ============ コマ8：ワークセットと成果物 — 3つの成果物が完成 ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="1つの仕事をするソフトの単位ワークセットのUIを考えると三つの成果物が出来上がる">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6ecdd"/>
+      <text x="180" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">1ワークセットのUIを考えると、成果物が3つ</text>
+      <!-- ワークセット -->
+      <g transform="translate(20,66)">
+        <rect x="0" y="0" width="92" height="108" rx="10" fill="#fff" stroke="var(--child-d)" stroke-width="2.4"/>
+        <text x="46" y="24" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">1ワークセット</text>
+        <rect x="18" y="36" width="56" height="40" rx="5" fill="#eefaf1" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M28 50 h36 M28 60 h24" stroke="#c9cee0" stroke-width="3" stroke-linecap="round"/>
+        <text x="46" y="96" text-anchor="middle" font-size="8.5" font-weight="700" fill="#7a7e8c">1つの仕事の単位</text>
+      </g>
+      <defs><marker id="ar8" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="var(--ink)"/></marker></defs>
+      <path d="M116 120 L142 120" fill="none" stroke="var(--ink)" stroke-width="2.4" marker-end="url(#ar8)"/>
+      <!-- 3成果物 -->
+      <g transform="translate(150,42)">
+        <rect x="0" y="0" width="196" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="18" y="22" font-size="16">🖼️</text>
+        <text x="44" y="21" font-size="10.5" font-weight="800" fill="var(--ink)">①ラフ／モックアップ</text>
+        <text x="44" y="38" font-size="8.5" font-weight="700" fill="#7a7e8c">画面の見た目イメージ</text>
+      </g>
+      <g transform="translate(150,98)">
+        <rect x="0" y="0" width="196" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="18" y="22" font-size="16">🔀</text>
+        <text x="44" y="21" font-size="10.5" font-weight="800" fill="var(--ink)">②画面遷移図</text>
+        <text x="44" y="38" font-size="8.5" font-weight="700" fill="#7a7e8c">画面から画面へのつながり</text>
+      </g>
+      <g transform="translate(150,154)">
+        <rect x="0" y="0" width="196" height="44" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="18" y="26" font-size="16">📝</text>
+        <text x="44" y="21" font-size="10.5" font-weight="800" fill="var(--ink)">③項目の説明</text>
+        <text x="44" y="37" font-size="8.5" font-weight="700" fill="#7a7e8c">データ・操作・導出項目の定義</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">成果物</span>1つの仕事をするソフトの単位を<b>ワークセット</b>と呼ぶ。1つのワークセットについてUIを考え抜くと、<b>ラフイメージ（またはモックアップ）・画面遷移図・項目の説明</b>という3つの成果物が出来上がる。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>🍽️ まとめ ── UIは「唯一の接点」。だから要件定義の第一歩はUIの定義</h2>
+    <p class="lead">お客さんは厨房（中身）を見られず、<strong>メニューや接客＝UIだけで店を判断</strong>します。ソフトも同じで、価値は<strong>UIを通してしか</strong>利用者に届きません。だからゴールを形にする<strong>第一歩はUIの定義</strong>。UIは<strong>データ項目・操作項目・レイアウト</strong>でできていて、<strong>ラフ→動線→画面遷移</strong>が固まってから<strong>操作と機能</strong>を織り込みます。ロゴ・バナーなど変わらないものも<strong>表示項目</strong>として列挙し、ルールで導く<strong>導出項目</strong>も定義。見落としがちな<strong>エラーメッセージ</strong>は<strong>現象・原因・対処方法</strong>の3つを必ず用意します。</p>
+    <ul>
+      <li><b>メニュー表の場合</b>：お客さんは厨房を見られない → メニュー・値段・注文の仕組み・店構え（UI）だけで店を評価 → 満席の貼り紙も「なぜ・どうすれば」まで書く → メニューを見れば料理（価値）が伝わる。</li>
+      <li><b>ソフト開発の場合</b>：利用者はプログラムの中身を見られない → <b>データ項目・操作項目・レイアウト</b>で作るUIだけが価値を伝える → <b>ラフ→動線→画面遷移→操作と機能</b>の順で組む → <b>表示項目</b>（ロゴ・バナー含む）と<b>導出項目</b>を列挙し、<b>エラーは現象・原因・対処方法</b>の3点で。</li>
+      <li><b>ポイント</b>：<b>1ワークセット</b>のUIを考え抜くと、<b>ラフ／モックアップ・画面遷移図・項目の説明</b>の3成果物が出来上がる。これが要件定義の土台になる。</li>
+    </ul>
+    <p class="map">物語の流れ： ①厨房は見えずUIだけで判断 → ②価値はUIを通してのみ届く＝第一歩 → ③基本要素はデータ項目・操作項目・レイアウト → ④ラフ→動線→遷移→操作と機能 → ⑤ロゴ・バナーも表示項目に列挙 → ⑥ルールで導く導出項目 → ⑦エラーは現象・原因・対処方法 → ⑧1ワークセットで3成果物が完成</p>
+  </section>
+
+</main>
+
+</body>
+</html>
