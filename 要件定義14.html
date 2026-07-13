@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>料理・厨房でわかる「機能（Function）」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 依頼者（成果を受け取る人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 機能＝料理人（仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;background:#ffd166;color:#5a4a10;border-radius:999px;padding:3px 14px;">Chapter-14</span></p>
+  <h1>お料理でわかる、<span class="hl">「機能（Function）」</span>のはなし</h1>
+  <p>機能とは仕事。──材料 x を入れて成果 y を出す、y = f(x) のはなし</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="機能とは英語でFunction 関数 y=f(x)">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <!-- 黒板 -->
+      <g transform="translate(150,26)">
+        <rect x="0" y="0" width="196" height="96" rx="10" fill="#33463f" stroke="var(--ink)" stroke-width="2"/>
+        <text x="98" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">機能＝Function＝関数</text>
+        <text x="98" y="72" text-anchor="middle" font-size="30" font-weight="800" fill="#ffe08a">y = f(x)</text>
+      </g>
+      <!-- 料理人キャラ（機能・水色・指さし） -->
+      <g transform="translate(80,74)">
+        <ellipse cx="0" cy="120" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="68" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <!-- コック帽 -->
+        <path d="M-24 -6 Q-30 -30 -12 -28 Q-6 -42 12 -34 Q30 -36 24 -12 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-24" y="-10" width="48" height="10" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M24 60 L58 50" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="62" cy="49" r="7" fill="#ffe1c4"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">導入</span>「機能」は英語で <b>Function（ファンクション）</b>＝関数。だから <b>y = f(x)</b> と書ける。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="材料xを入れると料理yが出てくる 機能は仕事">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- 左：材料 x -->
+      <g transform="translate(40,96)">
+        <rect x="0" y="0" width="70" height="60" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="24" cy="24" r="10" fill="#ff9d6b"/>
+        <circle cx="46" cy="28" r="9" fill="#8bc34a"/>
+        <ellipse cx="34" cy="44" rx="16" ry="6" fill="#f2c14e"/>
+        <text x="35" y="-12" text-anchor="middle" font-size="15" font-weight="800" fill="var(--child-d)">材料 x</text>
+      </g>
+      <!-- 機能ボックス f -->
+      <g transform="translate(140,86)">
+        <rect x="0" y="0" width="80" height="80" rx="14" fill="var(--child)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="40" y="40" text-anchor="middle" font-size="28" font-weight="800" fill="#fff">f</text>
+        <text x="40" y="60" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">機能</text>
+      </g>
+      <!-- 矢印 -->
+      <path d="M112 116 L138 116" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M134 110 L142 116 L134 122Z" fill="var(--ink)"/>
+      <path d="M222 116 L250 116" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M246 110 L254 116 L246 122Z" fill="var(--ink)"/>
+      <!-- 右：成果 y -->
+      <g transform="translate(258,92)">
+        <ellipse cx="35" cy="52" rx="34" ry="9" fill="#00000010"/>
+        <path d="M2 30 Q35 8 68 30 Q60 58 35 58 Q10 58 2 30Z" fill="#ffd9a0" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="26" cy="30" r="6" fill="#ff7043"/>
+        <circle cx="44" cy="28" r="5" fill="#8bc34a"/>
+        <path d="M18 44 Q22 34 30 40" stroke="#c98a2e" stroke-width="2" fill="none"/>
+        <text x="35" y="-8" text-anchor="middle" font-size="15" font-weight="800" fill="var(--child-d)">成果 y</text>
+      </g>
+      <!-- きらきら -->
+      <path d="M320 56 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">定義</span><b>材料 x（入力）</b>を入れると <b>料理 y（成果＝出力）</b>が出てくる。つまり機能とは「<b>仕事</b>」。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="材料を入れても何も出てこない 成果ゼロは仕事してないのと同じ">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#e7d6d6"/>
+      <!-- 機能ボックス（稼働してるのに） -->
+      <g transform="translate(140,86)">
+        <rect x="0" y="0" width="80" height="80" rx="14" fill="#c7ccd6" stroke="var(--ink)" stroke-width="2"/>
+        <text x="40" y="46" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">f</text>
+      </g>
+      <path d="M112 116 L138 116" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M134 110 L142 116 L134 122Z" fill="var(--ink)"/>
+      <!-- 出口：空っぽの皿 -->
+      <g transform="translate(258,96)">
+        <ellipse cx="35" cy="48" rx="34" ry="9" fill="#00000010"/>
+        <path d="M2 30 Q35 12 68 30 Q60 52 35 52 Q10 52 2 30Z" fill="#eef1f5" stroke="var(--ink)" stroke-width="2"/>
+        <text x="35" y="42" text-anchor="middle" font-size="16" font-weight="800" fill="#b0b6c2">空</text>
+      </g>
+      <text x="228" y="112" font-size="22">💢</text>
+      <!-- 困り顔の料理人 -->
+      <g transform="translate(66,80)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-24 -6 Q-30 -30 -12 -28 Q-6 -42 12 -34 Q30 -36 24 -12 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-24" y="-10" width="48" height="10" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M-17 20 Q-12 16 -7 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M7 20 Q12 16 17 20" stroke="#3a3a44" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-9 38 Q0 33 9 38" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-8 30 l-3 8 M0 30 l0 8 M8 30 l3 8" stroke="#9fb6c9" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">反例</span>材料を入れても<b>料理が出てこない</b>調理台は、<b>働いていないのと同じ</b>。成果を出さない機能に価値はない。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="まずどんな料理を出すか 出力 成果 y を先に決める">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <!-- 依頼者（ピンク・こういう料理が欲しい） -->
+      <g transform="translate(80,80)">
+        <ellipse cx="0" cy="118" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="66" rx="20" fill="var(--parent)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-34 8 Q0 -34 34 8 Q34 -20 0 -24 Q-34 -20 -34 8Z" fill="#7a5a44"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 44 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <circle cx="20" cy="30" r="5" fill="#ffb3b3" opacity=".6"/>
+        <path d="M24 60 L60 52" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="64" cy="51" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 完成イメージ（オムライス）を掲げる看板 -->
+      <g transform="translate(178,40)">
+        <rect x="0" y="0" width="150" height="140" rx="12" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="26" text-anchor="middle" font-size="14" font-weight="800" fill="var(--parent-d)">出力＝成果 y</text>
+        <ellipse cx="75" cy="76" rx="52" ry="26" fill="#ffe0a0" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M40 72 Q75 56 110 72" stroke="#ff5a3c" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <text x="75" y="126" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">こんな料理が欲しい！</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手順①</span>まず「<b>どんな料理を出すか</b>」＝機能の<b>出力（成果 y）を先に決める</b>。ゴールが起点。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="その料理に必要な材料 入力 x を決める">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe3ea"/>
+      <!-- 成果 y から逆算して材料を並べる -->
+      <g transform="translate(250,40)">
+        <ellipse cx="35" cy="30" rx="34" ry="18" fill="#ffe0a0" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M8 26 Q35 14 62 26" stroke="#ff5a3c" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <text x="35" y="-4" text-anchor="middle" font-size="13" font-weight="800" fill="var(--parent-d)">成果 y</text>
+      </g>
+      <!-- 逆向き矢印（必要な材料を洗い出す） -->
+      <path d="M250 70 Q160 60 120 96" stroke="var(--child-d)" stroke-width="3" fill="none" stroke-dasharray="2 6" stroke-linecap="round"/>
+      <text x="188" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">必要な材料は？</text>
+      <!-- 材料カード x -->
+      <g transform="translate(28,104)">
+        <rect x="0" y="0" width="150" height="76" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="20" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">入力＝材料 x</text>
+        <circle cx="20" cy="46" r="11" fill="#ffd54f"/>
+        <text x="20" y="70" text-anchor="middle" font-size="10" fill="var(--ink)">卵</text>
+        <ellipse cx="57" cy="46" rx="12" ry="8" fill="#f6f0dc"/>
+        <text x="57" y="70" text-anchor="middle" font-size="10" fill="var(--ink)">ごはん</text>
+        <circle cx="94" cy="46" r="10" fill="#ff7043"/>
+        <text x="94" y="70" text-anchor="middle" font-size="10" fill="var(--ink)">ソース</text>
+        <circle cx="131" cy="46" r="9" fill="#8bc34a"/>
+        <text x="131" y="70" text-anchor="middle" font-size="10" fill="var(--ink)">具</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手順②</span>その成果を作るのに必要な「<b>材料</b>」＝機能の<b>入力（x）を決める</b>。出力から逆算して洗い出す。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="手元にない材料は冷蔵庫 データベース から調達する">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <!-- 冷蔵庫＝データベース -->
+      <g transform="translate(232,44)">
+        <rect x="0" y="0" width="96" height="128" rx="10" fill="#e8f0f6" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="0" y1="52" x2="96" y2="52" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="76" y="16" width="8" height="24" rx="3" fill="var(--child-d)"/>
+        <rect x="76" y="66" width="8" height="30" rx="3" fill="var(--child-d)"/>
+        <!-- DBシリンダー印 -->
+        <g transform="translate(30,74)">
+          <ellipse cx="18" cy="6" rx="18" ry="6" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M0 6 V34 Q18 42 36 34 V6" fill="var(--child)" stroke="var(--ink)" stroke-width="1.5"/>
+          <ellipse cx="18" cy="6" rx="18" ry="6" fill="#bfeaee"/>
+        </g>
+        <text x="48" y="-8" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">冷蔵庫＝DB</text>
+      </g>
+      <!-- 料理人が取りに行く -->
+      <g transform="translate(78,82)">
+        <ellipse cx="0" cy="116" rx="34" ry="8" fill="#00000010"/>
+        <rect x="-28" y="46" width="56" height="64" rx="20" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="34" fill="#ffe1c4"/>
+        <path d="M-32 4 Q-20 -30 0 -26 Q22 -30 32 6 Q20 -8 0 -8 Q-18 -8 -32 4Z" fill="#3a3a44"/>
+        <path d="M-24 -6 Q-30 -30 -12 -28 Q-6 -42 12 -34 Q30 -36 24 -12 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-24" y="-10" width="48" height="10" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-12" cy="22" r="4.5" fill="#3a3a44"/>
+        <circle cx="12" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 34 Q0 43 11 34" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M28 58 L64 70" stroke="#ffe1c4" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="68" cy="71" r="7" fill="#ffe1c4"/>
+      </g>
+      <!-- 調達の矢印 -->
+      <path d="M150 118 L214 108" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="2 6"/>
+      <path d="M210 102 L220 107 L211 114Z" fill="var(--ink)"/>
+      <text x="182" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">取り出す</text>
+    </svg>
+    <div class="cap"><span class="tag">手順③</span>手元（画面）にない材料は、<b>冷蔵庫＝データベース</b>から調達する。画面以外からの入力はDB由来。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="材料をどう料理するか 処理 手順 を考える">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- 手順書 -->
+      <g transform="translate(28,20)">
+        <rect x="0" y="0" width="150" height="150" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">処理＝調理手順</text>
+        <g font-size="12" font-weight="700" fill="var(--ink)">
+          <circle cx="20" cy="48" r="9" fill="var(--child)"/><text x="20" y="52" text-anchor="middle" fill="#fff">1</text>
+          <text x="38" y="52">卵を溶く</text>
+          <circle cx="20" cy="78" r="9" fill="var(--child)"/><text x="20" y="82" text-anchor="middle" fill="#fff">2</text>
+          <text x="38" y="82">ごはんを炒める</text>
+          <circle cx="20" cy="108" r="9" fill="var(--child)"/><text x="20" y="112" text-anchor="middle" fill="#fff">3</text>
+          <text x="38" y="112">卵で包む</text>
+          <circle cx="20" cy="138" r="9" fill="var(--child)"/><text x="20" y="142" text-anchor="middle" fill="#fff">4</text>
+          <text x="38" y="142">ソースをかける</text>
+        </g>
+      </g>
+      <!-- フライパンで調理する料理人 -->
+      <g transform="translate(262,84)">
+        <ellipse cx="0" cy="112" rx="32" ry="8" fill="#00000010"/>
+        <rect x="-26" y="46" width="52" height="62" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="32" fill="#ffe1c4"/>
+        <path d="M-30 4 Q-18 -28 0 -24 Q20 -28 30 6 Q18 -8 0 -8 Q-16 -8 -30 4Z" fill="#3a3a44"/>
+        <path d="M-22 -6 Q-28 -28 -11 -26 Q-6 -40 11 -32 Q28 -34 22 -11 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-22" y="-10" width="44" height="10" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-11" cy="22" r="4" fill="#3a3a44"/>
+        <circle cx="11" cy="22" r="4" fill="#3a3a44"/>
+        <path d="M-10 33 Q0 42 10 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-26 60 L-48 64" stroke="#ffe1c4" stroke-width="11" stroke-linecap="round"/>
+        <ellipse cx="-58" cy="66" rx="16" ry="6" fill="#555b66"/>
+        <path d="M-58 62 q5 -9 10 0" stroke="#ff8a4b" stroke-width="3" fill="none"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手順④</span>材料をどう料理するか＝機能が行う<b>処理（手順）を考える</b>。入力を出力へ変える中身を定義する。</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="品数が多くて混乱 担当を分ける 機能を分割する">
+      <rect width="360" height="240" fill="#fff4ea"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecdcc8"/>
+      <!-- 分割線 -->
+      <line x1="180" y1="24" x2="180" y2="184" stroke="var(--line)" stroke-width="3" stroke-dasharray="4 6"/>
+      <!-- 左：前菜担当 -->
+      <g transform="translate(80,86)">
+        <ellipse cx="0" cy="110" rx="30" ry="8" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="30" fill="#ffe1c4"/>
+        <path d="M-28 6 Q-16 -26 0 -22 Q18 -26 28 6 Q16 -6 0 -6 Q-16 -6 -28 6Z" fill="#3a3a44"/>
+        <path d="M-20 -6 Q-26 -26 -10 -24 Q-6 -38 10 -30 Q26 -32 20 -10 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-10" width="40" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-10" cy="22" r="4" fill="#3a3a44"/><circle cx="10" cy="22" r="4" fill="#3a3a44"/>
+        <path d="M-10 33 Q0 41 10 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="29" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="29" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="80" y="46" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">前菜の機能</text>
+      <!-- 右：メイン担当 -->
+      <g transform="translate(268,86)">
+        <ellipse cx="0" cy="110" rx="30" ry="8" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="30" fill="#ffe1c4"/>
+        <path d="M-28 6 Q-16 -26 0 -22 Q18 -26 28 6 Q16 -6 0 -6 Q-16 -6 -28 6Z" fill="#3a3a44"/>
+        <path d="M-20 -6 Q-26 -26 -10 -24 Q-6 -38 10 -30 Q26 -32 20 -10 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-10" width="40" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-10" cy="22" r="4" fill="#3a3a44"/><circle cx="10" cy="22" r="4" fill="#3a3a44"/>
+        <path d="M-10 33 Q0 41 10 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="29" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="29" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="268" y="46" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">メインの機能</text>
+      <text x="180" y="216" text-anchor="middle" font-size="14" font-weight="800" fill="var(--ink)">持ち場を分ければ混乱しない</text>
+    </svg>
+    <div class="cap"><span class="tag">手順⑤</span>品数が多くて<b>混乱しそうなら担当を分ける</b>＝<b>機能を分割する</b>。1つの機能は1つの仕事に。</div>
+  </section>
+
+  <!-- ============ コマ9 ============ -->
+  <section class="panel">
+    <div class="num">9</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ここまでで献立表 盛り付け見本 材料表 手順書が揃う 設計の成果物">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <text x="180" y="30" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">ここまでで、こんな“書類”が揃う</text>
+      <!-- 4枚の成果物カード -->
+      <g font-size="11" font-weight="700" fill="var(--ink)">
+        <!-- 盛り付け見本＝ラフ/モックアップ -->
+        <g transform="translate(24,50)">
+          <rect x="0" y="0" width="150" height="80" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <ellipse cx="34" cy="38" rx="20" ry="12" fill="#ffe0a0" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M20 34 Q34 26 48 34" stroke="#ff5a3c" stroke-width="3" fill="none"/>
+          <text x="98" y="30" text-anchor="middle">盛り付け見本</text>
+          <text x="98" y="48" text-anchor="middle" fill="var(--parent-d)">＝ラフ/モックアップ</text>
+          <text x="98" y="66" text-anchor="middle" fill="#7a7e8c" font-size="10">＋画面遷移図</text>
+        </g>
+        <!-- 材料表＝入出力定義 -->
+        <g transform="translate(186,50)">
+          <rect x="0" y="0" width="150" height="80" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <g stroke="var(--child-d)" stroke-width="2"><line x1="14" y1="30" x2="40" y2="30"/><line x1="14" y1="46" x2="40" y2="46"/><line x1="14" y1="62" x2="40" y2="62"/></g>
+          <text x="100" y="30" text-anchor="middle">材料表 x→y</text>
+          <text x="100" y="48" text-anchor="middle" fill="var(--child-d)">＝入出力の定義</text>
+          <text x="100" y="66" text-anchor="middle" fill="#7a7e8c" font-size="10">＋項目の説明</text>
+        </g>
+        <!-- 手順書＝処理定義 -->
+        <g transform="translate(105,140)">
+          <rect x="0" y="0" width="150" height="76" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <g fill="var(--child)"><circle cx="20" cy="30" r="7"/><circle cx="20" cy="52" r="7"/></g>
+          <text x="20" y="34" text-anchor="middle" fill="#fff" font-size="10">1</text>
+          <text x="20" y="56" text-anchor="middle" fill="#fff" font-size="10">2</text>
+          <text x="98" y="34" text-anchor="middle">手順書</text>
+          <text x="98" y="54" text-anchor="middle" fill="var(--child-d)">＝処理の定義</text>
+        </g>
+      </g>
+      <!-- きらきら -->
+      <path d="M300 150 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <path d="M40 150 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>出力→入力→調達→処理→分割…と進めた結果、<b>設計の成果物（書類）</b>が自然に出来上がっている。</div>
+  </section>
+
+  <!-- ============ コマ10 ============ -->
+  <section class="panel">
+    <div class="num">10</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="機能とは仕事 成果を出すこと y=f(x)">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <!-- x → f → y の完成形 -->
+      <g transform="translate(30,86)">
+        <rect x="0" y="8" width="60" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="20" cy="30" r="9" fill="#ff9d6b"/><circle cx="40" cy="34" r="8" fill="#8bc34a"/>
+        <text x="30" y="-2" text-anchor="middle" font-size="14" font-weight="800" fill="var(--child-d)">x</text>
+      </g>
+      <path d="M92 120 L120 120" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M116 114 L124 120 L116 126Z" fill="var(--ink)"/>
+      <g transform="translate(126,80)">
+        <rect x="0" y="0" width="76" height="76" rx="14" fill="var(--child)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="38" y="38" text-anchor="middle" font-size="26" font-weight="800" fill="#fff">f</text>
+        <text x="38" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">機能＝仕事</text>
+      </g>
+      <path d="M204 120 L232 120" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M228 114 L236 120 L228 126Z" fill="var(--ink)"/>
+      <g transform="translate(240,86)">
+        <ellipse cx="40" cy="52" rx="34" ry="9" fill="#00000010"/>
+        <path d="M6 30 Q40 8 74 30 Q66 58 40 58 Q14 58 6 30Z" fill="#ffd9a0" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="30" cy="30" r="6" fill="#ff7043"/><circle cx="50" cy="28" r="5" fill="#8bc34a"/>
+        <text x="40" y="-2" text-anchor="middle" font-size="14" font-weight="800" fill="var(--parent-d)">y</text>
+      </g>
+      <!-- きらきら -->
+      <path d="M296 78 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <text x="180" y="206" text-anchor="middle" font-size="16" font-weight="800" fill="var(--ink)">機能とは仕事＝成果を出すこと ＝ <tspan fill="#e7607c">y = f(x)</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">結論</span><b>機能とは仕事</b>。材料 x を受け取り成果 y を出す＝<b>y = f(x)</b>。成果を出してこそ機能。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ── 機能とは「仕事」、y = f(x)</h2>
+    <p class="lead">料理も機能も同じ。<strong>材料（入力 x）を受け取り、成果（出力 y）を作り出す</strong>のが仕事です。成果を出さない機能は、材料を入れても料理が出てこない調理台と同じ。だから<strong>「まず出力を決め、そこから逆算する」</strong>のが設計の順番です。</p>
+    <ul>
+      <li><b>料理の場合</b>：どんな料理を出すか（成果）→ 必要な材料は？ → 足りない材料は冷蔵庫（DB）から → 調理手順を決める → 品数が多ければ担当を分ける。</li>
+      <li><b>機能の場合</b>：機能の<b>出力（成果）</b>を決める → 必要な<b>入力（材料）</b>を決める → 画面以外はデータベースから調達 → <b>処理</b>を定義 → 混乱しないよう<b>機能を分割</b>する。</li>
+      <li><b>ここまでの成果物</b>：ラフイメージ／モックアップ・画面遷移図・項目の説明・機能の入出力定義・機能の処理定義。</li>
+    </ul>
+    <p class="map">物語の流れ： ①Function＝関数 y=f(x) → ②x（材料）で y（成果）を作る＝仕事 → ③成果ゼロは働いてないのと同じ → ④出力を決める → ⑤入力を決める → ⑥足りない材料はDBから → ⑦処理を考える → ⑧機能を分割 → ⑨成果物が揃う → ⑩機能とは仕事＝y=f(x)</p>
+  </section>
+
+</main>
+
+</body>
+</html>
