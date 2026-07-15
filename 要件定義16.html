@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在庫チェック表でわかる「CRUDマトリックス」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 依頼者（成果を受け取る人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 機能＝料理人（仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;background:#ffd166;color:#5a4a10;border-radius:999px;padding:3px 14px;">Chapter-16</span></p>
+  <h1>在庫チェック表でわかる、<span class="hl">「CRUDマトリックス」</span>のはなし</h1>
+  <p>“もう終わり”に見える要件定義の、抜け漏れを完成前に炙り出す検査表のはなし</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UIと機能とデータが揃い もう要件定義は終わりと一息つくシェフ">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <!-- 3枚の成果カード：UI・機能・データ -->
+      <g font-size="11" font-weight="800">
+        <g transform="translate(30,44)"><rect x="0" y="0" width="82" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/><rect x="12" y="14" width="58" height="8" rx="2" fill="#eef2f7"/><rect x="12" y="28" width="40" height="8" rx="2" fill="#eef2f7"/><text x="41" y="-8" text-anchor="middle" fill="var(--child-d)">UI</text></g>
+        <g transform="translate(30,110)"><rect x="0" y="0" width="82" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/><circle cx="20" cy="20" r="7" fill="var(--child)"/><circle cx="20" cy="38" r="7" fill="var(--child)"/><text x="20" y="23" text-anchor="middle" fill="#fff" font-size="8">1</text><text x="20" y="41" text-anchor="middle" fill="#fff" font-size="8">2</text><text x="55" y="34" text-anchor="middle" font-size="10">機能</text></g>
+        <g transform="translate(122,110)"><rect x="0" y="0" width="82" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/><rect x="14" y="16" width="20" height="12" rx="2" fill="#eaf6f8" stroke="var(--ink)" stroke-width="1"/><rect x="14" y="32" width="20" height="10" rx="2" fill="#fdeef0" stroke="var(--ink)" stroke-width="1"/><path d="M24 28 L24 32" stroke="var(--ink)" stroke-width="1.2"/><text x="58" y="34" text-anchor="middle" font-size="10">データ</text></g>
+      </g>
+      <text x="150" y="180" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">UI・機能・データ、揃った！</text>
+      <!-- ひと息つくシェフ -->
+      <g transform="translate(280,86)">
+        <ellipse cx="0" cy="104" rx="30" ry="8" fill="#00000010"/>
+        <rect x="-26" y="44" width="52" height="60" rx="18" fill="var(--child)"/>
+        <circle cx="0" cy="20" r="30" fill="#ffe1c4"/>
+        <path d="M-28 6 Q-16 -26 0 -22 Q18 -26 28 6 Q16 -6 0 -6 Q-16 -6 -28 6Z" fill="#3a3a44"/>
+        <path d="M-20 -6 Q-26 -26 -10 -24 Q-6 -38 10 -30 Q26 -32 20 -10 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-20" y="-10" width="40" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-10" cy="22" r="4.5" fill="#3a3a44"/><circle cx="10" cy="22" r="4.5" fill="#3a3a44"/>
+        <path d="M-11 33 Q0 43 11 33" stroke="#b5594f" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="-18" cy="29" r="5" fill="#ffb3b3" opacity=".6"/><circle cx="18" cy="29" r="5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="286" y="60" font-size="18">😌</text>
+    </svg>
+    <div class="cap"><span class="tag">前提</span><b>厨房でいうと</b>、メニュー表(UI)・調理の段取り(機能)・食材の置き場(データ)がそろい、開店できそうに見える段階。 <b>UI・機能・データ</b>がまとまり、基本的には<b>「もう要件定義は終わり」</b>と言えるところまで来た。ひと息。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="完成して使い始めてから ある棚の出し入れ作業が抜けていたと気づいて慌てるシェフ">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd6da"/>
+      <text x="180" y="26" text-anchor="middle" font-size="12" font-weight="800" fill="var(--parent-d)">完成 → 使い始めてから…</text>
+      <!-- 棚（在庫）に穴＝抜けた作業 -->
+      <g transform="translate(28,54)">
+        <rect x="0" y="0" width="130" height="120" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="0" y1="42" x2="130" y2="42" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="0" y1="84" x2="130" y2="84" stroke="var(--line)" stroke-width="1.5"/>
+        <circle cx="26" cy="21" r="9" fill="#ff9d6b"/><circle cx="52" cy="21" r="9" fill="#8bc34a"/>
+        <rect x="14" y="52" width="102" height="20" rx="4" fill="#fff1f2" stroke="#e7607c" stroke-width="1.6" stroke-dasharray="4 4"/>
+        <text x="65" y="66" text-anchor="middle" font-size="11" font-weight="800" fill="#c9503f">この作業が無い…</text>
+        <circle cx="26" cy="103" r="9" fill="#7fc8e8"/><circle cx="52" cy="103" r="9" fill="#d9a3e8"/>
+        <text x="150" y="20" font-size="20">💥</text>
+      </g>
+      <!-- 慌てるシェフ -->
+      <g transform="translate(276,92)">
+        <ellipse cx="0" cy="100" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="42" width="48" height="58" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-26 4 Q-15 -24 0 -20 Q17 -24 26 4 Q15 -6 0 -6 Q-15 -6 -26 4Z" fill="#3a3a44"/>
+        <path d="M-19 -5 Q-24 -24 -9 -22 Q-5 -35 9 -28 Q24 -30 19 -9 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-19" y="-9" width="38" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M-16 14 L-4 20" stroke="#3a3a44" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M16 14 L4 20" stroke="#3a3a44" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <circle cx="-10" cy="22" r="4" fill="#3a3a44"/><circle cx="10" cy="22" r="4" fill="#3a3a44"/>
+        <ellipse cx="0" cy="34" rx="5" ry="7" fill="#c9503f"/>
+        <path d="M22 2 l-2 8 l6 -1" stroke="#7fc8e8" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+      <text x="276" y="62" font-size="18">😱</text>
+    </svg>
+    <div class="cap"><span class="tag">課題</span>でも実際に店を開けると、<b>「あの食材、補充も廃棄も段取りに入っていなかった」</b>と営業中に気づくようなもの。 今の要件だけで作って使い始めると、<b>ワークセットや行動シナリオの漏れ</b>にその時気づく＝「<b>要件定義が不十分だった</b>」と後で言うはめに。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="後で困る前に 全エンティティを一覧にして点検する在庫チェック表 CRUDマトリックスを作る">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <text x="180" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">後で困る前に、点検表を作る</text>
+      <!-- チェック表（棚の一覧×操作） -->
+      <g transform="translate(96,44)">
+        <rect x="0" y="0" width="168" height="126" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="1.25" y="1.25" width="165.5" height="22.75" rx="9" fill="#eaf6f8"/>
+        <rect x="1.25" y="14" width="165.5" height="10" fill="#eaf6f8"/>
+        <text x="12" y="17" font-size="10.5" font-weight="800" fill="var(--child-d)">エンティティ</text>
+        <g font-size="10" font-weight="800" fill="var(--ink)"><text x="98" y="17" text-anchor="middle">C</text><text x="120" y="17" text-anchor="middle">R</text><text x="142" y="17" text-anchor="middle">U</text><text x="160" y="17" text-anchor="middle">D</text></g>
+        <line x1="86" y1="0" x2="86" y2="126" stroke="var(--line)" stroke-width="1.4"/>
+        <g font-size="10" fill="var(--ink)">
+          <text x="12" y="46">顧客</text><text x="12" y="72">注文</text><text x="12" y="98">食材</text><text x="12" y="120">予約</text>
+        </g>
+        <g font-size="12" font-weight="800" fill="var(--child-d)">
+          <text x="98" y="46" text-anchor="middle">○</text><text x="120" y="46" text-anchor="middle">○</text><text x="142" y="46" text-anchor="middle">○</text><text x="160" y="46" text-anchor="middle">○</text>
+          <text x="98" y="72" text-anchor="middle">○</text><text x="120" y="72" text-anchor="middle">○</text><text x="142" y="72" text-anchor="middle">○</text><text x="160" y="72" text-anchor="middle">○</text>
+        </g>
+      </g>
+      <path d="M300 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <text x="180" y="212" text-anchor="middle" font-size="13" font-weight="800" fill="var(--ink)">全エンティティを一覧で点検＝<tspan fill="#3a9aa4">CRUDマトリックス</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">解決の入口</span>開店前に<b>冷蔵庫を棚卸し</b>して、食材ごとの“出し入れの抜け”を一覧で点検しておく。 そんな事態を<b>事前に防ぐ</b>ため、全エンティティ（棚）を一覧にして点検する表＝<b>CRUDマトリックス</b>を作り検証する。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CRUDの4操作 Create生成 Reference参照 Update更新 Drop Delete消去">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe3ea"/>
+      <text x="180" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">CRUD＝棚に対する4つの操作</text>
+      <g font-size="12" font-weight="800">
+        <!-- C -->
+        <g transform="translate(24,44)">
+          <rect x="0" y="0" width="150" height="62" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="26" cy="31" r="16" fill="#eafaf0" stroke="var(--ink)" stroke-width="1.6"/>
+          <path d="M26 23 L26 39 M18 31 L34 31" stroke="#3a9aa4" stroke-width="3" stroke-linecap="round"/>
+          <text x="54" y="26" fill="var(--child-d)">C：生成</text><text x="54" y="44" font-size="10" font-weight="700" fill="#7a7e8c">Create／入れる</text>
+        </g>
+        <!-- R -->
+        <g transform="translate(186,44)">
+          <rect x="0" y="0" width="150" height="62" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="26" cy="31" r="16" fill="#eaf2fb" stroke="var(--ink)" stroke-width="1.6"/>
+          <path d="M17 31 Q26 22 35 31 Q26 40 17 31Z" fill="#fff" stroke="#3a9aa4" stroke-width="2"/><circle cx="26" cy="31" r="3.4" fill="#3a9aa4"/>
+          <text x="54" y="26" fill="var(--child-d)">R：参照</text><text x="54" y="44" font-size="10" font-weight="700" fill="#7a7e8c">Reference／見る</text>
+        </g>
+        <!-- U -->
+        <g transform="translate(24,116)">
+          <rect x="0" y="0" width="150" height="62" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="26" cy="31" r="16" fill="#fff7e8" stroke="var(--ink)" stroke-width="1.6"/>
+          <path d="M33 24 A9 9 0 1 0 35 33" fill="none" stroke="#c98a10" stroke-width="2.6" stroke-linecap="round"/><path d="M33 20 L35 27 L28 26Z" fill="#c98a10"/>
+          <text x="54" y="26" fill="var(--child-d)">U：更新</text><text x="54" y="44" font-size="10" font-weight="700" fill="#7a7e8c">Update／詰め替え</text>
+        </g>
+        <!-- D -->
+        <g transform="translate(186,116)">
+          <rect x="0" y="0" width="150" height="62" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="26" cy="31" r="16" fill="#fdeef0" stroke="var(--ink)" stroke-width="1.6"/>
+          <path d="M19 25 L33 25 M21 25 L22 39 Q26 41 30 39 L31 25 M24 25 L24 22 L28 22 L28 25" fill="none" stroke="#c9503f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="54" y="24" fill="var(--child-d)" font-size="11">D：消去</text><text x="54" y="42" font-size="9.5" font-weight="700" fill="#7a7e8c">Drop・Delete／捨てる</text>
+        </g>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">説明</span>食材にやることは<b>入れる・見る・詰め替える・捨てる</b>の4つだけ。 CRUDは<b>Create（生成）</b>・<b>Reference（参照）</b>・<b>Update（更新）</b>・<b>Drop/Delete（消去）</b>の4操作の頭文字。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="冷蔵庫の各食材に 入れる 見る 詰め替え 捨てるの一巡がそろっているか">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <text x="180" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">食材ひとつに“一巡”そろってる？</text>
+      <!-- 冷蔵庫 -->
+      <g transform="translate(30,54)">
+        <rect x="0" y="0" width="86" height="132" rx="10" fill="#eaf6f8" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="0" y1="52" x2="86" y2="52" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="68" y="12" width="8" height="24" rx="3" fill="var(--child-d)"/>
+        <rect x="68" y="66" width="8" height="30" rx="3" fill="var(--child-d)"/>
+        <circle cx="24" cy="26" r="8" fill="#ff9d6b"/><circle cx="46" cy="30" r="8" fill="#8bc34a"/>
+        <rect x="16" y="72" width="54" height="16" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.4"/>
+        <circle cx="26" cy="106" r="8" fill="#7fc8e8"/>
+        <text x="43" y="-8" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">冷蔵庫＝棚</text>
+      </g>
+      <!-- 4操作の一巡（循環矢印） -->
+      <g transform="translate(230,110)" font-size="11" font-weight="800">
+        <circle cx="0" cy="0" r="4" fill="var(--ink)"/>
+        <g fill="var(--ink)">
+          <text x="0" y="-58" text-anchor="middle" fill="#3a9aa4">入れる (C)</text>
+          <text x="86" y="4" text-anchor="middle" fill="#3a9aa4">見る (R)</text>
+          <text x="0" y="72" text-anchor="middle" fill="#3a9aa4">詰め替え (U)</text>
+          <text x="-86" y="4" text-anchor="middle" fill="#3a9aa4">捨てる (D)</text>
+        </g>
+        <path d="M20 -44 A48 48 0 0 1 44 -14" fill="none" stroke="var(--ink)" stroke-width="2.4"/>
+        <path d="M40 -22 L46 -12 L35 -13Z" fill="var(--ink)"/>
+        <path d="M44 22 A48 48 0 0 1 20 52" fill="none" stroke="var(--ink)" stroke-width="2.4"/>
+        <path d="M28 50 L18 55 L24 45Z" fill="var(--ink)"/>
+        <path d="M-20 52 A48 48 0 0 1 -44 22" fill="none" stroke="var(--ink)" stroke-width="2.4"/>
+        <path d="M-46 34 L-45 23 L-36 30Z" fill="var(--ink)"/>
+        <path d="M-44 -14 A48 48 0 0 1 -20 -44" fill="none" stroke="var(--ink)" stroke-width="2.4"/>
+        <path d="M-24 -46 L-14 -46 L-20 -37Z" fill="var(--ink)"/>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">たとえ</span><b>仕入れて終わり</b>では店は回らない。使い切って空にするまでが一巡。 冷蔵庫の食材（＝エンティティ）1つずつに<b>入れる・見る・詰め替え・捨てる（C/R/U/D）</b>が一巡そろっているか確かめる。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="エンティティを行 CRUDを列にした表に 行動シナリオをたどって○を埋めていく">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">行＝エンティティ × 列＝CRUD</text>
+      <g transform="translate(52,40)">
+        <rect x="0" y="0" width="256" height="148" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <!-- ヘッダ -->
+        <rect x="1.25" y="1.25" width="253.5" height="24.75" rx="9" fill="#eaf6f8"/><rect x="1.25" y="16" width="253.5" height="10" fill="#eaf6f8"/>
+        <text x="14" y="18" font-size="10.5" font-weight="800" fill="var(--child-d)">エンティティ</text>
+        <g font-size="11" font-weight="800" fill="var(--ink)"><text x="126" y="18" text-anchor="middle">C</text><text x="166" y="18" text-anchor="middle">R</text><text x="206" y="18" text-anchor="middle">U</text><text x="242" y="18" text-anchor="middle">D</text></g>
+        <!-- 罫線 -->
+        <g stroke="var(--line)" stroke-width="1.3">
+          <line x1="106" y1="0" x2="106" y2="148"/><line x1="146" y1="26" x2="146" y2="148"/><line x1="186" y1="26" x2="186" y2="148"/><line x1="226" y1="26" x2="226" y2="148"/>
+          <line x1="0" y1="56" x2="256" y2="56"/><line x1="0" y1="86" x2="256" y2="86"/><line x1="0" y1="116" x2="256" y2="116"/>
+        </g>
+        <g font-size="10.5" fill="var(--ink)"><text x="14" y="45">顧客</text><text x="14" y="75">注文</text><text x="14" y="105">食材</text><text x="14" y="135">予約</text></g>
+        <g font-size="13" font-weight="800" fill="var(--child-d)" text-anchor="middle">
+          <text x="126" y="46">○</text><text x="166" y="46">○</text><text x="206" y="46">○</text><text x="242" y="46">○</text>
+          <text x="126" y="76">○</text><text x="166" y="76">○</text><text x="206" y="76">○</text><text x="242" y="76">○</text>
+          <text x="126" y="106">○</text><text x="166" y="106">○</text><text x="206" y="106">○</text>
+          <text x="126" y="136">○</text><text x="166" y="136">○</text>
+        </g>
+        <!-- 記入中のペン -->
+        <g transform="translate(232,120) rotate(35)">
+          <rect x="-3.5" y="-20" width="7" height="16" rx="1" fill="#ffd166" stroke="var(--ink)" stroke-width="1.1"/>
+          <rect x="-3.5" y="-25" width="7" height="5" rx="1" fill="#ff9d6b" stroke="var(--ink)" stroke-width="1.1"/>
+          <path d="M-3.5 -4 L3.5 -4 L0 3 Z" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.1"/>
+          <path d="M-1.3 -0.2 L1.3 -0.2 L0 3 Z" fill="var(--ink)"/>
+        </g>
+      </g>
+      <text x="180" y="212" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink)">行動シナリオをたどり、どこで C/R/U/D するかを ○ で埋める</text>
+    </svg>
+    <div class="cap"><span class="tag">手順</span>食材を縦・4つの作業を横にした<b>棚卸し表</b>に、段取りをたどって印を付けていく。 エンティティを行・C/R/U/Dを列にした表を作り、行動シナリオをたどって<b>各マスに ○ を埋めていく</b>。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ある棚のD列が空欄 一度も捨てない食材は溢れる 抜けの発見">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd6da"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--parent-d)">1つでも空欄＝どれか無い！</text>
+      <g transform="translate(52,40)">
+        <rect x="0" y="0" width="256" height="118" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="1.25" y="1.25" width="253.5" height="24.75" rx="9" fill="#eaf6f8"/><rect x="1.25" y="16" width="253.5" height="10" fill="#eaf6f8"/>
+        <text x="14" y="18" font-size="10.5" font-weight="800" fill="var(--child-d)">エンティティ</text>
+        <g font-size="11" font-weight="800" fill="var(--ink)"><text x="126" y="18" text-anchor="middle">C</text><text x="166" y="18" text-anchor="middle">R</text><text x="206" y="18" text-anchor="middle">U</text><text x="242" y="18" text-anchor="middle">D</text></g>
+        <g stroke="var(--line)" stroke-width="1.3"><line x1="106" y1="0" x2="106" y2="118"/><line x1="146" y1="26" x2="146" y2="118"/><line x1="186" y1="26" x2="186" y2="118"/><line x1="226" y1="26" x2="226" y2="118"/><line x1="0" y1="56" x2="256" y2="56"/><line x1="0" y1="86" x2="256" y2="86"/></g>
+        <g font-size="10.5" fill="var(--ink)"><text x="14" y="45">顧客</text><text x="14" y="75">注文</text><text x="14" y="105">食材</text></g>
+        <g font-size="13" font-weight="800" fill="var(--child-d)" text-anchor="middle">
+          <text x="126" y="46">○</text><text x="166" y="46">○</text><text x="206" y="46">○</text><text x="242" y="46">○</text>
+          <text x="126" y="76">○</text><text x="166" y="76">○</text><text x="206" y="76">○</text><text x="242" y="76">○</text>
+          <text x="126" y="106">○</text><text x="166" y="106">○</text><text x="206" y="106">○</text>
+        </g>
+        <!-- D列・食材行が空欄＝赤で強調 -->
+        <rect x="226" y="88" width="30" height="26" fill="#fff1f2" stroke="#e7607c" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="241" y="105" text-anchor="middle" font-size="14" font-weight="800" fill="#c9503f">?</text>
+      </g>
+      <text x="326" y="80" font-size="20">💢</text>
+      <text x="180" y="180" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c9503f">「食材」を捨てる(D)作業がどこにも無い＝抜け！</text>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>印の付かないマスは、その食材の<b>その作業が段取りから抜けている</b>合図。 どこかのマスが空欄＝そのエンティティを扱う<b>ワークセット・行動シナリオが漏れている</b>という証拠が浮かび上がる。</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="欠けを埋めるためワークセットと行動シナリオを追加し 全マス○になるまで繰り返す">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">追加して繰り返し、精度を上げる</text>
+      <!-- 追加カード -->
+      <g transform="translate(24,50)">
+        <rect x="0" y="0" width="120" height="52" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="60" y="22" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">＋ ワークセット</text>
+        <text x="60" y="40" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">＋ 行動シナリオ</text>
+      </g>
+      <!-- ループ矢印 -->
+      <g transform="translate(180,110)">
+        <path d="M-40 -40 A56 56 0 1 1 -52 20" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M-60 8 L-52 24 L-42 12Z" fill="var(--ink)"/>
+        <text x="0" y="-2" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">検証</text>
+        <text x="0" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#7a7e8c">→追加→再点検</text>
+      </g>
+      <!-- 全○の表 -->
+      <g transform="translate(244,52)">
+        <rect x="0" y="0" width="96" height="112" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="1.1" y="1.1" width="93.8" height="20.9" rx="7" fill="#eafaf0"/><rect x="1.1" y="12" width="93.8" height="10" fill="#eafaf0"/>
+        <g font-size="9" font-weight="800" fill="var(--ink)"><text x="40" y="15" text-anchor="middle">C</text><text x="58" y="15" text-anchor="middle">R</text><text x="74" y="15" text-anchor="middle">U</text><text x="88" y="15" text-anchor="middle">D</text></g>
+        <g font-size="9" fill="var(--ink)"><text x="8" y="42">顧客</text><text x="8" y="66">注文</text><text x="8" y="90">食材</text></g>
+        <g font-size="11" font-weight="800" fill="var(--child-d)" text-anchor="middle"><text x="40" y="43">○</text><text x="58" y="43">○</text><text x="74" y="43">○</text><text x="88" y="43">○</text><text x="40" y="67">○</text><text x="58" y="67">○</text><text x="74" y="67">○</text><text x="88" y="67">○</text><text x="40" y="91">○</text><text x="58" y="91">○</text><text x="74" y="91">○</text><text x="88" y="91">○</text></g>
+        <text x="48" y="106" text-anchor="middle" font-size="9" font-weight="800" fill="#3a9aa4">全マス ○</text>
+      </g>
+      <path d="M318 166 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">手順（ループ）</span>抜けを見つけたら<b>仕入れ・提供の段取りを足し</b>、全部の印が付くまでやり直す。 欠けたマスを埋めるため<b>ワークセットと行動シナリオを追加</b>。全マスが揃うまで<b>作業を繰り返し精度を高める</b>。</div>
+  </section>
+
+  <!-- ============ コマ9 ============ -->
+  <section class="panel flip">
+    <div class="num">9</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="全マス揃ったら最後にプロジェクトの必要性に応じて応答性や可用性などの非機能要件を定義">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <text x="180" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">最後に非機能要件を定義</text>
+      <!-- メーター類 -->
+      <g transform="translate(30,52)">
+        <rect x="0" y="0" width="146" height="60" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="14" y="22" font-size="11" font-weight="800" fill="var(--child-d)">応答性</text>
+        <path d="M22 50 A26 26 0 0 1 74 50" fill="none" stroke="var(--line)" stroke-width="6"/>
+        <path d="M22 50 A26 26 0 0 1 64 32" fill="none" stroke="#3a9aa4" stroke-width="6" stroke-linecap="round"/>
+        <text x="108" y="40" text-anchor="middle" font-size="10" fill="#7a7e8c">速い応答</text>
+      </g>
+      <g transform="translate(184,52)">
+        <rect x="0" y="0" width="146" height="60" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="14" y="22" font-size="11" font-weight="800" fill="var(--child-d)">可用性</text>
+        <text x="30" y="46" font-size="16">🕐</text>
+        <text x="96" y="34" text-anchor="middle" font-size="10" fill="#7a7e8c">止まらない</text>
+        <text x="96" y="48" text-anchor="middle" font-size="10" fill="#7a7e8c">24時間</text>
+      </g>
+      <!-- ほか非機能 -->
+      <g transform="translate(30,124)" font-size="10.5" font-weight="800">
+        <g><rect x="0" y="0" width="94" height="42" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/><text x="47" y="20" text-anchor="middle" fill="var(--ink)">セキュリティ</text><text x="47" y="34" text-anchor="middle" font-size="14">🔒</text></g>
+        <g transform="translate(102,0)"><rect x="0" y="0" width="94" height="42" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/><text x="47" y="20" text-anchor="middle" fill="var(--ink)">拡張性</text><text x="47" y="34" text-anchor="middle" font-size="13">📈</text></g>
+        <g transform="translate(204,0)"><rect x="0" y="0" width="96" height="42" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/><text x="48" y="20" text-anchor="middle" fill="var(--ink)">保守性</text><text x="48" y="34" text-anchor="middle" font-size="13">🛠️</text></g>
+      </g>
+      <path d="M316 44 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">仕上げ</span>棚卸しが済んだら、最後に<b>「提供の速さ」「休まず店を開けられるか」</b>など店の質を詰める。 全マスが揃ったら、<b>プロジェクトの必要性に応じて</b><b>応答性・可用性</b>などの各種<b>非機能要件</b>を定義していく。</div>
+  </section>
+
+  <!-- ============ コマ10 ============ -->
+  <section class="panel flip">
+    <div class="num">10</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2人のシェフがCRUDマトリックスを一緒に見て 完成前に抜け漏れを潰す">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <!-- 中央：全○のCRUDマトリックス -->
+      <g transform="translate(130,38)">
+        <rect x="0" y="0" width="100" height="112" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="1.25" y="1.25" width="97.5" height="20.75" rx="9" fill="#eafaf0"/><rect x="1.25" y="12" width="97.5" height="10" fill="#eafaf0"/>
+        <g font-size="9" font-weight="800" fill="var(--ink)"><text x="44" y="15" text-anchor="middle">C</text><text x="60" y="15" text-anchor="middle">R</text><text x="76" y="15" text-anchor="middle">U</text><text x="90" y="15" text-anchor="middle">D</text></g>
+        <g font-size="9" fill="var(--ink)"><text x="8" y="42">顧客</text><text x="8" y="66">注文</text><text x="8" y="90">食材</text></g>
+        <g font-size="11" font-weight="800" fill="var(--child-d)" text-anchor="middle"><text x="44" y="43">○</text><text x="60" y="43">○</text><text x="76" y="43">○</text><text x="90" y="43">○</text><text x="44" y="67">○</text><text x="60" y="67">○</text><text x="76" y="67">○</text><text x="90" y="67">○</text><text x="44" y="91">○</text><text x="60" y="91">○</text><text x="76" y="91">○</text><text x="90" y="91">○</text></g>
+        <text x="50" y="-8" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">抜け漏れ検査表</text>
+      </g>
+      <!-- 左右のシェフが一緒に見る -->
+      <g transform="translate(52,96)">
+        <ellipse cx="0" cy="92" rx="26" ry="7" fill="#00000010"/>
+        <rect x="-22" y="40" width="44" height="52" rx="16" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-24 4 Q-14 -22 0 -18 Q16 -22 24 4 Q14 -6 0 -6 Q-14 -6 -24 4Z" fill="#3a3a44"/>
+        <path d="M-17 -4 Q-22 -22 -8 -20 Q-4 -32 8 -26 Q22 -28 17 -8 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-17" y="-8" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-8" cy="18" r="3.6" fill="#3a3a44"/><circle cx="8" cy="18" r="3.6" fill="#3a3a44"/>
+        <path d="M-8 28 Q0 35 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-14" cy="24" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="14" cy="24" r="4" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <g transform="translate(308,96)">
+        <ellipse cx="0" cy="92" rx="26" ry="7" fill="#00000010"/>
+        <rect x="-22" y="40" width="44" height="52" rx="16" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-24 4 Q-14 -22 0 -18 Q16 -22 24 4 Q14 -6 0 -6 Q-14 -6 -24 4Z" fill="#3a3a44"/>
+        <path d="M-17 -4 Q-22 -22 -8 -20 Q-4 -32 8 -26 Q22 -28 17 -8 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-17" y="-8" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-8" cy="18" r="3.6" fill="#3a3a44"/><circle cx="8" cy="18" r="3.6" fill="#3a3a44"/>
+        <path d="M-8 28 Q0 35 8 28" stroke="#b5594f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <circle cx="-14" cy="24" r="4" fill="#ffb3b3" opacity=".6"/><circle cx="14" cy="24" r="4" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <path d="M84 130 L128 120" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 6"/>
+      <path d="M276 130 L232 120" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 6"/>
+      <path d="M300 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+      <text x="180" y="222" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">CRUDマトリックス＝<tspan fill="#e7607c">抜け漏れの検査表</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">結論</span><b>冷蔵庫の棚卸し表</b>＝出し忘れ・捨て忘れをあぶり出す点検表。開店前に穴をふさぐ。 <b>CRUDマトリックス＝要件の抜け漏れ検査表</b>。C/R/U/Dの点検で、「不十分だった」を<b>完成前に潰す</b>。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ── CRUDマトリックスは「厨房の棚卸し表」＝抜け漏れの検査表</h2>
+    <p class="lead"><strong>厨房でいえば、仕入れ・提供・詰め替え・廃棄のどれかが段取りから抜けた食材は、開店してから必ず事故になります。</strong>同じように、UI・機能・データが揃うと要件定義は一見“終わり”に見えます。でもワークセットや行動シナリオの漏れは、<strong>作って使い始めてから初めて発覚</strong>しがち。それを事前に防ぐのが<strong>CRUDマトリックス</strong>――全エンティティに<strong>C（生成）・R（参照）・U（更新）・D（消去）</strong>が揃うかを点検し、欠けたら<strong>ワークセットと行動シナリオを追加して繰り返し</strong>、最後に<strong>非機能要件</strong>を定義します。</p>
+    <ul>
+      <li><b>厨房の棚卸しの場合</b>：冷蔵庫の食材ひとつずつに「入れる・見る・詰め替え・捨てる」の一巡がそろうか点検 → 一度も捨てない棚は溢れ、一度も使わない食材は無駄 → 抜けを見つけたら買い方・使い方の段取りを足す。</li>
+      <li><b>要件定義の場合</b>：エンティティ×<b>C/R/U/D</b>の表で全マスに○が付くか検証 → 空欄＝<b>ワークセット・行動シナリオの漏れ</b> → 追加して精度を高める → 揃ったら<b>応答性・可用性など各種の非機能要件</b>を定義。</li>
+      <li><b>ねらい</b>：「要件定義が不十分だった」と<b>後で言うはめになる事態</b>を、CRUDマトリックスという検査表で<b>完成前に事前防止</b>する。</li>
+    </ul>
+    <p class="map">物語の流れ： ①UI・機能・データが揃い一息 → ②使い始めてから漏れに気づく → ③全食材を棚卸し＝CRUDマトリックス → ④C/R/U/Dの4操作 → ⑤食材ごとに一巡そろうか → ⑥表の各マスに○を埋める → ⑦空欄＝ワークセット/行動シナリオの漏れ → ⑧追加を繰り返し精度UP → ⑨非機能要件（応答性・可用性 等）を定義 → ⑩CRUDマトリックス＝抜け漏れの検査表</p>
+  </section>
+
+</main>
+
+</body>
+</html>
