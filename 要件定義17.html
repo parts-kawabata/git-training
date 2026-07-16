@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お店の引き継ぎブックでわかる「要件定義を渡せる状態にする」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;      /* 依頼者（成果を受け取る人）の色 */
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* 機能＝料理人（仕事をする側）の色 */
+    --child-d:#3a9aa4;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bubble:#ffffff;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.title{
+    text-align:center; margin:8px auto 28px; max-width:1000px;
+  }
+  header.title h1{
+    font-size:30px; margin:0 0 8px;
+    letter-spacing:.04em;
+  }
+  header.title h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe08a 60%);
+    padding:0 .15em;
+  }
+  header.title p{ margin:0; color:#7a7e8c; font-size:15px;}
+  .grid{
+    max-width:1000px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .panel .num{
+    position:absolute; margin:8px; width:30px; height:30px;
+    background:var(--ink); color:#fff; border-radius:50%;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel .art{ width:100%; display:block; background:#f7fafc;}
+  .panel .cap{
+    padding:10px 14px; font-size:14px; line-height:1.5;
+    border-top:2px dashed var(--line); background:#fff;
+  }
+  .panel .cap b{ color:var(--parent-d); }
+  .panel.flip .cap b{ color:var(--child-d); }
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    background:var(--accent); color:#5a4a10;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+  }
+  .summary{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+    border:2px solid var(--ink); border-radius:14px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+    padding:22px 26px;
+  }
+  .summary h2{ margin:0 0 10px; font-size:22px;}
+  .summary .lead{ font-size:16px; line-height:1.7; margin:0 0 14px;}
+  .summary .lead strong{ background:linear-gradient(transparent 60%,#ffd166 60%); }
+  .summary ul{ margin:0; padding-left:1.1em; line-height:1.8;}
+  .summary .map{ color:#7a7e8c; font-size:13px; margin-top:14px;}
+  @media (max-width:680px){
+    .grid{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; }
+    .panel,.summary{ box-shadow:none; break-inside:avoid; }
+    .grid{ gap:10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.14em;background:#ffd166;color:#5a4a10;border-radius:999px;padding:3px 14px;">Chapter-17</span></p>
+  <h1>お店の引き継ぎブックでわかる、<span class="hl">「要件定義を“渡せる状態”にする」</span>のはなし</h1>
+  <p>成果物がそろっただけでは終わらない。──目次・一覧・想定問答をそろえ、合意形成と後工程への伝達に備えるはなし</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ コマ1 ============ -->
+  <section class="panel">
+    <div class="num">1</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="企画書からERDまで12点の成果物が机に勢ぞろいし もう完成と一息つくシェフ">
+      <rect width="360" height="240" fill="#eef7f0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe7d3"/>
+      <text x="150" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">成果物が全部そろった！</text>
+      <!-- 成果物の書類の山（12点） -->
+      <g font-size="7.5" font-weight="800" fill="var(--ink)" text-anchor="middle">
+        <g transform="translate(24,40)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#ffe0b2"/><text x="30" y="26">企画書</text><text x="30" y="34">全体像</text></g>
+        <g transform="translate(90,40)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#c8e6c9"/><text x="30" y="26">実装技術</text><text x="30" y="34">要求一覧</text></g>
+        <g transform="translate(156,40)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#b3e5fc"/><text x="30" y="26">行動</text><text x="30" y="34">シナリオ</text></g>
+        <g transform="translate(24,84)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#d1c4e9"/><text x="30" y="26">概念データ</text><text x="30" y="34">モデル</text></g>
+        <g transform="translate(90,84)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#ffccbc"/><text x="30" y="26">モックアップ</text><text x="30" y="34">画面遷移図</text></g>
+        <g transform="translate(156,84)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#f8bbd0"/><text x="30" y="26">項目の説明</text><text x="30" y="34">入出力定義</text></g>
+        <g transform="translate(57,128)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><rect x="8" y="8" width="44" height="5" rx="2" fill="#b2dfdb"/><text x="30" y="26">処理定義</text><text x="30" y="34">統合ERD</text></g>
+        <g transform="translate(123,128)"><rect width="60" height="38" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><text x="30" y="17" font-size="9">…12点</text><text x="30" y="30" font-size="9">勢ぞろい</text></g>
+      </g>
+      <!-- ひと息つくシェフ -->
+      <g transform="translate(300,96)">
+        <ellipse cx="0" cy="94" rx="28" ry="7" fill="#00000010"/>
+        <rect x="-24" y="40" width="48" height="56" rx="17" fill="var(--child)"/>
+        <circle cx="0" cy="18" r="28" fill="#ffe1c4"/>
+        <path d="M-26 4 Q-15 -24 0 -20 Q17 -24 26 4 Q15 -6 0 -6 Q-15 -6 -26 4Z" fill="#3a3a44"/>
+        <path d="M-19 -5 Q-24 -24 -9 -22 Q-5 -35 9 -28 Q24 -30 19 -9 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-19" y="-9" width="38" height="9" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="-9" cy="20" r="4.2" fill="#3a3a44"/><circle cx="9" cy="20" r="4.2" fill="#3a3a44"/>
+        <path d="M-10 30 Q0 39 10 30" stroke="#b5594f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <circle cx="-16" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/><circle cx="16" cy="27" r="4.5" fill="#ffb3b3" opacity=".6"/>
+      </g>
+      <text x="306" y="66" font-size="18">😌</text>
+    </svg>
+    <div class="cap"><span class="tag">前提</span><b>開店の準備でいうと</b>、メニュー・段取り・見取り図…店を開けるのに要る物が全部そろった段階。 <b>企画書・全体像・要求一覧・行動シナリオ・概念データモデル・モックアップ・画面遷移図・入出力/処理定義・統合ERD…と12点の成果物</b>が机に勢ぞろい。「もう完成」とひと息。</div>
+  </section>
+
+  <!-- ============ コマ2 ============ -->
+  <section class="panel">
+    <div class="num">2</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="紙束をドサッと後任シェフに渡すが 順序も置き場も分からず後任が困り店が回らない">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd6da"/>
+      <text x="180" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="var(--parent-d)">紙束をドサッと渡しても…</text>
+      <!-- ぐしゃっと積まれた紙束 -->
+      <g transform="translate(88,78)">
+        <rect x="-8" y="46" width="96" height="14" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.6" transform="rotate(-6 40 53)"/>
+        <rect x="-2" y="34" width="92" height="14" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.6" transform="rotate(4 44 41)"/>
+        <rect x="2" y="22" width="90" height="14" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.6" transform="rotate(-3 47 29)"/>
+        <rect x="0" y="10" width="94" height="14" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.6" transform="rotate(5 47 17)"/>
+        <rect x="6" y="-2" width="84" height="14" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.6" transform="rotate(-2 48 5)"/>
+        <text x="112" y="-4" font-size="18">💥</text>
+      </g>
+      <!-- 困る後任シェフ -->
+      <g transform="translate(262,100)">
+        <ellipse cx="0" cy="92" rx="26" ry="7" fill="#00000010"/>
+        <rect x="-22" y="40" width="44" height="52" rx="16" fill="#a99cd6"/>
+        <circle cx="0" cy="16" r="26" fill="#ffe1c4"/>
+        <path d="M-24 4 Q-14 -22 0 -18 Q16 -22 24 4 Q14 -6 0 -6 Q-14 -6 -24 4Z" fill="#3a3a44"/>
+        <path d="M-17 -4 Q-22 -22 -8 -20 Q-4 -32 8 -26 Q22 -28 17 -8 Z" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="-17" y="-8" width="34" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M-13 14 L-4 18" stroke="#3a3a44" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <path d="M13 14 L4 18" stroke="#3a3a44" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <circle cx="-8" cy="20" r="3.6" fill="#3a3a44"/><circle cx="8" cy="20" r="3.6" fill="#3a3a44"/>
+        <ellipse cx="0" cy="30" rx="4" ry="6" fill="#c9503f"/>
+      </g>
+      <text x="266" y="64" font-size="17">😵</text>
+      <text x="298" y="98" font-size="15" font-weight="800" fill="#c9503f">？？</text>
+    </svg>
+    <div class="cap"><span class="tag">課題</span>でも<b>紙の束をそのまま後任の店長に渡しても、お店は回らない</b>。どこに何があるか、なぜこの順かが伝わらない。 同じく<b>要件定義は成果物がそろっただけでは完結しない</b>。実装や詳細設計をする人に<b>きちんと伝わって初めて意味を持つ</b>。</div>
+  </section>
+
+  <!-- ============ コマ3 ============ -->
+  <section class="panel flip">
+    <div class="num">3</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="渡す相手は2種 発注元と握手して合意形成 後工程の担当へ手渡して伝達">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">説明する相手は2種類</text>
+      <!-- 左：発注元と握手（合意形成） -->
+      <g transform="translate(20,54)">
+        <rect x="0" y="0" width="150" height="120" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="20" text-anchor="middle" font-size="11" font-weight="800" fill="var(--parent-d)">① 発注元と</text>
+        <!-- 握手 -->
+        <circle cx="42" cy="58" r="15" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M30 50 Q42 40 54 50" fill="var(--parent)"/>
+        <circle cx="108" cy="58" r="15" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M96 50 Q108 40 120 50" fill="var(--child)"/>
+        <path d="M57 66 L93 66" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="66" cy="66" r="5" fill="#ffcc9a" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="84" cy="66" r="5" fill="#ffcc9a" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="75" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">「これでOK」</text>
+        <text x="75" y="114" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--parent-d)">＝合意形成</text>
+      </g>
+      <!-- 右：後工程へ手渡し（伝達） -->
+      <g transform="translate(190,54)">
+        <rect x="0" y="0" width="150" height="120" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <text x="75" y="20" text-anchor="middle" font-size="11" font-weight="800" fill="var(--child-d)">② 後工程の担当へ</text>
+        <!-- 冊子を手渡す -->
+        <g transform="translate(26,38)">
+          <rect x="0" y="0" width="34" height="44" rx="3" fill="#eafaf0" stroke="var(--ink)" stroke-width="1.8"/>
+          <rect x="0" y="0" width="8" height="44" rx="2" fill="var(--child-d)"/>
+          <line x1="14" y1="12" x2="28" y2="12" stroke="var(--line)" stroke-width="2"/>
+          <line x1="14" y1="22" x2="28" y2="22" stroke="var(--line)" stroke-width="2"/>
+          <line x1="14" y1="32" x2="24" y2="32" stroke="var(--line)" stroke-width="2"/>
+        </g>
+        <path d="M66 60 L96 60" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M88 53 L98 60 L88 67" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="116" cy="54" r="13" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M105 47 Q116 38 127 47" fill="#a99cd6"/>
+        <text x="75" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">実装・詳細設計へ</text>
+        <text x="75" y="114" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">＝後工程への伝達</text>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">目的</span>引き継ぎには2つの相手がいる。<b>発注元と「これで作ります」と握手する＝合意形成</b>、そして<b>実際に作る後任へ手渡す＝伝達</b>。 どちらの場でも<b>定義した要件をきちんと説明できる</b>状態にしておくのがゴール。</div>
+  </section>
+
+  <!-- ============ コマ4 ============ -->
+  <section class="panel flip">
+    <div class="num">4</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="バラバラの紙束を一冊にまとめ 表紙と目次を付ける 成果物の目次化">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">まず一冊にまとめて目次を付ける</text>
+      <!-- 表紙＋目次のブック -->
+      <g transform="translate(40,44)">
+        <rect x="0" y="0" width="120" height="140" rx="8" fill="#eafaf0" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="0" y="0" width="16" height="140" rx="4" fill="var(--child-d)"/>
+        <text x="70" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="var(--child-d)">目 次</text>
+        <g font-size="9.5" fill="var(--ink)">
+          <text x="30" y="44">1. 企画書 …… p.1</text>
+          <text x="30" y="60">2. 要求一覧 …… p.8</text>
+          <text x="30" y="76">3. 行動シナリオ … p.15</text>
+          <text x="30" y="92">4. 概念モデル … p.22</text>
+          <text x="30" y="108">5. 画面/UI …… p.30</text>
+          <text x="30" y="124">6. 統合ERD …… p.44</text>
+        </g>
+      </g>
+      <!-- 束ねる矢印 -->
+      <path d="M176 110 L212 110" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M204 102 L214 110 L204 118" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- まとまった背表紙の並び -->
+      <g transform="translate(226,54)">
+        <rect x="0" y="0" width="20" height="120" rx="3" fill="#ffe0b2" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="24" y="0" width="20" height="120" rx="3" fill="#c8e6c9" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="48" y="0" width="20" height="120" rx="3" fill="#b3e5fc" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="72" y="0" width="20" height="120" rx="3" fill="#f8bbd0" stroke="var(--ink)" stroke-width="1.8"/>
+        <text x="46" y="-8" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">1冊に整列</text>
+      </g>
+      <path d="M300 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">手順①</span>バラバラの紙束を<b>一冊のブックにまとめ、表紙と目次を付ける</b>。どこに何があるか一目で分かる。 これがこれまでの<b>成果物の目次化</b>。全体の地図があるだけで、読む人も探す人も迷わなくなる。</div>
+  </section>
+
+  <!-- ============ コマ5 ============ -->
+  <section class="panel flip">
+    <div class="num">5</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="うちで出す料理の一覧を作る 行動シナリオ一覧">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">「出す料理」を一覧にする</text>
+      <g transform="translate(70,40)">
+        <rect x="0" y="0" width="220" height="146" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="1.2" y="1.2" width="217.6" height="24" rx="9" fill="#eafaf0"/><rect x="1.2" y="14" width="217.6" height="11" fill="#eafaf0"/>
+        <text x="14" y="18" font-size="10.5" font-weight="800" fill="var(--child-d)">行動シナリオ一覧</text>
+        <text x="150" y="18" font-size="9.5" font-weight="800" fill="#7a7e8c">利用者 / 場面</text>
+        <g stroke="var(--line)" stroke-width="1.2"><line x1="0" y1="52" x2="220" y2="52"/><line x1="0" y1="76" x2="220" y2="76"/><line x1="0" y1="100" x2="220" y2="100"/><line x1="0" y1="124" x2="220" y2="124"/><line x1="138" y1="26" x2="138" y2="146"/></g>
+        <g font-size="10" fill="var(--ink)">
+          <text x="14" y="45">① 注文を受ける</text><text x="150" y="45" font-size="9">来店客</text>
+          <text x="14" y="69">② 会計する</text><text x="150" y="69" font-size="9">レジ係</text>
+          <text x="14" y="93">③ 在庫を補充</text><text x="150" y="93" font-size="9">仕入担当</text>
+          <text x="14" y="117">④ 予約を管理</text><text x="150" y="117" font-size="9">店長</text>
+          <text x="14" y="140">⑤ 日報を締める</text><text x="150" y="140" font-size="9">店長</text>
+        </g>
+      </g>
+      <path d="M300 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">手順②</span>「うちで出す料理はこれ全部」と<b>メニューを一覧に並べる</b>ように、システムがカバーする利用場面を並べる。 これが<b>行動シナリオ一覧</b>。誰のどんな場面を扱うのかが、一目で見渡せるようになる。</div>
+  </section>
+
+  <!-- ============ コマ6 ============ -->
+  <section class="panel flip">
+    <div class="num">6</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="一皿ごとに使う材料と道具のセット表 ワークセット一覧">
+      <rect width="360" height="240" fill="#eef4f7"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dbe3ea"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">一作業で使う「セット」を一覧に</text>
+      <!-- 3つのセットカード -->
+      <g font-size="9.5" font-weight="700">
+        <g transform="translate(24,44)">
+          <rect x="0" y="0" width="100" height="130" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="1" y="1" width="98" height="22" rx="9" fill="#eaf6f8"/><rect x="1" y="12" width="98" height="11" fill="#eaf6f8"/>
+          <text x="50" y="16" text-anchor="middle" font-size="10" font-weight="800" fill="var(--child-d)">注文セット</text>
+          <text x="12" y="42">◦ 顧客データ</text>
+          <text x="12" y="62">◦ 注文データ</text>
+          <text x="12" y="82">◦ 商品マスタ</text>
+          <text x="12" y="106" font-size="8.5" fill="#7a7e8c">＝この作業で</text>
+          <text x="12" y="120" font-size="8.5" fill="#7a7e8c">触る束</text>
+        </g>
+        <g transform="translate(130,44)">
+          <rect x="0" y="0" width="100" height="130" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="1" y="1" width="98" height="22" rx="9" fill="#eafaf0"/><rect x="1" y="12" width="98" height="11" fill="#eafaf0"/>
+          <text x="50" y="16" text-anchor="middle" font-size="10" font-weight="800" fill="var(--child-d)">会計セット</text>
+          <text x="12" y="42">◦ 注文データ</text>
+          <text x="12" y="62">◦ 会計データ</text>
+          <text x="12" y="82">◦ 支払方法</text>
+          <text x="12" y="106" font-size="8.5" fill="#7a7e8c">＝この作業で</text>
+          <text x="12" y="120" font-size="8.5" fill="#7a7e8c">触る束</text>
+        </g>
+        <g transform="translate(236,44)">
+          <rect x="0" y="0" width="100" height="130" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="1" y="1" width="98" height="22" rx="9" fill="#fff3e0"/><rect x="1" y="12" width="98" height="11" fill="#fff3e0"/>
+          <text x="50" y="16" text-anchor="middle" font-size="10" font-weight="800" fill="var(--child-d)">在庫セット</text>
+          <text x="12" y="42">◦ 商品マスタ</text>
+          <text x="12" y="62">◦ 在庫データ</text>
+          <text x="12" y="82">◦ 仕入データ</text>
+          <text x="12" y="106" font-size="8.5" fill="#7a7e8c">＝この作業で</text>
+          <text x="12" y="120" font-size="8.5" fill="#7a7e8c">触る束</text>
+        </g>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">手順③</span>「この料理を作るには、この材料と道具のセット」と<b>一皿ごとの取り合わせ表</b>を作るように、 一つの作業で使うデータ・機能の束を並べる＝<b>ワークセット一覧</b>。どの作業が何を触るかがひと目で分かる。</div>
+  </section>
+
+  <!-- ============ コマ7 ============ -->
+  <section class="panel flip">
+    <div class="num">7</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="見学に来た他店の人が これは何 なぜこの順番と質問しそうな箇所を想像する">
+      <rect width="360" height="240" fill="#fdeef0"/>
+      <rect x="0" y="190" width="360" height="50" fill="#ecd6da"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--parent-d)">相手が聞いてきそうな所を想像</text>
+      <!-- ブックを見る他社の人 -->
+      <g transform="translate(70,96)">
+        <ellipse cx="0" cy="86" rx="26" ry="7" fill="#00000010"/>
+        <rect x="-22" y="38" width="44" height="50" rx="16" fill="#ff8aa3"/>
+        <circle cx="0" cy="16" r="24" fill="#ffe1c4"/>
+        <path d="M-22 4 Q-13 -20 0 -17 Q15 -20 22 4 Q13 -5 0 -5 Q-13 -5 -22 4Z" fill="#5a4a3a"/>
+        <circle cx="-8" cy="18" r="3.4" fill="#3a3a44"/><circle cx="8" cy="18" r="3.4" fill="#3a3a44"/>
+        <path d="M-7 27 Q0 32 7 27" stroke="#b5594f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- ブック -->
+      <g transform="translate(112,96)">
+        <rect x="0" y="0" width="46" height="58" rx="4" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="0" y="0" width="10" height="58" rx="2" fill="var(--child-d)"/>
+        <line x1="16" y1="14" x2="38" y2="14" stroke="var(--line)" stroke-width="2"/>
+        <line x1="16" y1="26" x2="38" y2="26" stroke="var(--line)" stroke-width="2"/>
+        <line x1="16" y1="38" x2="30" y2="38" stroke="var(--line)" stroke-width="2"/>
+      </g>
+      <!-- 疑問の吹き出し -->
+      <g font-size="10.5" font-weight="800" fill="var(--parent-d)">
+        <g transform="translate(190,52)"><rect x="0" y="0" width="150" height="30" rx="14" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><path d="M14 30 l-6 12 l16 -10Z" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><text x="14" y="20">この用語、何のこと？</text></g>
+        <g transform="translate(200,96)"><rect x="0" y="0" width="150" height="30" rx="14" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><path d="M14 30 l-6 12 l16 -10Z" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><text x="14" y="20">なぜこの順番なの？</text></g>
+        <g transform="translate(190,140)"><rect x="0" y="0" width="160" height="30" rx="14" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><path d="M14 30 l-6 12 l16 -10Z" fill="#fff" stroke="var(--parent-d)" stroke-width="1.8"/><text x="12" y="20">この機能はどこ担当？</text></g>
+      </g>
+    </svg>
+    <div class="cap"><span class="tag">気づき</span>ブックを見学に来た<b>他店（＝他社）の人</b>が「この用語は何？」「なぜこの順？」「これは誰の担当？」と<b>聞いてきそうな所</b>を先回りで想像する。 これが<b>プロジェクト説明で想定される質疑応答</b>の洗い出し。</div>
+  </section>
+
+  <!-- ============ コマ8 ============ -->
+  <section class="panel flip">
+    <div class="num">8</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="想定した質問と答えをまとめた想定問答集FAQを別冊に用意">
+      <rect width="360" height="240" fill="#eef3fb"/>
+      <rect x="0" y="190" width="360" height="50" fill="#dfe2ec"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">質問と答えを「想定問答集」に</text>
+      <g transform="translate(56,42)">
+        <rect x="0" y="0" width="248" height="146" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2.4"/>
+        <rect x="1.2" y="1.2" width="245.6" height="26" rx="9" fill="#eaf2fb"/><rect x="1.2" y="16" width="245.6" height="12" fill="#eaf2fb"/>
+        <text x="16" y="19" font-size="11" font-weight="800" fill="var(--child-d)">想定問題集（FAQ）</text>
+        <text x="214" y="19" font-size="16">📘</text>
+        <g font-size="10">
+          <g transform="translate(16,40)"><circle cx="7" cy="7" r="8" fill="#f8bbd0"/><text x="7" y="10.5" text-anchor="middle" font-size="9" font-weight="800" fill="#c2185b">Q</text><text x="22" y="10.5" fill="var(--ink)">この用語は何？</text><text x="150" y="10.5" font-size="9" fill="#7a7e8c">→用語集p.3参照</text></g>
+          <g transform="translate(16,70)"><circle cx="7" cy="7" r="8" fill="#f8bbd0"/><text x="7" y="10.5" text-anchor="middle" font-size="9" font-weight="800" fill="#c2185b">Q</text><text x="22" y="10.5" fill="var(--ink)">なぜこの順番？</text><text x="150" y="10.5" font-size="9" fill="#7a7e8c">→処理定義に依存</text></g>
+          <g transform="translate(16,100)"><circle cx="7" cy="7" r="8" fill="#f8bbd0"/><text x="7" y="10.5" text-anchor="middle" font-size="9" font-weight="800" fill="#c2185b">Q</text><text x="22" y="10.5" fill="var(--ink)">誰の担当？</text><text x="150" y="10.5" font-size="9" fill="#7a7e8c">→役割表で明示</text></g>
+          <g transform="translate(16,126)"><circle cx="7" cy="7" r="8" fill="#c8e6c9"/><text x="7" y="10.5" text-anchor="middle" font-size="9" font-weight="800" fill="#2e7d32">A</text><text x="22" y="10.5" fill="var(--ink)">…と、答えも一緒に用意しておく</text></g>
+        </g>
+      </g>
+      <path d="M312 40 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3Z" fill="var(--accent)"/>
+    </svg>
+    <div class="cap"><span class="tag">手順④</span>想像した質問に<b>あらかじめ答えを添えて別冊にまとめる</b>。これが<b>想定問題集</b>（FAQ）。 説明の場で聞かれても、その場で詰まらず即答できる。合意形成も伝達も、ぐっとスムーズになる。</div>
+  </section>
+
+  <!-- ============ コマ9 ============ -->
+  <section class="panel flip">
+    <div class="num">9</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="そもそも聞かれないよう資料本文に注釈と補足を書き足す">
+      <rect width="360" height="240" fill="#eef7f4"/>
+      <rect x="0" y="190" width="360" height="50" fill="#d6e7df"/>
+      <text x="180" y="24" text-anchor="middle" font-size="13" font-weight="800" fill="var(--child-d)">そもそも聞かれない資料にする</text>
+      <!-- 資料本文に注釈を書き足す -->
+      <g transform="translate(56,44)">
+        <rect x="0" y="0" width="180" height="140" rx="8" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+        <rect x="16" y="16" width="120" height="7" rx="3" fill="#e6ebf2"/>
+        <rect x="16" y="30" width="148" height="7" rx="3" fill="#e6ebf2"/>
+        <rect x="16" y="44" width="100" height="7" rx="3" fill="#e6ebf2"/>
+        <!-- 書き足された注釈（黄色ハイライト） -->
+        <rect x="16" y="62" width="150" height="16" rx="4" fill="#fff3c4" stroke="#e0b93a" stroke-width="1.4"/>
+        <text x="22" y="73" font-size="8.5" font-weight="700" fill="#8a6d10">※用語：ワークセットとは…</text>
+        <rect x="16" y="86" width="130" height="7" rx="3" fill="#e6ebf2"/>
+        <rect x="16" y="100" width="150" height="16" rx="4" fill="#fff3c4" stroke="#e0b93a" stroke-width="1.4"/>
+        <text x="22" y="111" font-size="8.5" font-weight="700" fill="#8a6d10">※補足：この順番の理由は…</text>
+        <rect x="16" y="124" width="90" height="7" rx="3" fill="#e6ebf2"/>
+      </g>
+      <!-- 赤ペンで書き込むシェフの手 -->
+      <g transform="translate(250,150) rotate(35)">
+        <rect x="-5" y="-46" width="10" height="40" rx="2" fill="#ffd166" stroke="var(--ink)" stroke-width="1.4"/>
+        <rect x="-5" y="-54" width="10" height="9" rx="2" fill="#ff9d6b" stroke="var(--ink)" stroke-width="1.4"/>
+        <path d="M-5 -6 L5 -6 L0 6 Z" fill="#ffe1c4" stroke="var(--ink)" stroke-width="1.4"/>
+        <path d="M-2 0 L2 0 L0 6 Z" fill="var(--ink)"/>
+      </g>
+      <text x="292" y="56" font-size="18">✍️</text>
+      <text x="292" y="76" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">注釈・補足を</text>
+      <text x="292" y="90" text-anchor="middle" font-size="10.5" font-weight="800" fill="var(--child-d)">本文に追記</text>
+    </svg>
+    <div class="cap"><span class="tag">仕上げ</span>さらに一歩。<b>そもそも質問が出ないよう、レシピ本文そのものに注釈や補足を書き足す</b>。 用語の説明や順序の理由を資料自体に織り込み、<b>読むだけで分かる＝手を離れても伝わる</b>形に磨く。</div>
+  </section>
+
+  <!-- ============ コマ10 ============ -->
+  <section class="panel flip">
+    <div class="num">10</div>
+    <svg class="art" viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="目次一覧注釈のそろった引き継ぎブックが完成し 発注元とも後任とも渡せる状態になる">
+      <rect width="360" height="240" fill="#eefaf1"/>
+      <!-- 中央：完成した引き継ぎブック -->
+      <g transform="translate(150,36)">
+        <rect x="0" y="0" width="68" height="120" rx="8" fill="#eafaf0" stroke="var(--ink)" stroke-width="2.6"/>
+        <rect x="0" y="0" width="12" height="120" rx="4" fill="var(--child-d)"/>
+        <text x="42" y="30" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">引き継ぎ</text>
+        <text x="42" y="44" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">ブック</text>
+        <g font-size="8" fill="#7a7e8c">
+          <text x="20" y="66">目次</text><text x="20" y="80">一覧</text><text x="20" y="94">FAQ</text><text x="20" y="108">注釈</text>
+        </g>
+        <path d="M32 -8 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2Z" fill="var(--accent)"/>
+      </g>
+      <!-- 左：発注元（受け取ってOK） -->
+      <g transform="translate(54,98)">
+        <ellipse cx="0" cy="86" rx="24" ry="7" fill="#00000010"/>
+        <rect x="-20" y="38" width="40" height="48" rx="15" fill="#ff8aa3"/>
+        <circle cx="0" cy="16" r="24" fill="#ffe1c4"/>
+        <path d="M-22 4 Q-13 -20 0 -17 Q15 -20 22 4 Q13 -5 0 -5 Q-13 -5 -22 4Z" fill="#5a4a3a"/>
+        <circle cx="-8" cy="18" r="3.4" fill="#3a3a44"/><circle cx="8" cy="18" r="3.4" fill="#3a3a44"/>
+        <path d="M-7 27 Q0 33 7 27" stroke="#b5594f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <text x="0" y="-34" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--parent-d)">発注元👍</text>
+      </g>
+      <!-- 右：後任シェフ（受け取れる） -->
+      <g transform="translate(306,98)">
+        <ellipse cx="0" cy="86" rx="24" ry="7" fill="#00000010"/>
+        <rect x="-20" y="38" width="40" height="48" rx="15" fill="var(--child)"/>
+        <circle cx="0" cy="16" r="24" fill="#ffe1c4"/>
+        <path d="M-22 4 Q-13 -20 0 -17 Q15 -20 22 4 Q13 -5 0 -5 Q-13 -5 -22 4Z" fill="#3a3a44"/>
+        <path d="M-16 -4 Q-20 -20 -8 -18 Q-4 -30 8 -24 Q20 -26 16 -8 Z" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <rect x="-16" y="-8" width="32" height="8" rx="3" fill="#fff" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="-8" cy="18" r="3.4" fill="#3a3a44"/><circle cx="8" cy="18" r="3.4" fill="#3a3a44"/>
+        <path d="M-7 27 Q0 33 7 27" stroke="#b5594f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <text x="0" y="-34" text-anchor="middle" font-size="9.5" font-weight="800" fill="var(--child-d)">後任🙆</text>
+      </g>
+      <path d="M84 130 L146 140" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 6"/>
+      <path d="M276 130 L222 140" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 6"/>
+      <text x="180" y="222" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">引き継ぎブック＝<tspan fill="#3a9aa4">誰にでも渡せる状態</tspan></text>
+    </svg>
+    <div class="cap"><span class="tag">結論</span>目次・一覧・想定問答・注釈のそろった<b>引き継ぎブックが完成</b>。発注元とは握手（<b>合意形成</b>）、後任には手渡し（<b>伝達</b>）。 成果物を束ねただけの状態から、<b>誰が読んでも作れる＝渡せる状態</b>へ。ここで要件定義がようやく“伝わる”形になる。</div>
+  </section>
+
+  <!-- ============ まとめ ============ -->
+  <section class="summary">
+    <h2>📋 まとめ ── 引き継ぎブック＝「渡せる要件定義」。束ねるだけでなく“伝わる”形にする</h2>
+    <p class="lead"><strong>お店を後任に引き継ぐとき、食材やレシピが全部そろっていても、紙束をドサッと渡すだけでは店は回りません。</strong>同じように、企画書からERDまで12点の成果物がそろうと要件定義は一見“完成”に見えます。でも<strong>実装・詳細設計をする人に伝わって初めて意味を持つ</strong>もの。そこで<strong>成果物の目次化 → 行動シナリオ一覧 → ワークセット一覧 → 想定問題集 → 資料自体の手直し</strong>を重ね、<strong>合意形成と後工程への伝達</strong>の両方に耐えられる“渡せる状態”に仕上げます。</p>
+    <ul>
+      <li><b>引き継ぎブックの場合</b>：紙束を一冊に束ねて目次を付け → 料理一覧・材料セット表を作り → 見学者が聞きそうな質問を想定問答集にまとめ → そもそも聞かれないようレシピに注釈を書き足す → 発注元と後任、どちらにも渡せる一冊に。</li>
+      <li><b>要件定義の場合</b>：成果物を<b>目次化</b> → <b>行動シナリオ一覧・ワークセット一覧</b>を作成 → 他社説明で想定される質疑から<b>想定問題集</b>を作り → <b>資料自体に手を加えて</b>質問が出ない状態にし → <b>誰にでも渡せる状態</b>にする。</li>
+      <li><b>ねらい</b>：<b>合意形成</b>（発注元と「これで作る」と握手）と<b>後工程への伝達</b>（実装・詳細設計への手渡し）の両方で、定義した要件を<b>きちんと説明できる</b>ようにすること。</li>
+    </ul>
+    <p class="map">物語の流れ： ①成果物12点が勢ぞろい → ②紙束のままでは伝わらない → ③相手は発注元(合意形成)と後工程(伝達)の2種 → ④目次化して一冊に → ⑤行動シナリオ一覧 → ⑥ワークセット一覧 → ⑦想定される質疑を洗い出す → ⑧想定問題集(FAQ)にまとめる → ⑨資料本文に注釈を書き足す → ⑩誰にでも渡せる状態へ</p>
+  </section>
+
+</main>
+
+</body>
+</html>
