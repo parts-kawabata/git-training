@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1枚でわかる「要件定義」</title>
+<style>
+  :root{
+    --parent:#ff8aa3;
+    --parent-d:#e7607c;
+    --child:#5cc6d0;       /* UI */
+    --child-d:#3a9aa4;
+    --self:#7fbf9b;        /* 機能 */
+    --self-d:#4f9370;
+    --kid:#a99cd6;         /* データ */
+    --kid-d:#7a6ab5;
+    --ink:#3a3a44;
+    --line:#cfd3dd;
+    --bg:#fef9f3;
+    --panel:#ffffff;
+    --accent:#ffd166;
+    --muted:#7a7e8c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.7;
+  }
+  header.title{ text-align:center; margin:8px auto 24px; max-width:1100px; }
+  header.title h1{ font-size:30px; margin:0 0 8px; letter-spacing:.04em; }
+  header.title h1 .hl{ background:linear-gradient(transparent 60%, #ffe08a 60%); padding:0 .15em; }
+  header.title p{ margin:0; color:var(--muted); font-size:15px; }
+  .pill{
+    display:inline-block; font-size:12px; font-weight:800; letter-spacing:.14em;
+    background:var(--accent); color:#5a4a10; border-radius:999px; padding:3px 14px;
+  }
+
+  .grid{
+    max-width:1100px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:18px;
+  }
+  .panel{
+    background:var(--panel); border:2px solid var(--ink);
+    border-radius:14px; padding:20px 22px;
+    box-shadow:4px 5px 0 rgba(58,58,68,.12);
+  }
+  .wide{ grid-column:1 / -1; }
+  .lead{
+    grid-column:1 / -1;
+    background:linear-gradient(135deg,#fff 0%,#fff7e8 100%);
+  }
+
+  .panel h2{
+    margin:0 0 12px; font-size:20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .panel h2 .n{
+    flex:none; width:28px; height:28px; border-radius:50%;
+    background:var(--ink); color:#fff;
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel p{ margin:0 0 10px; font-size:14.5px; }
+  .panel p:last-child{ margin-bottom:0; }
+  .big{ font-size:17px; line-height:1.75; }
+  .big strong{ background:linear-gradient(transparent 60%,var(--accent) 60%); font-weight:700; }
+
+  svg.fig{ width:100%; height:auto; display:block; margin:6px 0 14px; }
+
+  .note{
+    border-left:4px solid var(--line); padding:8px 0 8px 12px;
+    font-size:13.5px; color:var(--muted); margin:12px 0 0;
+  }
+  .warn{
+    background:#fff0f3; border:2px dashed var(--parent-d);
+    border-radius:10px; padding:12px 14px; margin:14px 0 0;
+    font-size:14.5px;
+  }
+  .warn b{ color:var(--parent-d); }
+  .quote{
+    background:#f7fafc; border-radius:10px; padding:12px 14px;
+    font-size:14px; margin:12px 0 0;
+  }
+  .quote .src{ display:block; color:var(--muted); font-size:12px; margin-top:6px; }
+
+  .tag{
+    display:inline-block; font-size:12px; font-weight:700;
+    border-radius:999px; padding:2px 10px; margin-right:6px;
+    background:var(--accent); color:#5a4a10;
+  }
+  .tag.ui{ background:var(--child); color:#0d3f45; }
+  .tag.fn{ background:var(--self); color:#17402c; }
+  .tag.dt{ background:var(--kid); color:#2b2352; }
+
+  .cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:4px 0 0; }
+  .card{ border:2px solid var(--ink); border-radius:10px; padding:10px 12px; font-size:13.5px; }
+  .card h3{ margin:0 0 6px; font-size:15px; }
+  .card.ui{ background:#eafafc; border-color:var(--child-d); }
+  .card.fn{ background:#eefaf3; border-color:var(--self-d); }
+  .card.dt{ background:#f3f0fc; border-color:var(--kid-d); }
+  .card .why{ color:var(--muted); font-size:12.5px; margin-top:6px; display:block; }
+
+  .steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0 0; }
+  .step{ border:2px solid var(--ink); border-radius:10px; padding:10px 12px; font-size:13.5px; background:#fff; }
+  .step .lbl{ font-size:12px; font-weight:800; color:var(--muted); display:block; margin-bottom:4px; letter-spacing:.08em; }
+
+  footer{ max-width:1100px; margin:18px auto 0; color:var(--muted); font-size:12px; text-align:center; }
+
+  @media (max-width:820px){
+    .grid{ grid-template-columns:1fr; }
+    .cards, .steps{ grid-template-columns:1fr; }
+    header.title h1{ font-size:23px; }
+  }
+  @media print{
+    body{ background:#fff; padding:10px; }
+    .panel{ box-shadow:none; break-inside:avoid; }
+    @page{ size:A4 landscape; margin:8mm; }
+  }
+</style>
+</head>
+<body>
+
+<header class="title">
+  <p style="margin:0 0 10px;"><span class="pill">要件定義 まとめ</span></p>
+  <h1>1枚でわかる、<span class="hl">「要件定義」</span></h1>
+  <p>作りはじめる前に、「どうなったらOKか」をおたがいで決めておく話</p>
+</header>
+
+<main class="grid">
+
+  <!-- ============ 1. 要件定義とは ============ -->
+  <section class="panel lead">
+    <h2><span class="n">1</span>要件定義とは（一言で）</h2>
+    <p class="big">
+      <strong>依頼する人と作る人が合意した条件をもとに、「何をどうすればよいのか」を作りはじめる前に決めておくこと。</strong>
+      「要件」は合意した条件そのもの、「定義」はその条件を<b>はじめに知らせておく</b>ことです。
+    </p>
+    <div class="quote">
+      「部屋の掃除をしなさい」と言われて自分なりに綺麗にしても、親から見ればまだ汚れている。
+      掃除した側は「<b>だったら先に言っておいてよ</b>」となる。
+      ——この「先に言っておく」が、要件定義です。
+      <span class="src">出典：第01章「要件定義＝要件を定義すること」</span>
+    </div>
+  </section>
+
+  <!-- ============ 2. 要望→要求→要件 ============ -->
+  <section class="panel">
+    <h2><span class="n">2</span>要望 → 要求 → 要件</h2>
+
+    <svg class="fig" viewBox="0 0 520 190" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="要望から要求になり、検討と代替案の往復を経て要件になる流れの図">
+      <!-- 要望 -->
+      <rect x="8" y="60" width="130" height="56" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="73" y="84" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">要望</text>
+      <text x="73" y="104" text-anchor="middle" font-size="11" fill="#7a7e8c">心の中で望む状態</text>
+      <!-- 矢印1 -->
+      <path d="M144 88 L186 88" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah)"/>
+      <text x="165" y="76" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--child-d)">言葉に</text>
+      <text x="165" y="106" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--child-d)">する</text>
+      <!-- 要求 -->
+      <rect x="194" y="60" width="130" height="56" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="259" y="84" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">要求</text>
+      <text x="259" y="104" text-anchor="middle" font-size="11" fill="#7a7e8c">目に見える言葉</text>
+      <!-- 往復矢印 -->
+      <path d="M330 78 L372 78" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah)"/>
+      <path d="M372 100 L330 100" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah)"/>
+      <rect x="306" y="20" width="90" height="30" rx="15" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="351" y="40" text-anchor="middle" font-size="12" font-weight="800" fill="#5a4a10">検討・代替案</text>
+      <path d="M351 50 L351 70" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <!-- 要件 -->
+      <rect x="380" y="60" width="130" height="56" rx="10" fill="#fff7e8" stroke="var(--ink)" stroke-width="3"/>
+      <text x="445" y="84" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">要件</text>
+      <text x="445" y="104" text-anchor="middle" font-size="11" fill="#7a7e8c">おたがいが合意</text>
+      <!-- 合意マーク -->
+      <path d="M445 130 L445 150" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <rect x="392" y="150" width="106" height="26" rx="13" fill="var(--self)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="445" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="#17402c">ここから作る</text>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <p>
+      「こうしたい」という<b>要望</b>を言葉にすると<b>要求</b>になります。その要求を作る側が検討し、
+      直したほうがよければ<b>代替案</b>を出して提案する。それを繰り返し、
+      <b>おたがいが合意してできたものが要件</b>です。
+    </p>
+
+    <div class="warn">
+      <b>なぜ合意が要るのか。</b>勝手に決めてしまうと、あとから依頼した側は「依頼していた内容と違う」、
+      作る側は「このやり方ではできない」となり、おたがい納得できないものになって
+      <b>一からやり直し</b>になる可能性が高いからです。
+    </div>
+
+    <p class="note">
+      代替案は「このままではできない」ときだけのものではありません。そのままで十分可能でも、
+      より良い案があれば出したほうがよい。たいていの依頼主は、専門家の知見が加味されることを期待しています。（第02章）
+    </p>
+  </section>
+
+  <!-- ============ 3. 要件の3要素 ============ -->
+  <section class="panel">
+    <h2><span class="n">3</span>要件の3要素と、その順序</h2>
+
+    <div class="cards">
+      <div class="card ui">
+        <h3><span class="tag ui">1番目</span></h3>
+        <h3>UI</h3>
+        画面や、プリンタで印刷する帳票のこと。
+        <span class="why">利用者が触れるのはここだけ。ソフトの良し悪しを判断できる、ほぼ唯一の方法。</span>
+      </div>
+      <div class="card fn">
+        <h3><span class="tag fn">2番目</span></h3>
+        <h3>機能</h3>
+        コンピュータが行う仕事のこと。
+        <span class="why">「消費税を計算する」など。成果（出力）を先に決め、そこから逆算する。</span>
+      </div>
+      <div class="card dt">
+        <h3><span class="tag dt">3番目</span></h3>
+        <h3>データ</h3>
+        仕事に必要な数値や、出力されたもの。
+        <span class="why">計算のもとになる「売上金額」、結果の「消費税」など。</span>
+      </div>
+    </div>
+
+    <svg class="fig" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="UIから機能へ、機能からデータへ、そしてデータから機能を経てUIへ戻る循環の図">
+      <rect x="20" y="42" width="120" height="44" rx="10" fill="#eafafc" stroke="var(--child-d)" stroke-width="2.5"/>
+      <text x="80" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">UI</text>
+      <rect x="200" y="42" width="120" height="44" rx="10" fill="#eefaf3" stroke="var(--self-d)" stroke-width="2.5"/>
+      <text x="260" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">機能</text>
+      <rect x="380" y="42" width="120" height="44" rx="10" fill="#f3f0fc" stroke="var(--kid-d)" stroke-width="2.5"/>
+      <text x="440" y="70" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">データ</text>
+      <!-- 往路 -->
+      <path d="M146 56 L192 56" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <text x="169" y="46" text-anchor="middle" font-size="10" fill="#7a7e8c">操作</text>
+      <path d="M326 56 L372 56" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <text x="349" y="46" text-anchor="middle" font-size="10" fill="#7a7e8c">記録</text>
+      <!-- 復路 -->
+      <path d="M372 74 L326 74" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <text x="349" y="94" text-anchor="middle" font-size="10" fill="#7a7e8c">取り出す</text>
+      <path d="M192 74 L146 74" stroke="var(--ink)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <text x="169" y="94" text-anchor="middle" font-size="10" fill="#7a7e8c">見せる</text>
+      <text x="260" y="18" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--muted)">この行き来のくり返しで、ソフトは成り立っています</text>
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <p>
+      <b>なぜ3つなのか。</b>他の2つだけでは説明できず、4つ目を足す必要もない。
+      システムの動作を過不足なく書ける<b>最小セット</b>だからです。（第03章）
+    </p>
+    <p>
+      <b>なぜUIから決めるのか。</b>データや機能が正しくても、UIがきちんとできていないと、
+      そもそも<b>操作すること自体ができない</b>から。機能がどれだけ立派でも、
+      利用者との接点はUIだけなので、価値が伝わりません。（第04章・第13章）
+    </p>
+    <p class="note">
+      機能は「y = f(x)」（x＝材料、y＝成果）。入力から考え始めると「この材料で何が作れるか」と当てもなく探すことになるため、
+      先に成果を決めて逆算します。（第14章）
+    </p>
+  </section>
+
+  <!-- ============ 4. V字 ============ -->
+  <section class="panel wide">
+    <h2><span class="n">4</span>V字 ── 要件定義は、そのまま受入テストの物差しになる</h2>
+
+    <svg class="fig" viewBox="0 0 900 405" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="V字モデルの図。左側の要件定義と右側の受入テストが対応している">
+      <!-- V字の線（箱の中心を通る：左腕 110,60 → 450,340、右腕はその鏡像） -->
+      <path d="M110 60 L450 340 L790 60" stroke="var(--line)" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+
+      <!-- 対応の点線 -->
+      <path d="M185 60 L715 60" stroke="var(--parent-d)" stroke-width="3" stroke-dasharray="8 6"/>
+      <path d="M298 153 L602 153" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
+      <path d="M411 246 L489 246" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
+
+      <!-- 左：要件定義 -->
+      <rect x="35" y="37" width="150" height="46" rx="10" fill="#fff7e8" stroke="var(--ink)" stroke-width="3"/>
+      <text x="110" y="66" text-anchor="middle" font-size="17" font-weight="800" fill="var(--ink)">要件定義</text>
+      <!-- 左：基本設計 -->
+      <rect x="148" y="130" width="150" height="46" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="223" y="159" text-anchor="middle" font-size="14" fill="var(--ink)">基本設計</text>
+      <!-- 左：詳細設計 -->
+      <rect x="261" y="223" width="150" height="46" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="336" y="252" text-anchor="middle" font-size="14" fill="var(--ink)">詳細設計</text>
+      <!-- 底：実装 -->
+      <rect x="375" y="325" width="150" height="46" rx="10" fill="var(--ink)"/>
+      <text x="450" y="354" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">実装（プログラミング）</text>
+      <!-- 右：単体テスト -->
+      <rect x="489" y="223" width="150" height="46" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="564" y="252" text-anchor="middle" font-size="14" fill="var(--ink)">単体テスト</text>
+      <!-- 右：結合テスト -->
+      <rect x="602" y="130" width="150" height="46" rx="10" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+      <text x="677" y="159" text-anchor="middle" font-size="14" fill="var(--ink)">結合テスト</text>
+      <!-- 右：受入テスト -->
+      <rect x="715" y="37" width="150" height="46" rx="10" fill="#fff7e8" stroke="var(--ink)" stroke-width="3"/>
+      <text x="790" y="66" text-anchor="middle" font-size="17" font-weight="800" fill="var(--ink)">受入テスト</text>
+
+      <!-- 対応ラベル（点線の中央に重ねる） -->
+      <rect x="370" y="47" width="160" height="26" rx="13" fill="var(--parent-d)"/>
+      <text x="450" y="65" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">突き合わせて合否</text>
+
+      <!-- 左右の説明 -->
+      <text x="110" y="108" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--muted)">「こうなってほしい」を決める</text>
+      <text x="790" y="108" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--muted)">「そうなったか」を確かめる</text>
+      <text x="110" y="395" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">◀ 決める（左側）</text>
+      <text x="790" y="395" text-anchor="middle" font-size="12" font-weight="700" fill="var(--child-d)">確かめる（右側） ▶</text>
+    </svg>
+
+    <p class="big">
+      右側のテストは、要件定義で決めた「<b>こうなってほしい</b>」と、出来上がったものを突き合わせて合否を出す作業です。
+      つまり<strong>左で決めたことが、そのまま右の合格ラインになります。</strong>
+    </p>
+
+    <div class="warn">
+      <b>左が雑だと、右で全部やり直し。</b>
+      要件が曖昧なまま渡されると、右側で「<b>何をもって合格とするか</b>」が決まらず、そもそもテストが書けません。
+      ズレを後ろの工程に先送りするほど、<b>影響範囲も直す量も大きくなります</b>。（第17章）
+    </div>
+
+    <p class="note">
+      基本設計・詳細設計・単体／結合テストは主に開発側の工程です。業務担当者がしっかり関わるべきなのは、
+      V字の<b>両端の2つ（要件定義と受入テスト）</b>。そして、その2つは同じことを表と裏から見ているだけです。
+    </p>
+  </section>
+
+  <!-- ============ 5. 想像できる例 ============ -->
+  <section class="panel wide">
+    <h2><span class="n">5</span>想像できる例：「目玉焼きを作って」だとどうなるか</h2>
+
+    <p>ここまでの1〜4を、ひとつの題材で通してみます。</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="lbl">要望</span>
+        「朝ごはんに、あたたかいものが食べたい」
+        <span class="why" style="color:var(--muted);font-size:12.5px;display:block;margin-top:6px;">まだ心の中の状態</span>
+      </div>
+      <div class="step">
+        <span class="lbl">要求</span>
+        「目玉焼きを作って」
+        <span class="why" style="color:var(--muted);font-size:12.5px;display:block;margin-top:6px;">言葉になった</span>
+      </div>
+      <div class="step" style="background:#fffbf0;">
+        <span class="lbl" style="color:#5a4a10;">検討・代替案</span>
+        「焼き加減が決まっていない。半熟が好みだが、表面だけ焼くと白身が生っぽく残る。蓋をして蒸し焼きにする案を出す」
+        <span class="why" style="color:var(--muted);font-size:12.5px;display:block;margin-top:6px;">作る側からの提案</span>
+      </div>
+      <div class="step" style="background:#fff7e8;border-width:3px;">
+        <span class="lbl" style="color:#5a4a10;">要件（合意）</span>
+        「卵1個を蓋をして蒸し焼き。黄身は半熟、白身はしっかり。塩は別添え、トーストを添えて8時までに出す」
+        <span class="why" style="color:var(--muted);font-size:12.5px;display:block;margin-top:6px;">ここから作りはじめる</span>
+      </div>
+    </div>
+
+    <p style="margin-top:16px;"><b>この要件を、3要素に落とすと：</b></p>
+    <div class="cards">
+      <div class="card ui">
+        <h3><span class="tag ui">UI</span></h3>
+        皿の上の盛り付け：目玉焼き1個とトースト1枚、塩は別添え。
+        <span class="why">食べる人が見て、触れるのはここだけ。</span>
+      </div>
+      <div class="card fn">
+        <h3><span class="tag fn">機能</span></h3>
+        調理の段取り：フライパンを熱する→卵を割り入れる→蓋をして蒸し焼き→皿に盛る。
+        <span class="why">成果＝「半熟の目玉焼き」から逆算。</span>
+      </div>
+      <div class="card dt">
+        <h3><span class="tag dt">データ</span></h3>
+        材料と道具：卵、塩、食パン／フライパン、蓋。
+        <span class="why">材料がなければ、段取りは動かせない。</span>
+      </div>
+    </div>
+
+    <div class="quote" style="background:#fff7e8;margin-top:16px;">
+      <b>そして、これがそのまま受入テストになります（V字の右）。</b><br>
+      「8時に、黄身が半熟で白身に火が通った目玉焼きが、トーストと一緒に出てきたか」——
+      要件で決めた文がそのまま合格の物差しになり、テストが書けます。
+      逆に「朝ごはんを作って」としか決めていなければ、<b>何をもって合格とするかが決まりません</b>。
+      これは1の「だったら先に言っておいてよ」と、まったく同じ失敗です。
+    </div>
+
+    <p class="note">
+      ※目玉焼きは教本の例（第03・05・11章）、UI・機能・データの読み替えは第16章の
+      「メニュー表（UI）・調理の段取り（機能）・食材の置き場（データ）」に沿っています。
+      焼き加減などの具体は、流れを見せるための想像です。
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  出典：『要件定義』教本 第01〜17章の感想ノートより要約 ／ 用語：UI＝画面や帳票、受入テスト＝依頼した側が「これでOK」と確認するテスト、V字＝開発の進め方を表した図
+</footer>
+
+</body>
+</html>
