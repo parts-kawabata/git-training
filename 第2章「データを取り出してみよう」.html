@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2章 データを取り出してみよう｜はじめてのSQL</title>
+<style>
+  :root{
+    --apple:#ff6b6b;      /* リンゴ赤 */
+    --strawberry:#ff8fab;  /* いちご桃 */
+    --grape:#9b6dd6;      /* ぶどう紫 */
+    --banana:#ffd23f;     /* バナナ黄 */
+    --leaf:#5cb85c;       /* 葉緑 */
+    --sky:#5bc0eb;        /* 空色 */
+    --ink:#3a3550;
+    --ink-soft:#6b6580;
+    --paper:#fffdf8;
+    --card:#ffffff;
+    --line:#efe9df;
+    --shadow:0 8px 24px rgba(120,100,80,.10);
+    --shadow-lg:0 16px 40px rgba(120,100,80,.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI","Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, #fff2f5 0, transparent 40%),
+      radial-gradient(circle at 88% 4%, #fef7d6 0, transparent 38%),
+      radial-gradient(circle at 50% 100%, #eef8ee 0, transparent 45%),
+      var(--paper);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+  img{max-width:100%;height:auto;}
+
+  /* ===== ヒーロー ===== */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:56px 20px 44px;
+    margin-bottom:8px;
+  }
+  .hero .eyebrow{
+    display:inline-block;background:#fff;border:2px solid var(--banana);
+    color:var(--ink-soft);font-weight:700;font-size:.8rem;letter-spacing:.15em;
+    padding:6px 16px;border-radius:999px;box-shadow:var(--shadow);
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,6vw,3.1rem);margin:.5em 0 .2em;line-height:1.25;
+    letter-spacing:.02em;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(transparent 62%, var(--banana) 62%);
+    padding:0 .1em;
+  }
+  .hero p.lead{font-size:1.05rem;color:var(--ink-soft);margin:.4em auto 0;max-width:560px;}
+  .hero-illust{max-width:520px;margin:14px auto 0;}
+
+  /* ===== 目次 ===== */
+  .toc{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);padding:22px 24px;margin:24px 0 44px;
+  }
+  .toc h2{margin:0 0 12px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;counter-reset:t;}
+  .toc li{counter-increment:t;}
+  .toc a{
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+    padding:8px 10px;border-radius:12px;transition:background .15s,transform .15s;
+  }
+  .toc a:hover{background:#fff6ef;transform:translateX(3px);}
+  .toc a::before{
+    content:counter(t);flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--strawberry);color:#fff;font-weight:800;font-size:.85rem;
+    display:grid;place-items:center;
+  }
+  @media(max-width:560px){.toc ol{grid-template-columns:1fr;}}
+
+  /* ===== セクション ===== */
+  section{margin:0 0 52px;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin:0 0 18px;}
+  .sec-num{
+    flex:0 0 auto;width:52px;height:52px;border-radius:18px;
+    display:grid;place-items:center;font-weight:900;font-size:1.5rem;color:#fff;
+    box-shadow:var(--shadow);transform:rotate(-4deg);
+  }
+  .sec-head h2{margin:0;font-size:clamp(1.3rem,3.6vw,1.7rem);line-height:1.3;}
+  .c1{background:var(--apple);}
+  .c2{background:var(--grape);}
+  .c3{background:var(--leaf);}
+  .c4{background:var(--sky);}
+  .c5{background:var(--strawberry);}
+  .c6{background:#f0932b;}
+  .c7{background:var(--banana);color:var(--ink)!important;}
+  .c8{background:#2d2b40;}
+  .c9{background:var(--leaf);}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);padding:24px 26px;margin:16px 0;
+  }
+  p{margin:.6em 0;}
+  .fig{margin:20px 0;text-align:center;}
+  .fig svg{max-width:100%;height:auto;border-radius:16px;}
+  .caption{font-size:.85rem;color:var(--ink-soft);margin-top:8px;}
+
+  /* 用語タグ */
+  .term{
+    display:inline-block;font-weight:800;padding:.05em .45em;border-radius:8px;
+    background:#fff3c4;color:#8a6d00;white-space:nowrap;
+  }
+  .term.t-blue{background:#dff3fd;color:#1f7fa3;}
+  .term.t-green{background:#e2f6e2;color:#2f7a2f;}
+  .term.t-purple{background:#efe4fb;color:#6f42b3;}
+  .term.t-pink{background:#ffe4ee;color:#c23c72;}
+
+  /* 吹き出し */
+  .speech{
+    display:flex;gap:14px;align-items:flex-start;margin:18px 0;
+  }
+  .speech .avatar{flex:0 0 auto;width:64px;height:64px;}
+  .bubble{
+    position:relative;background:#fff7ef;border:2px solid #ffe3c9;border-radius:16px;
+    padding:12px 16px;font-size:.96rem;box-shadow:var(--shadow);
+  }
+  .bubble::before{
+    content:"";position:absolute;left:-11px;top:20px;
+    border-width:8px 11px 8px 0;border-style:solid;border-color:transparent #ffe3c9 transparent transparent;
+  }
+
+  /* RDBMSカード */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .rdbms{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;box-shadow:var(--shadow);border-top:5px solid var(--sky);
+  }
+  .rdbms h4{margin:0 0 4px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .rdbms .ruby{font-size:.72rem;color:var(--ink-soft);font-weight:600;}
+  .rdbms p{margin:.3em 0 0;font-size:.9rem;color:var(--ink-soft);}
+  .rdbms .ic{width:30px;height:30px;flex:0 0 auto;}
+
+  /* メリデメ */
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.pros-cons{grid-template-columns:1fr;}}
+  .pc{border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);}
+  .pc.pro{background:#effaf0;border:1px solid #c9ecc9;}
+  .pc.con{background:#fff0f0;border:1px solid #ffd3d3;}
+  .pc h4{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;}
+  .pc ul{margin:0;padding-left:4px;list-style:none;}
+  .pc li{padding:4px 0 4px 26px;position:relative;font-size:.94rem;}
+  .pc.pro li::before{content:"○";position:absolute;left:0;color:var(--leaf);font-weight:900;}
+  .pc.con li::before{content:"×";position:absolute;left:0;color:var(--apple);font-weight:900;}
+
+  /* ステップタイムライン */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+  @media(max-width:720px){.steps{grid-template-columns:1fr 1fr;}}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 14px;text-align:center;box-shadow:var(--shadow);position:relative;
+  }
+  .step .n{
+    width:34px;height:34px;border-radius:50%;background:var(--leaf);color:#fff;
+    font-weight:900;display:grid;place-items:center;margin:0 auto 8px;
+  }
+  .step h4{margin:0 0 4px;font-size:.95rem;}
+  .step p{margin:0;font-size:.82rem;color:var(--ink-soft);}
+  .step svg{width:44px;height:44px;margin:0 auto 4px;display:block;}
+
+  /* ターミナル風 */
+  .term-card{
+    background:#221f33;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);
+    margin:14px 0;
+  }
+  .term-bar{background:#312d47;padding:9px 14px;display:flex;align-items:center;gap:7px;}
+  .term-bar .dot{width:11px;height:11px;border-radius:50%;}
+  .term-bar .t{color:#aaa2c9;font-size:.78rem;margin-left:8px;}
+  .term-body{
+    padding:16px 18px;color:#e8e6f5;font-family:"Cascadia Code","Consolas","SF Mono",monospace;
+    font-size:.9rem;line-height:1.7;overflow-x:auto;
+  }
+  .term-body .prompt{color:#7ee1a8;}
+  .term-body .cmd{color:#ffe08a;}
+  .term-body .cmt{color:#8f88b3;}
+  .cmd-note{font-size:.9rem;color:var(--ink-soft);margin:6px 2px 0;}
+  .cmd-title{font-weight:800;margin:20px 0 4px;display:flex;align-items:center;gap:8px;}
+  .cmd-title .b{background:var(--ink);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:999px;}
+
+  /* コラム */
+  .column{
+    background:linear-gradient(#fffaf0,#fff);border:2px dashed var(--banana);
+    border-radius:18px;padding:20px 22px;margin:22px 0;
+  }
+  .column h4{margin:0 0 6px;display:flex;align-items:center;gap:8px;font-size:1.05rem;}
+
+  /* スクショ */
+  .shot{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-top:10px;}
+  .shot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:560px){.shot-row{grid-template-columns:1fr;}}
+  figure{margin:0;}
+  figcaption{font-size:.82rem;color:var(--ink-soft);margin-top:6px;text-align:center;}
+
+  /* まとめチップ */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+  .chip{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+    box-shadow:var(--shadow);font-size:.92rem;
+  }
+  .chip b{color:var(--apple);}
+
+  .divider{height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px);margin:10px 0;border:0;}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:.85rem;padding:30px 0 0;}
+
+  .keyline{
+    background:#fff;border-left:5px solid var(--strawberry);border-radius:0 12px 12px 0;
+    padding:10px 16px;margin:14px 0;box-shadow:var(--shadow);font-size:.95rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ヒーロー ===== -->
+<header class="hero">
+  <span class="eyebrow">はじめての SQL</span>
+  <h1>第2章<br><span class="accent">データを取り出してみよう</span></h1>
+  <p class="lead">テーブルにしまったデータ、どうやって呼び出すの？ ——<br><b>SELECT文</b>ひとつで、欲しいデータだけを自由に取り出せるようになります🍎</p>
+  <div class="hero-illust">
+    <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="フルーツ店とデータベースのイラスト">
+      <!-- 地面 -->
+      <ellipse cx="260" cy="200" rx="230" ry="16" fill="#f3ecdf"/>
+      <!-- データベースの円柱 -->
+      <g>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#7fd3f7"/>
+        <path d="M70 70 v70 a60 20 0 0 0 120 0 v-70" fill="#5bc0eb"/>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#a6e2fb"/>
+        <path d="M70 100 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <path d="M70 128 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <text x="130" y="76" text-anchor="middle" font-size="15" font-weight="800" fill="#1f6d8c">DB</text>
+      </g>
+      <!-- 矢印（うさぎの上を通る弧） -->
+      <path d="M194 108 Q 242 76 286 92" stroke="#ffb45c" stroke-width="4" fill="none" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#ffb45c"/></marker></defs>
+      <!-- 店の看板 -->
+      <g>
+        <rect x="290" y="70" width="180" height="110" rx="14" fill="#fff" stroke="#efe1cf" stroke-width="2"/>
+        <rect x="290" y="70" width="180" height="30" rx="14" fill="#ff8fab"/>
+        <text x="380" y="91" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">🍎 フルーツ店</text>
+        <!-- フルーツ（上下2段でバランスよく配置） -->
+        <!-- 上段：リンゴ / レモン / ブドウ -->
+        <rect x="328.5" y="109" width="3" height="9" rx="1.5" fill="#7a5230"/>
+        <ellipse cx="337" cy="111" rx="6" ry="3" fill="#5cb85c" transform="rotate(-20 337 111)"/>
+        <circle cx="330" cy="127" r="15" fill="#ff6b6b"/>
+        <ellipse cx="325" cy="123" rx="4" ry="2.5" fill="#ff9a9a" opacity=".7"/>
+
+        <ellipse cx="380" cy="127" rx="15" ry="13" fill="#ffd23f"/>
+        <ellipse cx="375" cy="123" rx="4" ry="2.5" fill="#ffe480" opacity=".8"/>
+
+        <rect x="427" y="106" width="2.5" height="7" fill="#7a5230"/>
+        <ellipse cx="434" cy="109" rx="5" ry="2.5" fill="#5cb85c" transform="rotate(-15 434 109)"/>
+        <circle cx="421" cy="120" r="6" fill="#9b6dd6"/><circle cx="434" cy="120" r="6" fill="#8a5cc7"/>
+        <circle cx="428" cy="118" r="5.5" fill="#a678db"/>
+        <circle cx="416" cy="129" r="5.5" fill="#8a5cc7"/><circle cx="440" cy="129" r="5.5" fill="#9b6dd6"/>
+        <circle cx="428" cy="130" r="6" fill="#9b6dd6"/>
+
+        <!-- 下段：イチゴ / オレンジ -->
+        <path d="M356 150 C 346 150 343 159 356 172 C 369 159 366 150 356 150 Z" fill="#ff5a7a"/>
+        <path d="M347 150 q9 -7 18 0 q-9 5 -18 0 Z" fill="#5cb85c"/>
+        <circle cx="352" cy="158" r="1" fill="#fff3c4"/><circle cx="360" cy="158" r="1" fill="#fff3c4"/><circle cx="356" cy="164" r="1" fill="#fff3c4"/>
+
+        <ellipse cx="411" cy="148" rx="5" ry="2.5" fill="#5cb85c" transform="rotate(20 411 148)"/>
+        <circle cx="407" cy="160" r="14" fill="#f0932b"/>
+        <ellipse cx="402" cy="156" rx="4" ry="2.5" fill="#ffb45c" opacity=".7"/>
+      </g>
+      <!-- 動物客（地面に座らせ、矢印と離す） -->
+      <g transform="translate(240,171)">
+        <circle cx="0" cy="0" r="22" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="-9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <circle cx="-7" cy="-2" r="2.5" fill="#3a3550"/><circle cx="7" cy="-2" r="2.5" fill="#3a3550"/>
+        <path d="M-5 6 q5 4 10 0" stroke="#3a3550" stroke-width="2" fill="none"/>
+        <circle cx="-12" cy="4" r="3" fill="#ffc2d1"/><circle cx="12" cy="4" r="3" fill="#ffc2d1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===== 目次 ===== -->
+<nav class="toc">
+  <h2>📖 この章で分かること</h2>
+  <ol>
+    <li><a href="#s1">sales テーブルをおさらい</a></li>
+    <li><a href="#s2">SELECT文でデータを取り出す</a></li>
+    <li><a href="#s3">欲しいカラムだけ取り出す</a></li>
+    <li><a href="#s4">AS で見出しに別名をつける</a></li>
+    <li><a href="#s5">WHERE句で条件をつける</a></li>
+    <li><a href="#s6">AND・OR・NOT で組み合わせる</a></li>
+    <li><a href="#s7">優先順位とカッコ</a></li>
+    <li><a href="#s8">IN・BETWEEN で範囲を指定</a></li>
+    <li><a href="#s9">まとめ：覚えた文法</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 1 salesテーブルをおさらい ===== -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num c1">1</div><h2>まずは <code>sales</code> テーブルをおさらい</h2></div>
+
+  <div class="card">
+    <p>この章では、<span class="term t-green">sales</span> という名前のテーブルにデータを入れて、そこから中身を取り出していきます。テーブルは前章で見た「2次元の表」のことですね。</p>
+    <p>テーブルの名前やカラム（列）の名前は、日本語を付けられる RDBMS もありますが、<b>どんな RDBMS でも動く SQL文</b>にするため、英語の名前を付けておくのがおすすめです。</p>
+
+    <div class="keyline">
+      <b>カラム名</b> とは、テーブルの列に付ける名前のこと。<b>入れるデータが分かりやすい名前</b>を付けます。<br>
+      <code>sales</code> テーブルには 5 つのカラムがあります👇
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 720 214" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="salesテーブルの5つのカラムと意味">
+        <!-- 表の外枠 -->
+        <rect x="40" y="40" width="640" height="162" rx="8" fill="#fff" stroke="#c9b48f" stroke-width="2"/>
+        <!-- ヘッダ行（カラム名） -->
+        <rect x="40" y="40" width="640" height="34" rx="8" fill="#eefbf0" stroke="#c9ecc9"/>
+        <g font-size="12.5" font-weight="800" fill="#2f7a2f">
+          <text x="104" y="62" text-anchor="middle">date</text>
+          <text x="232" y="62" text-anchor="middle">item_name</text>
+          <text x="360" y="62" text-anchor="middle">item_count</text>
+          <text x="488" y="62" text-anchor="middle">price</text>
+          <text x="616" y="62" text-anchor="middle">customer</text>
+        </g>
+        <!-- 意味の行 -->
+        <rect x="40" y="74" width="640" height="26" fill="#fffaf0"/>
+        <g font-size="11.5" font-weight="700" fill="#c9760f">
+          <text x="104" y="91" text-anchor="middle">日付</text>
+          <text x="232" y="91" text-anchor="middle">商品の名前</text>
+          <text x="360" y="91" text-anchor="middle">商品の個数</text>
+          <text x="488" y="91" text-anchor="middle">代金</text>
+          <text x="616" y="91" text-anchor="middle">顧客</text>
+        </g>
+        <!-- データ行 -->
+        <g font-size="12" fill="#3a3550">
+          <text x="104" y="122" text-anchor="middle">2023-04-10</text><text x="232" y="122" text-anchor="middle">リンゴ</text><text x="360" y="122" text-anchor="middle">3</text><text x="488" y="122" text-anchor="middle">360</text><text x="616" y="122" text-anchor="middle">ウサ田</text>
+          <text x="104" y="156" text-anchor="middle">2023-04-10</text><text x="232" y="156" text-anchor="middle">ブドウ</text><text x="360" y="156" text-anchor="middle">1</text><text x="488" y="156" text-anchor="middle">500</text><text x="616" y="156" text-anchor="middle">クマ井</text>
+          <text x="104" y="190" text-anchor="middle">2023-04-11</text><text x="232" y="190" text-anchor="middle">バナナ</text><text x="360" y="190" text-anchor="middle">2</text><text x="488" y="190" text-anchor="middle">400</text><text x="616" y="190" text-anchor="middle">サル橋</text>
+        </g>
+        <!-- 罫線 -->
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="40" y1="100" x2="680" y2="100"/><line x1="40" y1="134" x2="680" y2="134"/><line x1="40" y1="168" x2="680" y2="168"/>
+          <line x1="168" y1="40" x2="168" y2="202"/><line x1="296" y1="40" x2="296" y2="202"/><line x1="424" y1="40" x2="424" y2="202"/><line x1="552" y1="40" x2="552" y2="202"/>
+        </g>
+      </svg>
+      <div class="caption">▲ <code>sales</code> テーブル。緑がカラム名、オレンジがその意味。以降はこの表からデータを取り出します。</div>
+    </div>
+
+    <div class="chips">
+      <div class="chip"><b>date</b>：日付（yyyy-mm-dd）</div>
+      <div class="chip"><b>item_name</b>：商品の名前</div>
+      <div class="chip"><b>item_count</b>：商品の個数</div>
+      <div class="chip"><b>price</b>：代金</div>
+      <div class="chip"><b>customer</b>：顧客</div>
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">名前を英語にしておくと、あとで MySQL など別の RDBMS に引っ越しても、同じ SQL文がそのまま使えるよ🍋</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2 SELECT文でデータを取り出す ===== -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num c2">2</div><h2>SELECT文でデータを取り出す</h2></div>
+
+  <div class="card">
+    <p>データベースで <b>いちばん多い操作</b>が、データの取り出しです。ショッピングサイトで商品の一覧や詳細を表示するときも、裏ではデータベースから取り出したデータを見せています。</p>
+    <p>データを取り出すには <span class="term">SELECT文</span>を使います。</p>
+
+    <div class="keyline">
+      <b>書式：SELECT文</b><br>
+      <code>SELECT * FROM テーブル名;</code>
+    </div>
+
+    <p><b>「*（アスタリスク）」</b>は「そのテーブルの<b>すべてのカラム</b>を取り出す」という指定。<code>FROM</code> のあとに操作するテーブル名を書きます。SQL文の終わりには必ず <b>「;（セミコロン）」</b>を付ける決まりで、付け忘れるとエラーになるので注意です。</p>
+
+    <div class="cmd-title"><span class="b">STEP 1</span>SQLite を起動する</div>
+    <p class="cmd-note"><code>sqlite3 開きたいDB名</code> で起動します。ここでは <code>sample.db</code> を開きます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">コマンドプロンプト</span></div>
+      <div class="term-body"><span class="prompt">...\sql1nen&gt;</span> <span class="cmd">sqlite3 sample.db</span><br><span class="cmt">-- プロンプトが sqlite&gt; に変われば起動成功</span></div>
+    </div>
+
+    <div class="cmd-title"><span class="b">STEP 2</span>全部のデータを取り出す</div>
+    <p class="cmd-note">起動したら、次の SQL文を実行すると <code>sales</code> テーブルからデータを取り出せます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-1.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>📋 出力の表示形式を見やすくする</b><br>取り出した結果を見やすくするために、<b>ヘッダー（カラム名）を表示</b>したり、<b>表示モードを「カラム」</b>にして整列させたりできます。</p>
+    <div class="cmd-title"><span class="b">設定</span>ヘッダー表示＋カラムモード</div>
+    <p class="cmd-note"><code>.header on</code> でカラム名を表示、<code>.mode column</code> で列をそろえて表示します。設定したあと、もう一度 <code>SELECT * FROM sales;</code> を実行してみましょう。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">表示設定コマンド</span></div>
+      <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">.header on</span><br><span class="cmt">-- ヘッダー（カラム名）を表示する</span><br><span class="prompt">sqlite&gt;</span> <span class="cmd">.mode column</span><br><span class="cmt">-- 表示モードをカラム（整列）にする</span></div>
+    </div>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON06-1.png" alt="SELECT * FROM sales; の実行結果">
+        <figcaption>① <code>SELECT * FROM sales;</code> の結果</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON06-2.png" alt="ヘッダー表示・カラムモードにした実行結果">
+        <figcaption>② <code>.header on</code>＋<code>.mode column</code> 後の結果</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>💡 ちょっと注意</h4>
+      <p style="margin:0;">カラムモードで表示するとき、全角のひらがなや漢字が混ざっていると、表示が少しズレて見えることがあります（幅の計算のため）。</p>
+      <p style="margin:.5em 0 0;">また、<code>.exit</code> で終了して次に起動したときは、また見にくい表に戻ります。そのつど <code>.header on</code>／<code>.mode column</code> をもう一度実行しましょう。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3 欲しいカラムだけ取り出す ===== -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num c3">3</div><h2>欲しいカラムだけ取り出す</h2></div>
+
+  <div class="card">
+    <p><code>SELECT</code> のあとに <b>「*」</b>を入れると全カラムを取り出しますが、<b>特定のカラムだけ</b>取り出したいときは、<code>SELECT</code> のあとに<b>カラム名</b>を書きます。</p>
+
+    <div class="keyline">
+      <b>書式：指定したカラムを取り出す</b><br>
+      <code>SELECT カラム名 FROM テーブル名;</code>
+    </div>
+
+    <p>テーブルの1マスに入る個々のデータは <b>値</b> と呼びます。<code>sales</code> テーブルから、<code>customer</code> カラムの値を取り出してみましょう。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-3.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第2章/LESSON06-3.png" alt="SELECT customer FROM sales; の実行結果">
+      <figcaption>▲ <code>customer</code> カラムだけを取り出した結果</figcaption>
+    </figure>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>🧹 重複した値を取り除く（DISTINCT）</b><br>カラム名の前に <span class="term t-green">DISTINCT</span>（ディスティンクト）を入れると、<b>重複した値を取り除いて</b>取り出せます。</p>
+    <div class="keyline">
+      <b>書式：重複した値を取り除く</b><br>
+      <code>SELECT DISTINCT カラム名 FROM テーブル名;</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-4.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> <span class="cmd">DISTINCT</span> customer <span class="cmd">FROM</span> sales;</div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 640 218" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DISTINCTで重複した名前を取り除く前後の図">
+        <defs><marker id="d3" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5cb85c"/></marker></defs>
+        <!-- 左：そのまま -->
+        <text x="120" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="#c23c72">そのまま😵 重複あり</text>
+        <rect x="55" y="40" width="130" height="160" rx="10" fill="#fff" stroke="#f0c7d6" stroke-width="2"/>
+        <g font-size="13" fill="#3a3550" text-anchor="middle">
+          <text x="120" y="66">ウサ田</text>
+          <text x="120" y="94">クマ井</text>
+          <text x="120" y="122" font-weight="800" fill="#c23c72">サル橋</text>
+          <text x="120" y="150" font-weight="800" fill="#c23c72">サル橋</text>
+          <text x="120" y="178">イヌ山</text>
+        </g>
+        <!-- 矢印（左枠185・右枠405の中央 x=295 に配置）。ラベルは矢印から25px以上離す -->
+        <path d="M255 120 h80" stroke="#5cb85c" stroke-width="5" fill="none" marker-end="url(#d3)"/>
+        <text x="295" y="90" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">DISTINCT</text>
+        <text x="295" y="156" text-anchor="middle" font-size="11" fill="#4d8a4d">重複を1つに</text>
+        <!-- 右：スッキリ -->
+        <text x="470" y="26" text-anchor="middle" font-size="13" font-weight="800" fill="#2f7a2f">DISTINCT✨ スッキリ</text>
+        <rect x="405" y="40" width="130" height="132" rx="10" fill="#eefbf0" stroke="#c9ecc9" stroke-width="2"/>
+        <g font-size="13" fill="#3a3550" text-anchor="middle">
+          <text x="470" y="66">ウサ田</text>
+          <text x="470" y="94">クマ井</text>
+          <text x="470" y="122" font-weight="800" fill="#2f7a2f">サル橋</text>
+          <text x="470" y="150">イヌ山</text>
+        </g>
+      </svg>
+      <div class="caption">▲ 同じ「サル橋」が1つにまとまり、名前が重複しなくなってスッキリします。</div>
+    </div>
+    <figure>
+      <img class="shot" src="第2章/LESSON06-4.png" alt="SELECT DISTINCT customer FROM sales; の実行結果">
+      <figcaption>▲ <code>DISTINCT</code> で重複を取り除いた結果</figcaption>
+    </figure>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>➕ 複数のカラムを取り出す</b><br>カラム名は <b>「,（カンマ）」で区切る</b>と複数指定でき、書いた順番に取り出せます。</p>
+    <div class="keyline">
+      <b>書式：複数のカラムを取り出す</b><br>
+      <code>SELECT カラム名1, カラム名2, … FROM テーブル名;</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-5.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> date, item_name, item_count <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第2章/LESSON06-5.png" alt="SELECT date, item_name, item_count FROM sales; の実行結果">
+      <figcaption>▲ 3つのカラムだけを、指定した順で取り出した結果</figcaption>
+    </figure>
+    <p style="font-size:.92rem;color:var(--ink-soft);">カラム数が多いテーブルで全部を取り出すと、目的のデータを探すのが大変。取り出したいデータが決まっているなら、カラム名を指定したほうが見やすくなります。</p>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>🧩 「文」と「句」</b><br><b>句</b>には「文中の言葉のひと区切り」という意味があり、SQL文は複数の「句」をつなげて1つの「文」を表しています。</p>
+    <div class="fig">
+      <svg viewBox="0 0 660 176" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SELECT文がSELECT句とFROM句に分かれる図">
+        <!-- SELECT句 -->
+        <rect x="30" y="60" width="360" height="46" rx="10" fill="#fff3c4" stroke="#e0c65a" stroke-width="2"/>
+        <text x="210" y="52" text-anchor="middle" font-size="12.5" font-weight="800" fill="#8a6d00">SELECT句</text>
+        <text x="210" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#3a3550">SELECT date, item_name, item_count</text>
+        <!-- FROM句 -->
+        <rect x="410" y="60" width="220" height="46" rx="10" fill="#e2f6e2" stroke="#8fce8f" stroke-width="2"/>
+        <text x="520" y="52" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">FROM句</text>
+        <text x="520" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#3a3550">FROM sales;</text>
+        <!-- まとめて1文 -->
+        <text x="330" y="140" text-anchor="middle" font-size="12" fill="#6b6580">2つの句をつなげて、ひとつの <tspan font-weight="800" fill="#3a3550">SELECT文</tspan> になる</text>
+      </svg>
+      <div class="caption">▲ 「サル橋さんから…」ではなく、「salesテーブルから」「date・item_name・item_countを選べ」という2つの命令の合体です。</div>
+    </div>
+
+    <div class="column">
+      <h4>💡 コラム：SQL文は途中で改行できる</h4>
+      <p style="margin:0;">SQL文は <code>;</code> が入力されるまで、<b>Enter を押しても改行されるだけ</b>で実行されません。だから途中で改行を入れてもOKです。</p>
+      <p style="margin:.5em 0 0;">ただし、<code>SELECT</code> や <code>FROM</code> などのキーワードやカラム名を <b>単語の途中で改行</b>すると、実行時にエラーになります。</p>
+      <div class="term-card" style="margin-top:12px;">
+        <div class="term-bar"><span class="dot" style="background:#28c840"></span><span class="t">実行してもエラーにならない</span></div>
+        <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">SELECT</span> date, item_name, item_count<br><span class="prompt">   ...&gt;</span> <span class="cmd">FROM</span> sales;</div>
+      </div>
+      <div class="term-card" style="margin-top:10px;">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="t">実行するとエラーになる</span></div>
+        <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">SELECT</span> date, item_name, item_<br><span class="prompt">   ...&gt;</span> count <span class="cmd">FROM</span> sales;<br><span class="cmt">-- item_count を途中で改行してしまっている</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 AS で別名 ===== -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num c4">4</div><h2>AS で見出しに別名をつける</h2></div>
+
+  <div class="card">
+    <p>結果のヘッダーに出るカラム名は、<span class="term t-purple">AS</span> キーワードを使うと <b>一時的に別の名前</b>を付けられます。別名を付けたいカラム名のうしろに <code>AS 別名</code> と書きます。</p>
+
+    <div class="keyline">
+      <b>書式：見出しに別名を付ける</b><br>
+      <code>SELECT カラム名 AS 別名 FROM テーブル名;</code>
+    </div>
+
+    <p><code>item_name</code> カラムに「商品名」という別名を付けてみましょう。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-6.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name <span class="cmd">AS</span> 商品名 <span class="cmd">FROM</span> sales;</div>
+    </div>
+
+    <p>この <code>AS</code> で付けた別名は <span class="term t-purple">エイリアス</span>（alias）とも呼ばれ、「エイリアスを付ける」とも言います。<code>,</code> で区切れば <b>複数のカラム</b>にエイリアスを付けられます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-7.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name <span class="cmd">AS</span> 商品名, item_count <span class="cmd">AS</span> 個数 <span class="cmd">FROM</span> sales;</div>
+    </div>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON07-1.png" alt="item_name に商品名という別名を付けた結果">
+        <figcaption>① 見出しが「商品名」に変わる</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON07-2.png" alt="複数カラムにエイリアスを付けた結果">
+        <figcaption>② 「商品名」「個数」の2つに別名</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>💡 コラム：別名に記号を使う場合</h4>
+      <p style="margin:0;">記号を使ったエイリアスを付けたいときは、別名を <b>「"（ダブルクォーテーション）」で囲みます</b>。たとえば <code>&lt;</code> <code>&gt;</code> を使った別名は、囲まないとエラーになり実行に失敗します。</p>
+      <div class="term-card" style="margin-top:12px;">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-8.sql</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> item_name <span class="cmd">AS</span> "&lt;商品名&gt;" <span class="cmd">FROM</span> sales;</div>
+      </div>
+      <figure>
+        <img class="shot" src="第2章/LESSON07-3.png" alt="ダブルクォートで囲んだ記号入りの別名の結果">
+        <figcaption>▲ <code>"&lt;商品名&gt;"</code> のように囲めばOK</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5 WHERE句で条件 ===== -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num c5">5</div><h2>WHERE句で条件をつけて取り出す</h2></div>
+
+  <div class="card">
+    <p>取り出すデータに条件を付けたいときは、<code>FROM</code> 句のあとに <span class="term t-blue">WHERE句</span>を続けて、条件を指定します。データ量が多いデータベースでは、条件を付けて取り出すのが一般的です。</p>
+
+    <div class="keyline">
+      <b>書式：条件を指定して取り出す</b><br>
+      <code>SELECT * FROM テーブル名 WHERE 条件式;</code>
+    </div>
+
+    <p>次の SQL文は、<code>item_name</code> カラムが「リンゴ」のデータだけを取り出します。条件に使う値が <b>文字列のときは「'（シングルクォーテーション）」で囲みます</b>。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-9.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name = 'リンゴ';</div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WHERE句で条件に合う行だけをこし取る図">
+        <defs><marker id="w5" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5bc0eb"/></marker></defs>
+        <!-- 全データ -->
+        <text x="95" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#6b6580">全データ</text>
+        <g font-size="12" text-anchor="middle">
+          <rect x="30" y="38" width="130" height="26" rx="5" fill="#ffeaea"/><text x="95" y="56" fill="#c0392b" font-weight="800">リンゴ</text>
+          <rect x="30" y="68" width="130" height="26" rx="5" fill="#f3eefc"/><text x="95" y="86" fill="#6f42b3">ブドウ</text>
+          <rect x="30" y="98" width="130" height="26" rx="5" fill="#fff6d6"/><text x="95" y="116" fill="#8a6d00">バナナ</text>
+          <rect x="30" y="128" width="130" height="26" rx="5" fill="#ffeaea"/><text x="95" y="146" fill="#c0392b" font-weight="800">リンゴ</text>
+          <rect x="30" y="158" width="130" height="26" rx="5" fill="#ffe4ee"/><text x="95" y="176" fill="#c23c72">イチゴ</text>
+        </g>
+        <!-- ろうと（条件）：左の行160・右枠420の中央 x=290 に配置。ラベルは矢印から25px以上離す -->
+        <path d="M240 108 h100" stroke="#5bc0eb" stroke-width="5" fill="none" marker-end="url(#w5)"/>
+        <text x="290" y="74" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1f7fa3">WHERE</text>
+        <text x="290" y="150" text-anchor="middle" font-size="11.5" fill="#1f7fa3">item_name = 'リンゴ'</text>
+        <!-- 結果 -->
+        <text x="500" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">取り出される</text>
+        <rect x="420" y="66" width="160" height="70" rx="10" fill="#eefbf0" stroke="#c9ecc9" stroke-width="2"/>
+        <g font-size="13" text-anchor="middle" fill="#c0392b" font-weight="800">
+          <text x="500" y="94">リンゴ</text>
+          <text x="500" y="122">リンゴ</text>
+        </g>
+      </svg>
+      <div class="caption">▲ <code>WHERE</code> は「条件に合う行だけをこし取る」フィルターのイメージ。</div>
+    </div>
+    <figure>
+      <img class="shot" src="第2章/LESSON08-1.png" alt="WHERE item_name = 'リンゴ' の実行結果">
+      <figcaption>▲ 「リンゴ」の行だけが取り出された結果</figcaption>
+    </figure>
+    <p style="font-size:.92rem;color:var(--ink-soft);"><code>WHERE item_name = 'リンゴ'</code> が WHERE句、<code>item_name = 'リンゴ'</code> の部分が <b>条件式</b>です。</p>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>⚖️ いろいろな比較演算子</b><br><code>=</code>（イコール）のような、左右の値を比べる記号を <span class="term">比較演算子</span>と呼びます。</p>
+    <div class="fig">
+      <svg viewBox="0 0 640 244" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="比較演算子6種類の一覧表">
+        <rect x="40" y="20" width="560" height="214" rx="10" fill="#fff" stroke="#c9b48f" stroke-width="2"/>
+        <rect x="40" y="20" width="560" height="34" rx="10" fill="#fff3c4"/>
+        <g font-size="13" font-weight="800" fill="#8a6d00">
+          <text x="150" y="42" text-anchor="middle">記号</text>
+          <text x="410" y="42" text-anchor="middle">意味</text>
+        </g>
+        <line x1="260" y1="20" x2="260" y2="234" stroke="#e7dcc9"/>
+        <g font-size="14" fill="#3a3550">
+          <text x="150" y="74" text-anchor="middle" font-weight="800" font-family="monospace">=</text>
+          <text x="410" y="74" text-anchor="middle">右辺と左辺が同じ</text>
+          <text x="150" y="104" text-anchor="middle" font-weight="800" font-family="monospace">&lt;</text>
+          <text x="410" y="104" text-anchor="middle">左辺が右辺より小さい</text>
+          <text x="150" y="134" text-anchor="middle" font-weight="800" font-family="monospace">&gt;</text>
+          <text x="410" y="134" text-anchor="middle">左辺が右辺より大きい</text>
+          <text x="150" y="164" text-anchor="middle" font-weight="800" font-family="monospace">&lt;=</text>
+          <text x="410" y="164" text-anchor="middle">左辺が右辺以下</text>
+          <text x="150" y="194" text-anchor="middle" font-weight="800" font-family="monospace">&gt;=</text>
+          <text x="410" y="194" text-anchor="middle">左辺が右辺以上</text>
+          <text x="150" y="224" text-anchor="middle" font-weight="800" font-family="monospace">&lt;&gt;</text>
+          <text x="410" y="224" text-anchor="middle">左辺と右辺が違う</text>
+        </g>
+        <g stroke="#f0ead9" stroke-width="1">
+          <line x1="40" y1="84" x2="600" y2="84"/><line x1="40" y1="114" x2="600" y2="114"/><line x1="40" y1="144" x2="600" y2="144"/><line x1="40" y1="174" x2="600" y2="174"/><line x1="40" y1="204" x2="600" y2="204"/>
+        </g>
+      </svg>
+      <div class="caption">▲ 比較演算子は6種類。左右にある値を比べるはたらきをします。</div>
+    </div>
+
+    <p><code>item_count</code>（個数）が <b>2 より大きい</b>データを取り出してみます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-10.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_count &gt; 2;</div>
+    </div>
+    <div class="chips">
+      <div class="chip"><b>item_count &gt; 2</b>：2 <b>より大きい</b>（2は含まない）</div>
+      <div class="chip"><b>item_count &lt; 2</b>：2 <b>より小さい</b>（2は含まない）</div>
+      <div class="chip"><b>item_count &gt;= 2</b>：2 <b>以上</b>（2を含む）</div>
+      <div class="chip"><b>item_count &lt;= 2</b>：2 <b>以下</b>（2を含む）</div>
+    </div>
+
+    <p>次は <code>&lt;&gt;</code> を使って「<code>item_name</code> がリンゴと<b>違う</b>」という条件にしてみます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-11.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name &lt;&gt; 'リンゴ';</div>
+    </div>
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON08-2.png" alt="WHERE item_count > 2 の実行結果">
+        <figcaption>① 個数が2より大きい行（2は含まない）</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON08-3.png" alt="WHERE item_name <> 'リンゴ' の実行結果">
+        <figcaption>② リンゴ以外の行が取り出される</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>📅 日付データを条件に使う</b><br>日付が決まった形式で入っていれば、比較演算子で期間を指定できます。<code>sales</code> の <code>date</code> は、4桁の年・2桁の月・2桁の日を <code>-</code> で区切った <b>yyyy-mm-dd</b> 形式です（y=year 年、m=month 月、d=day 日）。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-12.sql（2023-04-11 以降）</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> date &gt;= '2023-04-11';</div>
+    </div>
+    <p class="cmd-note"><code>date &gt;= '2023-04-11'</code> は「dateの値が 2023-04-11 <b>以上</b>」という意味。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文（2023-04-11 よりあと）</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> date &gt; '2023-04-11';</div>
+    </div>
+    <p class="cmd-note"><code>date &gt; '2023-04-11'</code> は「dateの値が 2023-04-11 <b>より大きい（あと）</b>」という意味。</p>
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON08-4.png" alt="WHERE date >= '2023-04-11' の実行結果">
+        <figcaption>① 2023-04-11 以降（当日を含む）</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON08-5.png" alt="WHERE date > '2023-04-11' の実行結果">
+        <figcaption>② 2023-04-11 よりあと（当日を含まない）</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6 AND OR NOT ===== -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num c6">6</div><h2>AND・OR・NOT で条件を組み合わせる</h2></div>
+
+  <div class="card">
+    <p><span class="term t-purple">論理演算子</span>を使うと、<b>複数の条件を組み合わせた</b>条件式を作れます。よく使うのが <code>AND</code>・<code>OR</code>・<code>NOT</code> の3つです。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ANDは両方を満たす、ORはどちらかを満たすイメージ図">
+        <!-- AND -->
+        <text x="165" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#6f42b3">AND ＝ かつ</text>
+        <circle cx="140" cy="110" r="52" fill="#9b6dd6" opacity=".28"/>
+        <circle cx="200" cy="110" r="52" fill="#5bc0eb" opacity=".28"/>
+        <path d="M170 68 a52 52 0 0 1 0 84 a52 52 0 0 1 0 -84 Z" fill="#6f42b3" opacity=".55"/>
+        <text x="112" y="115" text-anchor="middle" font-size="11" fill="#3a3550">条件1</text>
+        <text x="228" y="115" text-anchor="middle" font-size="11" fill="#3a3550">条件2</text>
+        <text x="165" y="185" text-anchor="middle" font-size="11" fill="#6f42b3">両方を満たす部分だけ</text>
+        <!-- OR -->
+        <text x="470" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#f0932b">OR ＝ もしくは</text>
+        <circle cx="445" cy="110" r="52" fill="#f0932b" opacity=".45"/>
+        <circle cx="505" cy="110" r="52" fill="#f0932b" opacity=".45"/>
+        <text x="417" y="115" text-anchor="middle" font-size="11" fill="#3a3550">条件1</text>
+        <text x="533" y="115" text-anchor="middle" font-size="11" fill="#3a3550">条件2</text>
+        <text x="475" y="185" text-anchor="middle" font-size="11" fill="#c9760f">どちらか一方でOK（全体）</text>
+      </svg>
+      <div class="caption">▲ <b>AND</b> は「重なった部分」だけ、<b>OR</b> は「どちらかに入れば」取り出されます。</div>
+    </div>
+
+    <p><b>🟣 AND 演算子</b>（かつ）。左右の条件を <b>どちらも満たす</b>データを取り出します。</p>
+    <div class="keyline"><b>書式：AND</b>　<code>WHERE 条件式1 AND 条件式2</code></div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-14.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> customer = 'サル橋' <span class="cmd">AND</span> item_name = 'バナナ';</div>
+    </div>
+    <p class="cmd-note">「サル橋さん」で、かつ「バナナ」——つまり <b>サル橋さんがバナナを買った</b>情報だけを取り出します。</p>
+    <figure>
+      <img class="shot" src="第2章/LESSON09-1.png" alt="AND 演算子の実行結果">
+      <figcaption>▲ サル橋さん × バナナ の行だけ</figcaption>
+    </figure>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>🟠 OR 演算子</b>（もしくは）。左右の条件の <b>どちらかを満たす</b>データを取り出します。</p>
+    <div class="keyline"><b>書式：OR</b>　<code>WHERE 条件式1 OR 条件式2</code></div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-15.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> item_name = 'リンゴ' <span class="cmd">OR</span> item_name = 'ブドウ';</div>
+    </div>
+    <p class="cmd-note"><code>item_name</code> が「リンゴ」<b>もしくは</b>「ブドウ」のデータを取り出します。</p>
+
+    <p style="margin-top:16px;"><b>🔴 NOT 演算子</b>（ではない）。AND・OR とは少し違い、<b>右にある条件式を満たさない</b>データを取り出します。</p>
+    <div class="keyline"><b>書式：NOT</b>　<code>WHERE NOT 条件式</code></div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-16.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> <span class="cmd">NOT</span> item_name = 'リンゴ';</div>
+    </div>
+    <p class="cmd-note"><code>NOT item_name = 'リンゴ'</code> は「item_name がリンゴ <b>ではない</b>」——リンゴ以外のデータを取り出します。</p>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON09-2.png" alt="OR 演算子の実行結果">
+        <figcaption>① OR：リンゴ もしくは ブドウ</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON09-3.png" alt="NOT 演算子の実行結果">
+        <figcaption>② NOT：リンゴ「ではない」行</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7 優先順位とカッコ ===== -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num c7">7</div><h2>演算子の優先順位とカッコ</h2></div>
+
+  <div class="card">
+    <p>複数の演算子を組み合わせると、複雑な条件が作れます。ただし <b>演算子には優先順位</b>があり、注意が必要です。ふつうは左から右に処理しますが、優先順位が違う演算子があると、<b>優先順位の高いほうから</b>実行されます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 320 258" style="max-width:340px" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="演算子の優先順位の一覧。上ほど優先順位が高い">
+        <defs>
+          <marker id="prioUp" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#e53935"/></marker>
+        </defs>
+        <!-- 優先順位の矢印（下→上、上ほど高い） -->
+        <text x="36" y="18" text-anchor="middle" font-size="12" font-weight="800" fill="#3a3550">優先順位</text>
+        <text x="36" y="50" text-anchor="middle" font-size="12" font-weight="800" fill="#e53935">高</text>
+        <path d="M36 228 V56" stroke="#e53935" stroke-width="5" fill="none" marker-end="url(#prioUp)"/>
+        <text x="36" y="246" text-anchor="middle" font-size="12" font-weight="800" fill="#6b6580">低</text>
+
+        <!-- 比較演算子（桃のピル：グループ見出しを上に） -->
+        <text x="192" y="40" text-anchor="middle" font-size="11" font-weight="800" fill="#c23c72">比較演算子</text>
+        <g font-family="monospace" font-weight="800" fill="#c23c72" font-size="15" text-anchor="middle">
+          <rect x="76"  y="48" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="102" y="67">&lt;</text>
+          <rect x="136" y="48" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="162" y="67">&gt;</text>
+          <rect x="196" y="48" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="222" y="67">&gt;=</text>
+          <rect x="256" y="48" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="282" y="67">&lt;=</text>
+          <rect x="136" y="80" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="162" y="99">=</text>
+          <rect x="196" y="80" width="52" height="28" rx="8" fill="#ffe4ee" stroke="#ff8fab" stroke-width="1.5"/><text x="222" y="99">&lt;&gt;</text>
+        </g>
+        <!-- 論理演算子（青のピル：グループ見出しを上に） -->
+        <text x="192" y="126" text-anchor="middle" font-size="11" font-weight="800" fill="#1f7fa3">論理演算子</text>
+        <g font-weight="800" fill="#1f7fa3" font-size="14" text-anchor="middle">
+          <rect x="137" y="134" width="110" height="28" rx="8" fill="#dff3fd" stroke="#5bc0eb" stroke-width="1.5"/><text x="192" y="153">NOT</text>
+          <rect x="137" y="168" width="110" height="28" rx="8" fill="#dff3fd" stroke="#5bc0eb" stroke-width="1.5"/><text x="192" y="187">AND</text>
+          <rect x="137" y="202" width="110" height="28" rx="8" fill="#dff3fd" stroke="#5bc0eb" stroke-width="1.5"/><text x="192" y="221">OR</text>
+        </g>
+      </svg>
+      <div class="caption">▲ 上ほど優先順位が高い。比較演算子 → NOT → AND → OR の順に判定される。</div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ANDがORより先に処理される優先順位の図">
+        <!-- ① カッコなし → AND が先 -->
+        <text x="30" y="26" font-size="12.5" font-weight="800" fill="#c9760f">① カッコなし → AND が先に処理される</text>
+        <!-- ANDグループの枠（pill B と pill C を約10px余白で囲む。OR文字と枠左辺の間も12px以上あける） -->
+        <rect x="272" y="44" width="340" height="34" rx="8" fill="#f6f0fc" stroke="#9b6dd6" stroke-width="2"/>
+        <!-- 条件ピル -->
+        <text x="30" y="64" font-size="12.5" font-family="monospace" fill="#6b6580">WHERE</text>
+        <rect x="92" y="48" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="162" y="64" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">customer='サル橋'</text>
+        <text x="252" y="64" text-anchor="middle" font-size="12" font-weight="800" font-family="monospace" fill="#c9760f">OR</text>
+        <rect x="282" y="48" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="352" y="64" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">customer='ウサ田'</text>
+        <text x="445" y="64" text-anchor="middle" font-size="12" font-weight="800" font-family="monospace" fill="#6f42b3">AND</text>
+        <rect x="462" y="48" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="532" y="64" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">item_name='リンゴ'</text>
+        <!-- 順番バッジ -->
+        <circle cx="360" cy="100" r="9" fill="#9b6dd6"/><text x="360" y="104" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">1</text>
+        <text x="374" y="104" font-size="11" fill="#6f42b3">AND を先に処理</text>
+        <circle cx="120" cy="100" r="9" fill="#f0932b"/><text x="120" y="104" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">2</text>
+        <text x="134" y="104" font-size="11" fill="#c9760f">そのあと OR</text>
+
+        <line x1="30" y1="126" x2="630" y2="126" stroke="#efe9df" stroke-width="2"/>
+
+        <!-- ② カッコで囲む → OR が先 -->
+        <text x="30" y="150" font-size="12.5" font-weight="800" fill="#2f7a2f">② カッコで囲む → OR が先に処理される</text>
+        <!-- ORグループの枠（カッコごと約16px余白で囲む） -->
+        <rect x="84" y="168" width="372" height="34" rx="8" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+        <text x="30" y="188" font-size="12.5" font-family="monospace" fill="#6b6580">WHERE</text>
+        <text x="100" y="189" font-size="15" font-weight="800" font-family="monospace" fill="#2f7a2f">(</text>
+        <rect x="116" y="172" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="186" y="188" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">customer='サル橋'</text>
+        <text x="273" y="188" text-anchor="middle" font-size="12" font-weight="800" font-family="monospace" fill="#c9760f">OR</text>
+        <rect x="290" y="172" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="360" y="188" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">customer='ウサ田'</text>
+        <text x="440" y="189" font-size="15" font-weight="800" font-family="monospace" fill="#2f7a2f">)</text>
+        <text x="474" y="188" text-anchor="middle" font-size="12" font-weight="800" font-family="monospace" fill="#6f42b3">AND</text>
+        <rect x="498" y="172" width="140" height="24" rx="6" fill="#fff" stroke="#d9cfbe" stroke-width="1.5"/>
+        <text x="568" y="188" text-anchor="middle" font-size="11" font-family="monospace" fill="#3a3550">item_name='リンゴ'</text>
+        <!-- 順番バッジ -->
+        <circle cx="150" cy="224" r="9" fill="#5cb85c"/><text x="150" y="228" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">1</text>
+        <text x="164" y="228" font-size="11" fill="#2f7a2f">カッコの中（OR）を先に処理</text>
+      </svg>
+      <div class="caption">▲ <b>AND は OR より優先順位が高い</b>。カッコで囲むと、その中が先に処理されます。</div>
+    </div>
+
+    <p><b>OR と AND を組み合わせた条件</b>です。AND のほうが優先順位が高いので、先に AND が処理されます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-17.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> customer = 'サル橋' <span class="cmd">OR</span> customer = 'ウサ田'<br><span class="cmd">AND</span> item_name = 'リンゴ';</div>
+    </div>
+    <p class="cmd-note"><code>customer = 'ウサ田' AND item_name = 'リンゴ'</code> が先に処理され、そのあとで <code>customer = 'サル橋'</code> と OR で結ばれます。</p>
+
+    <p><b>カッコで優先順位を変える。</b>優先順位の低い演算子を先に処理させたいときは、その部分を <b>カッコで囲みます</b>。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-18.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> (customer = 'サル橋' <span class="cmd">OR</span> customer = 'ウサ田')<br><span class="cmd">AND</span> item_name = 'リンゴ';</div>
+    </div>
+    <p class="cmd-note">カッコで囲んだだけで結果が変わります。「サル橋 <b>もしくは</b> ウサ田」で、<b>かつ</b>「リンゴ」のデータになります。</p>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON09-4.png" alt="カッコなし（AND優先）の実行結果">
+        <figcaption>① カッコなし（AND が先）</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON09-5.png" alt="カッコあり（OR優先）の実行結果">
+        <figcaption>② カッコあり（OR が先）で結果が変わる</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>💡 コラム：「=」と「==」</h4>
+      <p style="margin:0;">比較演算子の <code>=</code> は、右辺と左辺が同じかを判定します。SQLite では <code>==</code> も <code>=</code> と同じはたらきをします。</p>
+      <p style="margin:.5em 0 0;">ただし <code>==</code> が使えるのは <b>SQLite だけ</b>で、MySQL など他の RDBMS では使えません。どの RDBMS でも通じる書き方を身につけるため、<code>==</code> ではなく <code>=</code> を使いましょう。</p>
+      <div class="term-card" style="margin-top:12px;">
+        <div class="term-bar"><span class="dot" style="background:#febc2e"></span><span class="t">「==」の使用例（SQLite限定）</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name == 'リンゴ';</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8 IN・BETWEEN ===== -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num c8">8</div><h2>IN・BETWEEN で範囲やリストを指定</h2></div>
+
+  <div class="card">
+    <p>もっと便利な条件式も見ておきましょう。<b>リストのどれか</b>や <b>範囲</b>を、すっきり書ける演算子です。</p>
+
+    <p><b>📝 IN 演算子</b>。複数の値の <b>いずれかに一致</b>するものを取り出すときに便利。カラム名のあとに <code>IN</code> と続け、カッコ内に探したい値を <code>,</code> で並べます。カッコ内のデータは <b>リスト</b>と呼ばれます。</p>
+    <div class="keyline">
+      <b>書式：リストのいずれかと一致</b><br>
+      <code>WHERE カラム名 IN (データ1, データ2, …)</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-19.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name <span class="cmd">IN</span>('リンゴ', 'イチゴ');</div>
+    </div>
+    <p class="cmd-note"><code>item_name</code> が「リンゴ」もしくは「イチゴ」のデータを取り出します。<code>=</code> と <code>OR</code> で書き換えると次と同じです👇</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#febc2e"></span><span class="t">「=」と「OR」で書き換えた場合</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> item_name = 'リンゴ' <span class="cmd">OR</span> item_name = 'イチゴ';</div>
+    </div>
+
+    <p style="margin-top:16px;"><b>🚫 NOT IN 演算子</b>。逆に、リストの <b>どれにも一致しない</b>データを取り出します。書き方は IN と同じです。</p>
+    <div class="keyline">
+      <b>書式：リストのいずれにも一致しない</b><br>
+      <code>WHERE カラム名 NOT IN (データ1, データ2, …);</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-20.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name <span class="cmd">NOT</span> <span class="cmd">IN</span>('リンゴ', 'イチゴ');</div>
+    </div>
+    <p class="cmd-note"><code>&lt;&gt;</code> と <code>AND</code> で書き換えると次と同じです。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#febc2e"></span><span class="t">「&lt;&gt;」と「AND」で書き換えた場合</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> item_name &lt;&gt; 'リンゴ' <span class="cmd">AND</span> item_name &lt;&gt; 'イチゴ';</div>
+    </div>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON10-1.png" alt="IN 演算子の実行結果">
+        <figcaption>① IN：リンゴ か イチゴ</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON10-2.png" alt="NOT IN 演算子の実行結果">
+        <figcaption>② NOT IN：リンゴ・イチゴ 以外</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>📏 BETWEEN 演算子</b>。数や日付で <b>特定の範囲</b>を指定するときに使います。カラム名のあとに <code>BETWEEN</code> を入れ、範囲の値を <code>AND</code> でつなぎます。ここでの <code>AND</code> は「かつ」ではなく <b>「から」</b>という意味に変わります。</p>
+    <div class="keyline">
+      <b>書式：指定した範囲</b><br>
+      <code>WHERE カラム名 BETWEEN 値1 AND 値2;</code>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BETWEENで04-11から04-13の範囲を指定する数直線">
+        <line x1="60" y1="86" x2="600" y2="86" stroke="#d9cfbe" stroke-width="3"/>
+        <!-- 範囲ハイライト（04-11=220 〜 04-13=440 を中央対称に覆う） -->
+        <rect x="208" y="74" width="244" height="24" rx="12" fill="#e2f6e2" stroke="#8fce8f" stroke-width="2"/>
+        <!-- 目盛り（中心 x=330 で左右対称：110/220/330/440/550） -->
+        <g font-size="12" fill="#3a3550" text-anchor="middle">
+          <circle cx="110" cy="86" r="5" fill="#c9b48f"/><text x="110" y="116">04-10</text>
+          <circle cx="220" cy="86" r="6" fill="#5cb85c"/><text x="220" y="116" font-weight="800" fill="#2f7a2f">04-11</text>
+          <circle cx="330" cy="86" r="6" fill="#5cb85c"/><text x="330" y="116" font-weight="800" fill="#2f7a2f">04-12</text>
+          <circle cx="440" cy="86" r="6" fill="#5cb85c"/><text x="440" y="116" font-weight="800" fill="#2f7a2f">04-13</text>
+          <circle cx="550" cy="86" r="5" fill="#c9b48f"/><text x="550" y="116">04-14</text>
+        </g>
+        <text x="330" y="42" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">BETWEEN '2023-04-11' AND '2023-04-13'</text>
+        <text x="330" y="60" text-anchor="middle" font-size="11" fill="#4d8a4d">04-11 から 04-13 まで（両端を含む）</text>
+      </svg>
+      <div class="caption">▲ <code>BETWEEN</code> は「両端を含む」範囲指定。始まりと終わりの日も入ります。</div>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-21.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> date <span class="cmd">BETWEEN</span> '2023-04-11' <span class="cmd">AND</span> '2023-04-13';</div>
+    </div>
+    <p class="cmd-note"><code>&gt;=</code> と <code>&lt;=</code> で書き換えると次と同じ（04-11 以上 <b>かつ</b> 04-13 以下）。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#febc2e"></span><span class="t">BETWEEN を使わない場合</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> date &gt;= '2023-04-11' <span class="cmd">AND</span> date &lt;= '2023-04-13';</div>
+    </div>
+
+    <p style="margin-top:16px;"><b>🚫 NOT BETWEEN 演算子</b>。逆に、指定した <b>範囲外</b>のデータを取り出します。書き方は BETWEEN と同じです。</p>
+    <div class="keyline">
+      <b>書式：指定した範囲外</b><br>
+      <code>WHERE カラム名 NOT BETWEEN 値1 AND 値2;</code>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NOT BETWEENで04-11から04-13の範囲以外を取り出す数直線">
+        <line x1="60" y1="86" x2="600" y2="86" stroke="#d9cfbe" stroke-width="3"/>
+        <!-- 中央（04-11〜04-13）＝対象外のグレー帯 -->
+        <rect x="216" y="74" width="228" height="24" rx="12" fill="#f0ece4" stroke="#c9b48f" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <!-- 外側（取り出す範囲）＝緑ハイライト -->
+        <rect x="52" y="74" width="150" height="24" rx="12" fill="#e2f6e2" stroke="#8fce8f" stroke-width="2"/>
+        <rect x="458" y="74" width="150" height="24" rx="12" fill="#e2f6e2" stroke="#8fce8f" stroke-width="2"/>
+        <!-- 目盛り（中心 x=330 で左右対称：110/220/330/440/550） -->
+        <g font-size="12" text-anchor="middle">
+          <circle cx="110" cy="86" r="6" fill="#5cb85c"/><text x="110" y="116" font-weight="800" fill="#2f7a2f">04-10</text>
+          <circle cx="220" cy="86" r="5" fill="#c9b48f"/><text x="220" y="116" fill="#9a927f">04-11</text>
+          <circle cx="330" cy="86" r="5" fill="#c9b48f"/><text x="330" y="116" fill="#9a927f">04-12</text>
+          <circle cx="440" cy="86" r="5" fill="#c9b48f"/><text x="440" y="116" fill="#9a927f">04-13</text>
+          <circle cx="550" cy="86" r="6" fill="#5cb85c"/><text x="550" y="116" font-weight="800" fill="#2f7a2f">04-14</text>
+        </g>
+        <text x="330" y="42" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c0392b">NOT BETWEEN '2023-04-11' AND '2023-04-13'</text>
+        <text x="330" y="60" text-anchor="middle" font-size="11" fill="#9a927f">中央（04-11〜04-13）は対象外。その【外側】を取り出す</text>
+      </svg>
+      <div class="caption">▲ <code>NOT BETWEEN</code> は範囲の <b>外側</b> だけを取り出す。両端（04-11・04-13）も含まれません。</div>
+    </div>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap2-22.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> date <span class="cmd">NOT</span> <span class="cmd">BETWEEN</span> '2023-04-11' <span class="cmd">AND</span> '2023-04-13';</div>
+    </div>
+    <p class="cmd-note">「04-11 から 04-13 の間<b>以外</b>」という条件。<code>&lt;</code> と <code>&gt;</code> と <code>OR</code> で書き換えると次と同じ（04-11 より小さい、もしくは 04-13 より大きい）。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#febc2e"></span><span class="t">NOT BETWEEN を使わない場合</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> date &lt; '2023-04-11' <span class="cmd">OR</span> date &gt; '2023-04-13';</div>
+    </div>
+
+    <div class="shot-row">
+      <figure>
+        <img class="shot" src="第2章/LESSON10-3.png" alt="BETWEEN 演算子の実行結果">
+        <figcaption>① BETWEEN：04-11〜04-13 の範囲内</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" src="第2章/LESSON10-4.png" alt="NOT BETWEEN 演算子の実行結果">
+        <figcaption>② NOT BETWEEN：その範囲の外側</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9 まとめ ===== -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num c9">9</div><h2>まとめ：この章で覚えた文法</h2></div>
+  <div class="card">
+    <p>おつかれさまでした🎉 第2章では、データを <b>取り出す</b>ための道具がたくさん登場しました。ぜんぶ <code>SELECT文</code> の仲間です。</p>
+    <div class="chips">
+      <div class="chip"><b>SELECT * FROM</b>：全カラムを取り出す</div>
+      <div class="chip"><b>SELECT カラム名</b>：指定したカラムだけ</div>
+      <div class="chip"><b>DISTINCT</b>：重複した値を取り除く</div>
+      <div class="chip"><b>AS / エイリアス</b>：見出しに別名を付ける</div>
+      <div class="chip"><b>WHERE</b>：条件をつけて絞り込む</div>
+      <div class="chip"><b>比較演算子</b>：= &lt; &gt; &lt;= &gt;= &lt;&gt;</div>
+      <div class="chip"><b>AND / OR / NOT</b>：条件を組み合わせる</div>
+      <div class="chip"><b>カッコ ( )</b>：優先順位を変える</div>
+      <div class="chip"><b>IN / NOT IN</b>：リストのどれか</div>
+      <div class="chip"><b>BETWEEN / NOT BETWEEN</b>：範囲の内／外を指定する</div>
+    </div>
+    <div class="speech" style="margin-top:20px;">
+      <div class="avatar">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="14" r="9" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="48" cy="14" r="9" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><ellipse cx="32" cy="41" rx="7" ry="5" fill="#ffe8ef"/><path d="M28 41 q4 4 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">条件のつけ方さえ分かれば、大きなテーブルから欲しいデータを一発で見つけられるよ。次はデータを <b>並べ替えたり・集計したり</b>してみよう🍓</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  第2章「データを取り出してみよう」 ／ はじめての SQL 入門
+</footer>
+
+</div>
+</body>
+</html>
