@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3章 取り出したデータを加工してみよう｜はじめてのSQL</title>
+<style>
+  :root{
+    --apple:#ff6b6b;      /* リンゴ赤 */
+    --strawberry:#ff8fab;  /* いちご桃 */
+    --grape:#9b6dd6;      /* ぶどう紫 */
+    --banana:#ffd23f;     /* バナナ黄 */
+    --leaf:#5cb85c;       /* 葉緑 */
+    --sky:#5bc0eb;        /* 空色 */
+    --ink:#3a3550;
+    --ink-soft:#6b6580;
+    --paper:#fffdf8;
+    --card:#ffffff;
+    --line:#efe9df;
+    --shadow:0 8px 24px rgba(120,100,80,.10);
+    --shadow-lg:0 16px 40px rgba(120,100,80,.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI","Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, #fff2f5 0, transparent 40%),
+      radial-gradient(circle at 88% 4%, #fef7d6 0, transparent 38%),
+      radial-gradient(circle at 50% 100%, #eef8ee 0, transparent 45%),
+      var(--paper);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+  img{max-width:100%;height:auto;}
+
+  /* ===== ヒーロー ===== */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:56px 20px 44px;
+    margin-bottom:8px;
+  }
+  .hero .eyebrow{
+    display:inline-block;background:#fff;border:2px solid var(--banana);
+    color:var(--ink-soft);font-weight:700;font-size:.8rem;letter-spacing:.15em;
+    padding:6px 16px;border-radius:999px;box-shadow:var(--shadow);
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,6vw,3.1rem);margin:.5em 0 .2em;line-height:1.25;
+    letter-spacing:.02em;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(transparent 62%, var(--banana) 62%);
+    padding:0 .1em;
+  }
+  .hero p.lead{font-size:1.05rem;color:var(--ink-soft);margin:.4em auto 0;max-width:560px;}
+  .hero-illust{max-width:520px;margin:14px auto 0;}
+
+  /* ===== 目次 ===== */
+  .toc{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);padding:22px 24px;margin:24px 0 44px;
+  }
+  .toc h2{margin:0 0 12px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;counter-reset:t;}
+  .toc li{counter-increment:t;}
+  .toc a{
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+    padding:8px 10px;border-radius:12px;transition:background .15s,transform .15s;
+  }
+  .toc a:hover{background:#fff6ef;transform:translateX(3px);}
+  .toc a::before{
+    content:counter(t);flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--strawberry);color:#fff;font-weight:800;font-size:.85rem;
+    display:grid;place-items:center;
+  }
+  @media(max-width:560px){.toc ol{grid-template-columns:1fr;}}
+
+  /* ===== セクション ===== */
+  section{margin:0 0 52px;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin:0 0 18px;}
+  .sec-num{
+    flex:0 0 auto;width:52px;height:52px;border-radius:18px;
+    display:grid;place-items:center;font-weight:900;font-size:1.5rem;color:#fff;
+    box-shadow:var(--shadow);transform:rotate(-4deg);
+  }
+  .sec-head h2{margin:0;font-size:clamp(1.3rem,3.6vw,1.7rem);line-height:1.3;}
+  .c1{background:var(--apple);}
+  .c2{background:var(--grape);}
+  .c3{background:var(--leaf);}
+  .c4{background:var(--sky);}
+  .c5{background:var(--strawberry);}
+  .c6{background:#f0932b;}
+  .c7{background:var(--banana);color:var(--ink)!important;}
+  .c8{background:#2d2b40;}
+  .c9{background:var(--leaf);}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);padding:24px 26px;margin:16px 0;
+  }
+  p{margin:.6em 0;}
+  .fig{margin:20px 0;text-align:center;}
+  .fig svg{max-width:100%;height:auto;border-radius:16px;}
+  .caption{font-size:.85rem;color:var(--ink-soft);margin-top:8px;}
+
+  /* 用語タグ */
+  .term{
+    display:inline-block;font-weight:800;padding:.05em .45em;border-radius:8px;
+    background:#fff3c4;color:#8a6d00;white-space:nowrap;
+  }
+  .term.t-blue{background:#dff3fd;color:#1f7fa3;}
+  .term.t-green{background:#e2f6e2;color:#2f7a2f;}
+  .term.t-purple{background:#efe4fb;color:#6f42b3;}
+  .term.t-pink{background:#ffe4ee;color:#c23c72;}
+
+  /* 吹き出し */
+  .speech{
+    display:flex;gap:14px;align-items:flex-start;margin:18px 0;
+  }
+  .speech .avatar{flex:0 0 auto;width:64px;height:64px;}
+  .bubble{
+    position:relative;background:#fff7ef;border:2px solid #ffe3c9;border-radius:16px;
+    padding:12px 16px;font-size:.96rem;box-shadow:var(--shadow);
+  }
+  .bubble::before{
+    content:"";position:absolute;left:-11px;top:20px;
+    border-width:8px 11px 8px 0;border-style:solid;border-color:transparent #ffe3c9 transparent transparent;
+  }
+
+  /* RDBMSカード */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .rdbms{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;box-shadow:var(--shadow);border-top:5px solid var(--sky);
+  }
+  .rdbms h4{margin:0 0 4px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .rdbms .ruby{font-size:.72rem;color:var(--ink-soft);font-weight:600;}
+  .rdbms p{margin:.3em 0 0;font-size:.9rem;color:var(--ink-soft);}
+  .rdbms .ic{width:30px;height:30px;flex:0 0 auto;}
+
+  /* メリデメ */
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.pros-cons{grid-template-columns:1fr;}}
+  .pc{border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);}
+  .pc.pro{background:#effaf0;border:1px solid #c9ecc9;}
+  .pc.con{background:#fff0f0;border:1px solid #ffd3d3;}
+  .pc h4{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;}
+  .pc ul{margin:0;padding-left:4px;list-style:none;}
+  .pc li{padding:4px 0 4px 26px;position:relative;font-size:.94rem;}
+  .pc.pro li::before{content:"○";position:absolute;left:0;color:var(--leaf);font-weight:900;}
+  .pc.con li::before{content:"×";position:absolute;left:0;color:var(--apple);font-weight:900;}
+
+  /* ステップタイムライン */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+  @media(max-width:720px){.steps{grid-template-columns:1fr 1fr;}}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 14px;text-align:center;box-shadow:var(--shadow);position:relative;
+  }
+  .step .n{
+    width:34px;height:34px;border-radius:50%;background:var(--leaf);color:#fff;
+    font-weight:900;display:grid;place-items:center;margin:0 auto 8px;
+  }
+  .step h4{margin:0 0 4px;font-size:.95rem;}
+  .step p{margin:0;font-size:.82rem;color:var(--ink-soft);}
+  .step svg{width:44px;height:44px;margin:0 auto 4px;display:block;}
+
+  /* ターミナル風 */
+  .term-card{
+    background:#221f33;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);
+    margin:14px 0;
+  }
+  .term-bar{background:#312d47;padding:9px 14px;display:flex;align-items:center;gap:7px;}
+  .term-bar .dot{width:11px;height:11px;border-radius:50%;}
+  .term-bar .t{color:#aaa2c9;font-size:.78rem;margin-left:8px;}
+  .term-body{
+    padding:16px 18px;color:#e8e6f5;font-family:"Cascadia Code","Consolas","SF Mono",monospace;
+    font-size:.9rem;line-height:1.7;overflow-x:auto;
+  }
+  .term-body .prompt{color:#7ee1a8;}
+  .term-body .cmd{color:#ffe08a;}
+  .term-body .cmt{color:#8f88b3;}
+  .cmd-note{font-size:.9rem;color:var(--ink-soft);margin:6px 2px 0;}
+  .cmd-title{font-weight:800;margin:20px 0 4px;display:flex;align-items:center;gap:8px;}
+  .cmd-title .b{background:var(--ink);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:999px;}
+
+  /* コラム */
+  .column{
+    background:linear-gradient(#fffaf0,#fff);border:2px dashed var(--banana);
+    border-radius:18px;padding:20px 22px;margin:22px 0;
+  }
+  .column h4{margin:0 0 6px;display:flex;align-items:center;gap:8px;font-size:1.05rem;}
+
+  /* スクショ */
+  .shot{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-top:10px;}
+  .shot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:560px){.shot-row{grid-template-columns:1fr;}}
+  figure{margin:0;}
+  figcaption{font-size:.82rem;color:var(--ink-soft);margin-top:6px;text-align:center;}
+
+  /* まとめチップ */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+  .chip{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+    box-shadow:var(--shadow);font-size:.92rem;
+  }
+  .chip b{color:var(--apple);}
+
+  .divider{height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px);margin:10px 0;border:0;}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:.85rem;padding:30px 0 0;}
+
+  .keyline{
+    background:#fff;border-left:5px solid var(--strawberry);border-radius:0 12px 12px 0;
+    padding:10px 16px;margin:14px 0;box-shadow:var(--shadow);font-size:.95rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ヒーロー ===== -->
+<header class="hero">
+  <span class="eyebrow">はじめての SQL</span>
+  <h1>第3章<br><span class="accent">取り出したデータを加工してみよう</span></h1>
+  <p class="lead">取り出したデータは、そのまま見るだけじゃもったいない。<br>数えて・合計して・グループにまとめて・並べ替える——データを"料理"する方法を学びます🍓</p>
+  <div class="hero-illust">
+    <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="売上データを集計するイラスト">
+      <!-- 地面 -->
+      <ellipse cx="260" cy="200" rx="230" ry="16" fill="#f3ecdf"/>
+      <!-- データベースの円柱 -->
+      <g>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#7fd3f7"/>
+        <path d="M70 70 v70 a60 20 0 0 0 120 0 v-70" fill="#5bc0eb"/>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#a6e2fb"/>
+        <path d="M70 100 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <path d="M70 128 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <text x="130" y="76" text-anchor="middle" font-size="15" font-weight="800" fill="#1f6d8c">DB</text>
+      </g>
+      <!-- 矢印（キャラの上を通る弧） -->
+      <path d="M194 108 Q 242 76 286 92" stroke="#ffb45c" stroke-width="4" fill="none" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#ffb45c"/></marker></defs>
+      <!-- テーマのボックス：売上を集計 -->
+      <g>
+        <rect x="290" y="70" width="180" height="110" rx="14" fill="#fff" stroke="#efe1cf" stroke-width="2"/>
+        <rect x="290" y="70" width="180" height="30" rx="14" fill="#ff8fab"/>
+        <text x="380" y="91" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">🧮 売上を集計</text>
+        <!-- 上段：合計バー（棒グラフ風） -->
+        <rect x="312" y="140" width="14" height="24" rx="3" fill="#ff6b6b"/>
+        <rect x="332" y="128" width="14" height="36" rx="3" fill="#ffd23f"/>
+        <rect x="352" y="118" width="14" height="46" rx="3" fill="#5cb85c"/>
+        <rect x="372" y="134" width="14" height="30" rx="3" fill="#5bc0eb"/>
+        <rect x="392" y="122" width="14" height="42" rx="3" fill="#9b6dd6"/>
+        <line x1="308" y1="164" x2="452" y2="164" stroke="#e7dcc9" stroke-width="2"/>
+        <!-- 下段：合計の答え -->
+        <text x="380" y="122" text-anchor="middle" font-size="12" font-weight="800" fill="#c9760f">Σ</text>
+        <rect x="416" y="118" width="42" height="46" rx="8" fill="#fff3c4" stroke="#ffd23f" stroke-width="2"/>
+        <text x="437" y="140" text-anchor="middle" font-size="11" font-weight="800" fill="#8a6d00">合計</text>
+        <text x="437" y="156" text-anchor="middle" font-size="12" font-weight="900" fill="#c9760f">4460</text>
+      </g>
+      <!-- 動物客（位置固定：矢印と重ねない） -->
+      <g transform="translate(240,171)">
+        <circle cx="0" cy="0" r="22" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="-9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <circle cx="-7" cy="-2" r="2.5" fill="#3a3550"/><circle cx="7" cy="-2" r="2.5" fill="#3a3550"/>
+        <path d="M-5 6 q5 4 10 0" stroke="#3a3550" stroke-width="2" fill="none"/>
+        <circle cx="-12" cy="4" r="3" fill="#ffc2d1"/><circle cx="12" cy="4" r="3" fill="#ffc2d1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===== 目次 ===== -->
+<nav class="toc">
+  <h2>📖 この章で分かること</h2>
+  <ol>
+    <li><a href="#s1">集計関数ってなんだろう？</a></li>
+    <li><a href="#s2">COUNT でレコード数を数える</a></li>
+    <li><a href="#s3">合計・平均・最小・最大を求める</a></li>
+    <li><a href="#s4">GROUP BY でグループにまとめる</a></li>
+    <li><a href="#s5">GROUP_CONCAT で値を結合する</a></li>
+    <li><a href="#s6">HAVING でグループに条件をつける</a></li>
+    <li><a href="#s7">ORDER BY で並べ替える</a></li>
+    <li><a href="#s8">句を組み合わせる・実行される順番</a></li>
+    <li><a href="#s9">まとめ：覚えた文法</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 1 集計関数とは ===== -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num c1">1</div><h2>集計関数ってなんだろう？</h2></div>
+
+  <div class="card">
+    <p>RDBMS には、データベースの中のデータを <b>集計したり操作したりする</b> ための <span class="term t-purple">関数</span>というしくみが用意されています。関数にデータや条件を渡すと、何らかの処理をして結果を返してくれます。</p>
+
+    <div class="keyline">
+      関数に渡すデータや条件のことを <span class="term">引数</span>（ひきすう）、関数から返ってくる結果を <span class="term t-green">戻り値</span>（もどりち）と呼びます。
+    </div>
+
+    <p>その中でも、テーブルにあるカラムの <b>合計値や平均値</b> など、たくさんの数値から <b>1つの結果</b> を返す関数を <span class="term t-pink">集計関数</span>といいます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="たくさんの値を集計関数に渡すと1つの結果が返る図">
+        <!-- ラベル（文字と要素は12px以上あける） -->
+        <text x="95" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c23c72">たくさんの値</text>
+        <text x="330" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#6f42b3">集計関数でまとめる</text>
+        <text x="566" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">答えは1つ</text>
+
+        <!-- 左：値チップ -->
+        <g font-size="12" font-weight="700" fill="#3a3550">
+          <rect x="55" y="44" width="80" height="24" rx="6" fill="#fff" stroke="#ffd0dd" stroke-width="1.5"/><text x="95" y="61" text-anchor="middle">360</text>
+          <rect x="55" y="74" width="80" height="24" rx="6" fill="#fff" stroke="#ffd0dd" stroke-width="1.5"/><text x="95" y="91" text-anchor="middle">500</text>
+          <rect x="55" y="104" width="80" height="24" rx="6" fill="#fff" stroke="#ffd0dd" stroke-width="1.5"/><text x="95" y="121" text-anchor="middle">400</text>
+          <rect x="55" y="134" width="80" height="24" rx="6" fill="#fff" stroke="#ffd0dd" stroke-width="1.5"/><text x="95" y="151" text-anchor="middle">600</text>
+          <rect x="55" y="164" width="80" height="24" rx="6" fill="#fff" stroke="#ffd0dd" stroke-width="1.5"/><text x="95" y="181" text-anchor="middle">…</text>
+        </g>
+
+        <!-- 矢印：値 → 関数 -->
+        <path d="M143 112 H252" stroke="#ff8fab" stroke-width="3" fill="none" marker-end="url(#a1a)"/>
+        <defs><marker id="a1a" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#ff8fab"/></marker></defs>
+
+        <!-- 中央：関数ボックス -->
+        <rect x="258" y="78" width="150" height="68" rx="14" fill="#f3ecff" stroke="#c9b3e8" stroke-width="2"/>
+        <text x="333" y="106" text-anchor="middle" font-size="14" font-weight="900" fill="#6f42b3">集計関数</text>
+        <text x="333" y="128" text-anchor="middle" font-size="10.5" fill="#8a7ba8">COUNT / SUM / AVG …</text>
+
+        <!-- 矢印：関数 → 結果 -->
+        <path d="M410 112 H500" stroke="#5cb85c" stroke-width="3" fill="none" marker-end="url(#a1b)"/>
+        <defs><marker id="a1b" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5cb85c"/></marker></defs>
+
+        <!-- 右：結果ピル -->
+        <rect x="506" y="92" width="120" height="40" rx="20" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+        <text x="566" y="117" text-anchor="middle" font-size="14" font-weight="900" fill="#2f7a2f">1つの値</text>
+      </svg>
+      <div class="caption">▲ 集計関数は、カラムに並んだたくさんの値を「まとめて計算」して、1つの答えを返します。</div>
+    </div>
+
+    <p><b>この章で使う集計関数は5つ。</b>どれもすべての RDBMS で使えます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="集計関数の一覧表">
+        <!-- 外枠 -->
+        <rect x="40" y="30" width="640" height="220" rx="8" fill="#fff" stroke="#c9b48f" stroke-width="2"/>
+        <!-- ヘッダ行 -->
+        <rect x="40" y="30" width="640" height="40" rx="8" fill="#eefbf0" stroke="#c9ecc9"/>
+        <g font-size="13" font-weight="800" fill="#2f7a2f">
+          <text x="150" y="55" text-anchor="middle">関数</text>
+          <text x="450" y="55" text-anchor="middle">意味</text>
+        </g>
+        <!-- 行 -->
+        <g font-size="12.5" fill="#3a3550">
+          <text x="150" y="92" text-anchor="middle" font-weight="800" fill="#c9760f">COUNT</text><text x="450" y="92" text-anchor="middle">テーブルのレコード数を求める</text>
+          <text x="150" y="128" text-anchor="middle" font-weight="800" fill="#c9760f">SUM</text><text x="450" y="128" text-anchor="middle">指定したカラムの合計値を求める</text>
+          <text x="150" y="164" text-anchor="middle" font-weight="800" fill="#c9760f">AVG</text><text x="450" y="164" text-anchor="middle">指定したカラムの平均値を求める</text>
+          <text x="150" y="200" text-anchor="middle" font-weight="800" fill="#c9760f">MIN</text><text x="450" y="200" text-anchor="middle">指定したカラムの最小値を求める</text>
+          <text x="150" y="236" text-anchor="middle" font-weight="800" fill="#c9760f">MAX</text><text x="450" y="236" text-anchor="middle">指定したカラムの最大値を求める</text>
+        </g>
+        <!-- 罫線 -->
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="40" y1="70" x2="680" y2="70"/><line x1="40" y1="106" x2="680" y2="106"/><line x1="40" y1="142" x2="680" y2="142"/><line x1="40" y1="178" x2="680" y2="178"/><line x1="40" y1="214" x2="680" y2="214"/>
+          <line x1="260" y1="30" x2="260" y2="250"/>
+        </g>
+      </svg>
+      <div class="caption">▲ カッコ内のよみ方：COUNT（カウント）／SUM（サム）／AVG（エイブイジー）／MIN（ミン）／MAX（マックス）。</div>
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">関数は RDBMS によって独自のものがあったり、同じ名前でも引数の数がちがったりするよ。でもこの5つは <b>どの RDBMS でも使える</b> から安心してね🍋</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2 COUNTでレコード数 ===== -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num c2">2</div><h2>COUNT でレコード数を数える</h2></div>
+
+  <div class="card">
+    <p>集計関数を使う SQL文の基本の形は、<b>関数名のあとに引数を（）で囲む</b>だけ。とてもシンプルです。</p>
+
+    <div class="keyline">
+      <b>書式：関数を使う基本の形</b><br>
+      <code>SELECT 関数名(引数) FROM テーブル名;</code>
+    </div>
+
+    <p><span class="term t-pink">COUNT</span>関数ですべてのレコード数（＝データの件数）を数えるときは、引数に <b>「*（アスタリスク）」</b> を指定します。</p>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-1.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> COUNT(*) <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-1.png" alt="SELECT COUNT(*) FROM sales; の実行結果">
+      <figcaption>▲ <code>sales</code> テーブルのレコード数（件数）が求められた</figcaption>
+    </figure>
+
+    <p style="margin-top:18px;">SELECT句で関数を使うと、見出しには <b>「関数名と引数」</b> がそのまま表示されます。<span class="term">AS</span>キーワードを使うと、見出しに好きな別名を付けられます。</p>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-2.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> COUNT(*) <span class="cmd">AS</span> records <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-2.png" alt="SELECT COUNT(*) AS records FROM sales; の実行結果">
+      <figcaption>▲ 見出しが <code>records</code> という分かりやすい名前に変わった</figcaption>
+    </figure>
+
+    <div class="column">
+      <h4>💡 コラム：COUNT の引数にカラム名を指定したら？</h4>
+      <p style="margin:0;">COUNT関数の引数には、<code>*</code> のかわりに <b>カラム名</b> を指定することもできます。その場合、値が <span class="term">NULL値</span> ではないレコードだけが数える対象になります。</p>
+      <p style="margin:.5em 0 0;"><b>NULL値</b>とは、セルにデータが入っていない（空っぽの）ことを表す特別な値のことです。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3 SUM/AVG/MIN/MAX ===== -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num c3">3</div><h2>合計・平均・最小・最大を求める</h2></div>
+
+  <div class="card">
+    <p>数を数えられたら、次は <b>合計・平均・最小・最大</b>。使い方は COUNT とまったく同じで、引数に対象のカラム名を入れるだけです。</p>
+
+    <div class="cmd-title"><span class="b">SUM</span>合計値を求める</div>
+    <p class="cmd-note"><span class="term">SUM</span>関数で、<code>price</code> カラムの値をすべて合計します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-3.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> SUM(price) <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-3.png" alt="SELECT SUM(price) FROM sales; の実行結果">
+      <figcaption>▲ <code>360＋500＋400＋600＋800＋600＋400＋800 ＝ 4460</code> の計算が行われた</figcaption>
+    </figure>
+
+    <div class="cmd-title"><span class="b">AVG</span>平均値を求める</div>
+    <p class="cmd-note"><span class="term">AVG</span>は Average（＝平均値）の略。1日あたりの平均売上などを調べるのに便利です。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-4.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> AVG(price) <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-4.png" alt="SELECT AVG(price) FROM sales; の実行結果">
+      <figcaption>▲ <code>4460 ÷ 8 ＝ 557.5</code>。季節や天気で売上がどう変わるかを調べるのに使えます</figcaption>
+    </figure>
+
+    <div class="cmd-title"><span class="b">MIN / MAX</span>最小値と最大値を求める</div>
+    <p class="cmd-note"><span class="term">MIN</span>（Minimum＝最小）と <span class="term">MAX</span>（Maximum＝最大）。関数も <b>「,（カンマ）」で区切れば同時に使えます。</b></p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-5.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> MIN(price), MAX(price) <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-5.png" alt="SELECT MIN(price), MAX(price) FROM sales; の実行結果">
+      <figcaption>▲ <code>price</code> の一番安い値と一番高い値が同時に求められた</figcaption>
+    </figure>
+
+    <p style="margin-top:18px;">数値だけでなく、<b>文字列で表した日付</b>にも MIN・MAX が使えます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-6.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> MIN(date), MAX(date) <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON11-6.png" alt="SELECT MIN(date), MAX(date) FROM sales; の実行結果">
+      <figcaption>▲ 一番古い日付が最小値、一番新しい日付が最大値になる</figcaption>
+    </figure>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">日付で最小・最大を探すときは、<b>形式がそろっていること</b>が大事。<code>2023-04-10</code> のように書き方が統一されていないと、正しい結果が得られないから注意してね。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 GROUP BY ===== -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num c4">4</div><h2>GROUP BY でグループにまとめる</h2></div>
+
+  <div class="card">
+    <p>ここまでは「テーブル全体」を集計してきました。でも本当に知りたいのは <b>「お客さんごと」「商品ごと」の集計</b>のはず。そこで登場するのが <span class="term t-blue">GROUP BY</span>句（＝グループ分けする）です。</p>
+
+    <div class="keyline">
+      <b>書式：GROUP BY 句の基本</b><br>
+      <code>SELECT カラム名, 関数(引数) FROM テーブル名 GROUP BY カラム名;</code>
+    </div>
+
+    <p>GROUP BY は集計関数と組み合わせて使います。テーブル名のあとに <code>GROUP BY</code> でまとめたいカラムを指定すると、そのカラムの値ごとにグループを作り、<b>グループごとに集計</b>してくれます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="customerでグループ化してレコード数を数える図">
+        <!-- ラベル -->
+        <text x="110" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#6b6580">元のレコード</text>
+        <text x="510" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1f7fa3">customer でまとめて COUNT</text>
+
+        <!-- 左：バラバラのレコード（顧客ごとに色分け） -->
+        <g font-size="12" font-weight="700" fill="#fff">
+          <rect x="45" y="42" width="130" height="26" rx="6" fill="#ff8fab"/><text x="110" y="60" text-anchor="middle">ウサ田</text>
+          <rect x="45" y="74" width="130" height="26" rx="6" fill="#9b6dd6"/><text x="110" y="92" text-anchor="middle">クマ井</text>
+          <rect x="45" y="106" width="130" height="26" rx="6" fill="#ff8fab"/><text x="110" y="124" text-anchor="middle">ウサ田</text>
+          <rect x="45" y="138" width="130" height="26" rx="6" fill="#5cb85c"/><text x="110" y="156" text-anchor="middle">サル橋</text>
+          <rect x="45" y="170" width="130" height="26" rx="6" fill="#5cb85c"/><text x="110" y="188" text-anchor="middle">サル橋</text>
+          <rect x="45" y="202" width="130" height="26" rx="6" fill="#5bc0eb"/><text x="110" y="220" text-anchor="middle">イヌ山</text>
+        </g>
+
+        <!-- 矢印 -->
+        <path d="M195 135 H320" stroke="#f0932b" stroke-width="4" fill="none" marker-end="url(#a4)"/>
+        <defs><marker id="a4" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f0932b"/></marker></defs>
+        <text x="255" y="120" text-anchor="middle" font-size="11" font-weight="800" fill="#c9760f">GROUP BY</text>
+
+        <!-- 右：グループごとにまとまり＋COUNT -->
+        <g font-size="12.5" font-weight="700">
+          <rect x="360" y="46" width="300" height="42" rx="10" fill="#fff0f4" stroke="#ff8fab" stroke-width="2"/>
+          <text x="386" y="72" fill="#c23c72" font-weight="800">ウサ田</text>
+          <circle cx="620" cy="67" r="15" fill="#ff8fab"/><text x="620" y="72" text-anchor="middle" fill="#fff" font-weight="900">2</text>
+
+          <rect x="360" y="98" width="300" height="42" rx="10" fill="#f6effc" stroke="#9b6dd6" stroke-width="2"/>
+          <text x="386" y="124" fill="#6f42b3" font-weight="800">クマ井</text>
+          <circle cx="620" cy="119" r="15" fill="#9b6dd6"/><text x="620" y="124" text-anchor="middle" fill="#fff" font-weight="900">1</text>
+
+          <rect x="360" y="150" width="300" height="42" rx="10" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+          <text x="386" y="176" fill="#2f7a2f" font-weight="800">サル橋</text>
+          <circle cx="620" cy="171" r="15" fill="#5cb85c"/><text x="620" y="176" text-anchor="middle" fill="#fff" font-weight="900">2</text>
+
+          <rect x="360" y="202" width="300" height="42" rx="10" fill="#eef8ff" stroke="#5bc0eb" stroke-width="2"/>
+          <text x="386" y="228" fill="#1f7fa3" font-weight="800">イヌ山</text>
+          <circle cx="620" cy="223" r="15" fill="#5bc0eb"/><text x="620" y="228" text-anchor="middle" fill="#fff" font-weight="900">1</text>
+        </g>
+      </svg>
+      <div class="caption">▲ <code>customer</code> の値ごとにグループを作り、グループごとに COUNT。お客さんごとの来店回数が分かる。</div>
+    </div>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-7.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer, COUNT(*) <span class="cmd">FROM</span> sales <span class="cmd">GROUP BY</span> customer;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON12-1.png" alt="SELECT customer, COUNT(*) FROM sales GROUP BY customer; の実行結果">
+      <figcaption>▲ お客さんごとの来店回数（レコード数）が求められた</figcaption>
+    </figure>
+
+    <div class="keyline">
+      <b>大事なルール：</b>GROUP BY でグループ化するカラムは、<b>SELECT句で指定するカラムと同じ</b>にします。
+    </div>
+
+    <p>試しにルールを破って、GROUP BY と SELECT で <b>ちがうカラム</b> を指定するとどうなるでしょうか。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-8.sql（うまくいかない例）</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name, COUNT(*) <span class="cmd">FROM</span> sales <span class="cmd">GROUP BY</span> customer;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON12-2.png" alt="GROUP BY customer なのに SELECT で item_name を指定した実行結果">
+      <figcaption>▲ <code>customer</code> でまとめているのに <code>item_name</code> を取り出したので、正しい結果にならない</figcaption>
+    </figure>
+
+    <div class="pros-cons">
+      <div class="pc pro">
+        <h4>👍 正しい書き方</h4>
+        <ul>
+          <li>GROUP BY のカラムを SELECT でも指定する</li>
+          <li><code>SELECT customer …GROUP BY customer</code></li>
+        </ul>
+      </div>
+      <div class="pc con">
+        <h4>🤔 やりがちな間違い</h4>
+        <ul>
+          <li>GROUP BY と SELECT でカラムがズレる</li>
+          <li><code>SELECT item_name …GROUP BY customer</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cmd-title"><span class="b">SUM</span>商品ごとに合計する</div>
+    <p class="cmd-note"><code>item_name</code>（商品）でグループを作り、グループごとに <code>price</code> を合計します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-9.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name, SUM(price) <span class="cmd">FROM</span> sales <span class="cmd">GROUP BY</span> item_name;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON12-3.png" alt="SELECT item_name, SUM(price) FROM sales GROUP BY item_name; の実行結果">
+      <figcaption>▲ 商品ごとの売上合計が求められた</figcaption>
+    </figure>
+
+    <div class="cmd-title"><span class="b">AVG</span>日付ごとに平均する</div>
+    <p class="cmd-note"><code>date</code>（日付）でグループを作り、1日の平均売上額を求めます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-10.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> date, AVG(price) <span class="cmd">FROM</span> sales <span class="cmd">GROUP BY</span> date;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON12-4.png" alt="SELECT date, AVG(price) FROM sales GROUP BY date; の実行結果">
+      <figcaption>▲ 日付ごとの1日あたり平均売上額が求められた</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 5 GROUP_CONCAT ===== -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num c5">5</div><h2>GROUP_CONCAT で値を結合する</h2></div>
+
+  <div class="card">
+    <p><span class="term t-purple">GROUP_CONCAT</span>関数には、指定したカラムの値を <b>結合</b>する働きがあります。<span class="term">結合</span>とは、複数の値をつなげて1つの値にすることです。</p>
+    <p>使い方は COUNT や SUM と同じで、引数に <b>結合したいカラム名</b> を入れます。</p>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-11.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer, GROUP_CONCAT(item_name) <span class="cmd">FROM</span> sales<br><span class="cmd">GROUP BY</span> customer;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON13-1.png" alt="SELECT customer, GROUP_CONCAT(item_name) FROM sales GROUP BY customer; の実行結果">
+      <figcaption>▲ お客さんごとに「どの商品を買ったか」が1つにつながって表示された</figcaption>
+    </figure>
+
+    <div class="keyline">
+      GROUP_CONCAT でつなげた値の間には <b>「,（カンマ）」</b>が入ります。このように値を区切る文字を <span class="term">区切り文字</span>と呼びます。
+    </div>
+
+    <p style="margin-top:18px;">同じ商品を何度も買っていると、値が重複して表示されます。<span class="term t-blue">DISTINCT</span>キーワードを付けると、<b>重複を取り除いた</b> 結果が得られます。</p>
+
+    <div class="keyline">
+      <b>書式：関数の引数に DISTINCT を付ける</b><br>
+      <code>GROUP_CONCAT(DISTINCT カラム名)</code>
+    </div>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-12.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer, GROUP_CONCAT(<span class="cmd">DISTINCT</span> item_name) <span class="cmd">FROM</span> sales<br><span class="cmd">GROUP BY</span> customer;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON13-2.png" alt="GROUP_CONCAT に DISTINCT を付けた実行結果">
+      <figcaption>▲ 同じ商品名が重ならず、すっきりした結果になった</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 6 HAVING ===== -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num c6">6</div><h2>HAVING でグループに条件をつける</h2></div>
+
+  <div class="card">
+    <p>グループ化して集計した結果に対して <b>条件をつけたい</b> ときは <span class="term">HAVING</span>句を使います。「レコードが2件以上のお客さんだけ」といった絞り込みができます。</p>
+
+    <div class="keyline">
+      <b>書式：HAVING 句の基本</b><br>
+      <code>SELECT カラム名, 集計関数 FROM テーブル名<br>GROUP BY カラム名 HAVING 条件式;</code>
+    </div>
+
+    <p>次の SQL文では、<code>customer</code> でグループ化したうえで、<b>レコードが2件以上ある</b>グループだけを取り出しています。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-13.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer, COUNT(*) <span class="cmd">FROM</span> sales<br><span class="cmd">GROUP BY</span> customer <span class="cmd">HAVING</span> COUNT(*) &gt;= 2;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON14-1.png" alt="GROUP BY customer HAVING COUNT(*) >= 2 の実行結果">
+      <figcaption>▲ 来店回数が2回以上のお客さんだけに絞り込まれた</figcaption>
+    </figure>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>🔑 WHERE句と HAVING句の違い</b><br>どちらもレコードを絞り込む条件ですが、<b>効くタイミングがちがいます</b>。WHERE句は <b>グループ化する前</b>のデータに、HAVING句は <b>グループ化したあと</b>のデータに条件をつけます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WHEREはグループ化の前、HAVINGはグループ化の後に効く図">
+        <defs><marker id="a6" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#c9a24a"/></marker></defs>
+
+        <!-- ステージ1：全レコード -->
+        <rect x="24" y="74" width="120" height="62" rx="12" fill="#fff" stroke="#e7dcc9" stroke-width="2"/>
+        <text x="84" y="101" text-anchor="middle" font-size="12.5" font-weight="800" fill="#3a3550">全レコード</text>
+        <text x="84" y="120" text-anchor="middle" font-size="10.5" fill="#8a8398">まだバラバラ</text>
+
+        <!-- 矢印1（WHERE） -->
+        <path d="M148 105 H196" stroke="#c9a24a" stroke-width="3" fill="none" marker-end="url(#a6)"/>
+        <text x="172" y="66" text-anchor="middle" font-size="11.5" font-weight="800" fill="#c23c72">WHERE</text>
+        <text x="172" y="150" text-anchor="middle" font-size="10" fill="#c23c72">行をしぼる</text>
+
+        <!-- ステージ2：GROUP BY -->
+        <rect x="200" y="74" width="120" height="62" rx="12" fill="#eef8ff" stroke="#5bc0eb" stroke-width="2"/>
+        <text x="260" y="101" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1f7fa3">GROUP BY</text>
+        <text x="260" y="120" text-anchor="middle" font-size="10.5" fill="#4593b3">グループを作る</text>
+
+        <!-- 矢印2（HAVING） -->
+        <path d="M324 105 H372" stroke="#c9a24a" stroke-width="3" fill="none" marker-end="url(#a6)"/>
+        <text x="348" y="66" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2f7a2f">HAVING</text>
+        <text x="348" y="150" text-anchor="middle" font-size="10" fill="#2f7a2f">グループをしぼる</text>
+
+        <!-- ステージ3：グループ -->
+        <rect x="376" y="74" width="120" height="62" rx="12" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+        <text x="436" y="101" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">集計したグループ</text>
+        <text x="436" y="120" text-anchor="middle" font-size="10.5" fill="#4d8a4d">条件で選ぶ</text>
+
+        <!-- 矢印3 -->
+        <path d="M500 105 H548" stroke="#c9a24a" stroke-width="3" fill="none" marker-end="url(#a6)"/>
+
+        <!-- ステージ4：結果 -->
+        <rect x="552" y="74" width="120" height="62" rx="12" fill="#fff7ef" stroke="#ffb45c" stroke-width="2"/>
+        <text x="612" y="109" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c9760f">結果</text>
+      </svg>
+      <div class="caption">▲ WHERE は「行」を、HAVING は「グループ」を絞り込む。だから WHERE では集計関数は使えません。</div>
+    </div>
+
+    <p><b>句には実行される順番があります。</b>SQL文は書いた順番どおりに実行されるとは限りません。</p>
+    <div class="keyline">
+      <b>実行される順番：</b>FROM句 → WHERE句 → GROUP BY句 → HAVING句 → SELECT句
+    </div>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-14.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> customer, COUNT(*) <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> customer &lt;&gt; 'ウサ田'<br><span class="cmd">GROUP BY</span> customer <span class="cmd">HAVING</span> COUNT(*) &gt;= 2;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON14-2.png" alt="WHERE customer <> 'ウサ田' と HAVING を組み合わせた実行結果">
+      <figcaption>▲ ①ウサ田を除外（WHERE）→ ②customer でまとめ（GROUP BY）→ ③2件以上に絞る（HAVING）</figcaption>
+    </figure>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">グループ化する前にできるだけ WHERE で絞っておくと、SQL文が読みやすくなるよ。「行の条件は WHERE、グループの条件は HAVING」と覚えよう🍯</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7 ORDER BY ===== -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num c7">7</div><h2>ORDER BY で並べ替える</h2></div>
+
+  <div class="card">
+    <p><span class="term t-pink">ORDER BY</span>句を使うと、取り出したデータを <b>指定したカラムの値で並べ替え</b>られます。ORDER はここでは「順番」という意味で使われています。</p>
+
+    <div class="keyline">
+      <b>書式：ORDER BY 句の基本</b><br>
+      <code>SELECT * FROM テーブル名 ORDER BY 並べ替え基準のカラム名;</code>
+    </div>
+
+    <p>次の SQL文は <code>price</code> カラムを基準にしているので、<b>代金が安い順</b>に並んで出力されます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-15.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">ORDER BY</span> price;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON15-1.png" alt="SELECT * FROM sales ORDER BY price; の実行結果">
+      <figcaption>▲ 代金の安い順（小さい方から大きい方へ）に並んだ</figcaption>
+    </figure>
+
+    <p style="margin-top:18px;">並べ替え基準のカラム名のあとに <span class="term">DESC</span>キーワードを付けると、<b>大きい方から小さい方へ</b>並べ替えられます。</p>
+    <div class="keyline">
+      <b>書式：大きい順に並べる</b><br>
+      <code>SELECT * FROM テーブル名 ORDER BY カラム名 DESC;</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-16.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">ORDER BY</span> price <span class="cmd">DESC</span>;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON15-2.png" alt="SELECT * FROM sales ORDER BY price DESC; の実行結果">
+      <figcaption>▲ 今度は代金の高い順（大きい方から）に並んだ</figcaption>
+    </figure>
+
+    <div class="grid2">
+      <div class="rdbms" style="border-top-color:#5cb85c;">
+        <h4><span class="ic">⬆️</span>昇順（ASC）</h4>
+        <div class="ruby">Ascending ／ アセンディング</div>
+        <p>小さい方から大きい方へ。<code>DESC</code> を書かないと自動的にこちらになります。</p>
+      </div>
+      <div class="rdbms" style="border-top-color:#ff8fab;">
+        <h4><span class="ic">⬇️</span>降順（DESC）</h4>
+        <div class="ruby">Descending ／ ディセンディング</div>
+        <p>大きい方から小さい方へ。並べ替え基準のカラム名のあとに <code>DESC</code> を書きます。</p>
+      </div>
+    </div>
+    <div class="keyline">
+      つまり <code>ORDER BY price;</code> は <code>ORDER BY price ASC;</code> と同じ意味です（<code>ASC</code> は省略されているだけ）。
+    </div>
+
+    <div class="cmd-title"><span class="b">複数指定</span>並べ替え基準を2つ以上にする</div>
+    <p class="cmd-note">まず <code>item_count</code> だけで並べ替えると、個数が同じ「3」でも <code>price</code> は 360／600 と、きれいには並びません。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-17.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">ORDER BY</span> item_count <span class="cmd">DESC</span>;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON15-3.png" alt="SELECT * FROM sales ORDER BY item_count DESC; の実行結果">
+      <figcaption>▲ <code>item_count</code> は降順だが、同じ値の中では <code>price</code> がバラバラ</figcaption>
+    </figure>
+
+    <p style="margin-top:18px;">そこで並べ替え基準を <b>「,（カンマ）」で複数つなげます。</b>1つめが同じ値のときは、2つめの基準でさらに並べ替わります。</p>
+    <div class="keyline">
+      <b>書式：並べ替え基準を複数指定</b><br>
+      <code>SELECT * FROM テーブル名<br>ORDER BY カラム名1 DESC, カラム名2 DESC;</code>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-18.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">ORDER BY</span> item_count <span class="cmd">DESC</span>, price <span class="cmd">DESC</span>;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON15-4.png" alt="SELECT * FROM sales ORDER BY item_count DESC, price DESC; の実行結果">
+      <figcaption>▲ <code>item_count</code> が同じ値でも、さらに <code>price</code> でキレイに並んだ</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 8 句の組み合わせと実行順序 ===== -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num c8">8</div><h2>句を組み合わせる・実行される順番</h2></div>
+
+  <div class="card">
+    <p>いよいよ総まとめ。これまでの句を組み合わせて、複雑な SELECT文を作ります。ポイントは <b>句が実行される順番</b>です。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="句が実行される順番のパイプライン図">
+        <defs><marker id="a8" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#b8adc9"/></marker></defs>
+
+        <!-- 6ステップの箱 -->
+        <!-- FROM -->
+        <rect x="14" y="70" width="98" height="66" rx="12" fill="#fff0f0" stroke="#ff6b6b" stroke-width="2"/>
+        <circle cx="30" cy="86" r="12" fill="#ff6b6b"/><text x="30" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">1</text>
+        <text x="63" y="112" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c0392b">FROM</text>
+        <text x="63" y="128" text-anchor="middle" font-size="9.5" fill="#a86">テーブル</text>
+        <path d="M112 103 H130" stroke="#b8adc9" stroke-width="2.5" fill="none" marker-end="url(#a8)"/>
+        <!-- WHERE -->
+        <rect x="132" y="70" width="98" height="66" rx="12" fill="#f6effc" stroke="#9b6dd6" stroke-width="2"/>
+        <circle cx="148" cy="86" r="12" fill="#9b6dd6"/><text x="148" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">2</text>
+        <text x="181" y="112" text-anchor="middle" font-size="12.5" font-weight="800" fill="#6f42b3">WHERE</text>
+        <text x="181" y="128" text-anchor="middle" font-size="9.5" fill="#8a7ba8">行の条件</text>
+        <path d="M230 103 H248" stroke="#b8adc9" stroke-width="2.5" fill="none" marker-end="url(#a8)"/>
+        <!-- GROUP BY -->
+        <rect x="250" y="70" width="98" height="66" rx="12" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+        <circle cx="266" cy="86" r="12" fill="#5cb85c"/><text x="266" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">3</text>
+        <text x="299" y="108" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2f7a2f">GROUP BY</text>
+        <text x="299" y="126" text-anchor="middle" font-size="9.5" fill="#4d8a4d">グループ化</text>
+        <path d="M348 103 H366" stroke="#b8adc9" stroke-width="2.5" fill="none" marker-end="url(#a8)"/>
+        <!-- HAVING -->
+        <rect x="368" y="70" width="98" height="66" rx="12" fill="#eef8ff" stroke="#5bc0eb" stroke-width="2"/>
+        <circle cx="384" cy="86" r="12" fill="#5bc0eb"/><text x="384" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">4</text>
+        <text x="417" y="112" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1f7fa3">HAVING</text>
+        <text x="417" y="128" text-anchor="middle" font-size="9.5" fill="#4593b3">グループの条件</text>
+        <path d="M466 103 H484" stroke="#b8adc9" stroke-width="2.5" fill="none" marker-end="url(#a8)"/>
+        <!-- SELECT -->
+        <rect x="486" y="70" width="98" height="66" rx="12" fill="#fff7ef" stroke="#f0932b" stroke-width="2"/>
+        <circle cx="502" cy="86" r="12" fill="#f0932b"/><text x="502" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">5</text>
+        <text x="535" y="112" text-anchor="middle" font-size="12.5" font-weight="800" fill="#c9760f">SELECT</text>
+        <text x="535" y="128" text-anchor="middle" font-size="9.5" fill="#c98b3f">列を取り出す</text>
+        <path d="M584 103 H602" stroke="#b8adc9" stroke-width="2.5" fill="none" marker-end="url(#a8)"/>
+        <!-- ORDER BY -->
+        <rect x="604" y="70" width="100" height="66" rx="12" fill="#fff0f4" stroke="#ff8fab" stroke-width="2"/>
+        <circle cx="620" cy="86" r="12" fill="#ff8fab"/><text x="620" y="90" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">6</text>
+        <text x="654" y="108" text-anchor="middle" font-size="11.5" font-weight="800" fill="#c23c72">ORDER BY</text>
+        <text x="654" y="126" text-anchor="middle" font-size="9.5" fill="#c23c72">並べ替え</text>
+
+        <!-- 見出し -->
+        <text x="360" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#3a3550">句が実行される順番</text>
+      </svg>
+      <div class="caption">▲ 書く順番では <code>SELECT</code> が先頭でも、<b>実行は5番目</b>。だから ORDER BY は SELECT のあとに動きます。</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">組み合わせ①</span>WHERE ＋ ORDER BY</div>
+    <p class="cmd-note">条件で絞り込んだデータを並べ替えます。WHERE の条件式のあとに ORDER BY を書きます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-19.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> item_name = 'バナナ' <span class="cmd">ORDER BY</span> price;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON16-1.png" alt="WHERE item_name = 'バナナ' ORDER BY price の実行結果">
+      <figcaption>▲ バナナだけに絞り込み（WHERE）→ 取り出し（SELECT）→ price で並べ替え（ORDER BY）</figcaption>
+    </figure>
+
+    <div class="cmd-title"><span class="b">組み合わせ②</span>GROUP BY ＋ ORDER BY</div>
+    <p class="cmd-note">グループ化して集計した数値でも並べ替えられます。ORDER BY に SELECT と同じ集計関数を指定します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-20.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name, SUM(item_count) <span class="cmd">FROM</span> sales<br><span class="cmd">GROUP BY</span> item_name<br><span class="cmd">ORDER BY</span> SUM(item_count) <span class="cmd">DESC</span>;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON16-2.png" alt="GROUP BY item_name ORDER BY SUM(item_count) DESC の実行結果">
+      <figcaption>▲ 商品ごとの販売個数の合計を、多い順に並べ替えた</figcaption>
+    </figure>
+
+    <div class="cmd-title"><span class="b">組み合わせ③</span>ここまでの句を全部使う</div>
+    <p class="cmd-note">WHERE・GROUP BY・HAVING・ORDER BY をすべて組み合わせた、この章の集大成です。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-21.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> item_name, SUM(item_count) <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> item_name &lt;&gt; 'バナナ'<br><span class="cmd">GROUP BY</span> item_name <span class="cmd">HAVING</span> SUM(item_count) &gt; 2<br><span class="cmd">ORDER BY</span> SUM(item_count) <span class="cmd">DESC</span>;</div>
+    </div>
+    <figure>
+      <img class="shot" src="第3章/LESSON16-3.png" alt="WHERE・GROUP BY・HAVING・ORDER BY をすべて使った実行結果">
+      <figcaption>▲ ①バナナ以外に絞る → ②商品でまとめる → ③合計が2より大きいグループだけ → ④多い順に並べる</figcaption>
+    </figure>
+
+    <div class="keyline">
+      <b>実行される順番（chap3-21）：</b>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY。<br>
+      グループ化したあとの HAVING・SELECT・ORDER BY では <b>集計関数が使えます</b>。
+    </div>
+
+    <div class="column">
+      <h4>⚠️ コラム：WHERE句で集計関数を使うとエラー</h4>
+      <p style="margin:0;">WHERE句はグループ化する <b>前</b> に実行されるため、集計関数（SUM など）は使えません。試すとエラーになります。</p>
+      <div class="term-card">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文 ── chap3-22.sql（エラーになる例）</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> item_name, SUM(item_count) <span class="cmd">FROM</span> sales<br><span class="cmd">WHERE</span> SUM(item_count) &gt; 2<br><span class="cmd">GROUP BY</span> item_name;</div>
+      </div>
+      <figure>
+        <img class="shot" src="第3章/LESSON16-4.png" alt="WHERE句で SUM を使ってParse errorになった画面">
+        <figcaption>▲ <code>Parse error</code>（SQL文の解析に失敗）。<code>misuse of aggregate: SUM()</code> ＝「SUM() の誤った使い方」という意味</figcaption>
+      </figure>
+      <p style="margin:.6em 0 0;">絞り込みたい条件が集計関数なら、WHERE ではなく <b>HAVING</b> を使いましょう。</p>
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">思ったとおりの結果が出ないときは、<b>句の実行順序</b>と <b>条件式</b>を見直すのが近道。短い SQL文で順番をしっかり押さえておこう🍓</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9 まとめ ===== -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num c9">9</div><h2>まとめ：この章で覚えた文法</h2></div>
+  <div class="card">
+    <p>おつかれさまでした🎉 第3章では、取り出したデータを「加工」する方法をたくさん学びました。大事な言葉を並べておきます。</p>
+    <div class="chips">
+      <div class="chip"><b>集計関数</b>：たくさんの値から1つの結果を返す関数</div>
+      <div class="chip"><b>COUNT</b>：レコード数（件数）を数える</div>
+      <div class="chip"><b>SUM / AVG</b>：合計値／平均値を求める</div>
+      <div class="chip"><b>MIN / MAX</b>：最小値／最大値を求める</div>
+      <div class="chip"><b>AS</b>：見出しに別名を付ける</div>
+      <div class="chip"><b>GROUP BY</b>：カラムの値でグループにまとめる</div>
+      <div class="chip"><b>GROUP_CONCAT</b>：値をつなげて結合する（DISTINCTで重複除去）</div>
+      <div class="chip"><b>HAVING</b>：グループ化したあとに条件をつける</div>
+      <div class="chip"><b>ORDER BY</b>：並べ替える（DESC＝降順／ASC＝昇順）</div>
+      <div class="chip"><b>実行順</b>：FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY</div>
+    </div>
+    <div class="speech" style="margin-top:20px;">
+      <div class="avatar">
+        <svg viewBox="-2 -4 68 68" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><path d="M22 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><path d="M38 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M27 41 q5 5 10 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">集計・グループ化・並べ替えができれば、データはぐっと「使える情報」に変わるよ。ここまで来たら、もう立派な SQL の使い手だね！おたのしみに🍓</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  第3章「取り出したデータを加工してみよう」 ／ はじめての SQL 入門
+</footer>
+
+</div>
+</body>
+</html>
