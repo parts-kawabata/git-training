@@ -73,7 +73,7 @@ SQLiteの公式サイトから、SQLiteコマンドラインツールが含ま�
 
 ②ダウンロード先のフォルダを表示する
 
-![alt text](第1章\LESSON02-1.png)
+![alt text](LESSON02-1.png)
 
 ③zipファイルを全て展開する
 
