@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4章 データを変更してみよう｜はじめてのSQL</title>
+<style>
+  :root{
+    --apple:#ff6b6b;      /* リンゴ赤 */
+    --strawberry:#ff8fab;  /* いちご桃 */
+    --grape:#9b6dd6;      /* ぶどう紫 */
+    --banana:#ffd23f;     /* バナナ黄 */
+    --leaf:#5cb85c;       /* 葉緑 */
+    --sky:#5bc0eb;        /* 空色 */
+    --ink:#3a3550;
+    --ink-soft:#6b6580;
+    --paper:#fffdf8;
+    --card:#ffffff;
+    --line:#efe9df;
+    --shadow:0 8px 24px rgba(120,100,80,.10);
+    --shadow-lg:0 16px 40px rgba(120,100,80,.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI","Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, #fff2f5 0, transparent 40%),
+      radial-gradient(circle at 88% 4%, #fef7d6 0, transparent 38%),
+      radial-gradient(circle at 50% 100%, #eef8ee 0, transparent 45%),
+      var(--paper);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+  img{max-width:100%;height:auto;}
+
+  /* ===== ヒーロー ===== */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:56px 20px 44px;
+    margin-bottom:8px;
+  }
+  .hero .eyebrow{
+    display:inline-block;background:#fff;border:2px solid var(--banana);
+    color:var(--ink-soft);font-weight:700;font-size:.8rem;letter-spacing:.15em;
+    padding:6px 16px;border-radius:999px;box-shadow:var(--shadow);
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,6vw,3.1rem);margin:.5em 0 .2em;line-height:1.25;
+    letter-spacing:.02em;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(transparent 62%, var(--banana) 62%);
+    padding:0 .1em;
+  }
+  .hero p.lead{font-size:1.05rem;color:var(--ink-soft);margin:.4em auto 0;max-width:560px;}
+  .hero-illust{max-width:520px;margin:14px auto 0;}
+
+  /* ===== 目次 ===== */
+  .toc{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);padding:22px 24px;margin:24px 0 44px;
+  }
+  .toc h2{margin:0 0 12px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;counter-reset:t;}
+  .toc li{counter-increment:t;}
+  .toc a{
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+    padding:8px 10px;border-radius:12px;transition:background .15s,transform .15s;
+  }
+  .toc a:hover{background:#fff6ef;transform:translateX(3px);}
+  .toc a::before{
+    content:counter(t);flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--strawberry);color:#fff;font-weight:800;font-size:.85rem;
+    display:grid;place-items:center;
+  }
+  @media(max-width:560px){.toc ol{grid-template-columns:1fr;}}
+
+  /* ===== セクション ===== */
+  section{margin:0 0 52px;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin:0 0 18px;}
+  .sec-num{
+    flex:0 0 auto;width:52px;height:52px;border-radius:18px;
+    display:grid;place-items:center;font-weight:900;font-size:1.5rem;color:#fff;
+    box-shadow:var(--shadow);transform:rotate(-4deg);
+  }
+  .sec-head h2{margin:0;font-size:clamp(1.3rem,3.6vw,1.7rem);line-height:1.3;}
+  .c1{background:var(--apple);}
+  .c2{background:var(--grape);}
+  .c3{background:var(--leaf);}
+  .c4{background:var(--sky);}
+  .c5{background:var(--strawberry);}
+  .c6{background:#f0932b;}
+  .c7{background:var(--banana);color:var(--ink)!important;}
+  .c8{background:#2d2b40;}
+  .c9{background:var(--leaf);}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);padding:24px 26px;margin:16px 0;
+  }
+  p{margin:.6em 0;}
+  .fig{margin:20px 0;text-align:center;}
+  .fig svg{max-width:100%;height:auto;border-radius:16px;}
+  .caption{font-size:.85rem;color:var(--ink-soft);margin-top:8px;}
+
+  /* 用語タグ */
+  .term{
+    display:inline-block;font-weight:800;padding:.05em .45em;border-radius:8px;
+    background:#fff3c4;color:#8a6d00;white-space:nowrap;
+  }
+  .term.t-blue{background:#dff3fd;color:#1f7fa3;}
+  .term.t-green{background:#e2f6e2;color:#2f7a2f;}
+  .term.t-purple{background:#efe4fb;color:#6f42b3;}
+  .term.t-pink{background:#ffe4ee;color:#c23c72;}
+
+  /* 吹き出し */
+  .speech{
+    display:flex;gap:14px;align-items:flex-start;margin:18px 0;
+  }
+  .speech .avatar{flex:0 0 auto;width:64px;height:64px;}
+  .bubble{
+    position:relative;background:#fff7ef;border:2px solid #ffe3c9;border-radius:16px;
+    padding:12px 16px;font-size:.96rem;box-shadow:var(--shadow);
+  }
+  .bubble::before{
+    content:"";position:absolute;left:-11px;top:20px;
+    border-width:8px 11px 8px 0;border-style:solid;border-color:transparent #ffe3c9 transparent transparent;
+  }
+
+  /* RDBMSカード */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .rdbms{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;box-shadow:var(--shadow);border-top:5px solid var(--sky);
+  }
+  .rdbms h4{margin:0 0 4px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .rdbms .ruby{font-size:.72rem;color:var(--ink-soft);font-weight:600;}
+  .rdbms p{margin:.3em 0 0;font-size:.9rem;color:var(--ink-soft);}
+  .rdbms .ic{width:30px;height:30px;flex:0 0 auto;}
+
+  /* メリデメ */
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.pros-cons{grid-template-columns:1fr;}}
+  .pc{border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);}
+  .pc.pro{background:#effaf0;border:1px solid #c9ecc9;}
+  .pc.con{background:#fff0f0;border:1px solid #ffd3d3;}
+  .pc h4{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;}
+  .pc ul{margin:0;padding-left:4px;list-style:none;}
+  .pc li{padding:4px 0 4px 26px;position:relative;font-size:.94rem;}
+  .pc.pro li::before{content:"○";position:absolute;left:0;color:var(--leaf);font-weight:900;}
+  .pc.con li::before{content:"×";position:absolute;left:0;color:var(--apple);font-weight:900;}
+
+  /* ステップタイムライン */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+  @media(max-width:720px){.steps{grid-template-columns:1fr 1fr;}}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 14px;text-align:center;box-shadow:var(--shadow);position:relative;
+  }
+  .step .n{
+    width:34px;height:34px;border-radius:50%;background:var(--leaf);color:#fff;
+    font-weight:900;display:grid;place-items:center;margin:0 auto 8px;
+  }
+  .step h4{margin:0 0 4px;font-size:.95rem;}
+  .step p{margin:0;font-size:.82rem;color:var(--ink-soft);}
+  .step svg{width:44px;height:44px;margin:0 auto 4px;display:block;}
+
+  /* ターミナル風 */
+  .term-card{
+    background:#221f33;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);
+    margin:14px 0;
+  }
+  .term-bar{background:#312d47;padding:9px 14px;display:flex;align-items:center;gap:7px;}
+  .term-bar .dot{width:11px;height:11px;border-radius:50%;}
+  .term-bar .t{color:#aaa2c9;font-size:.78rem;margin-left:8px;}
+  .term-body{
+    padding:16px 18px;color:#e8e6f5;font-family:"Cascadia Code","Consolas","SF Mono",monospace;
+    font-size:.9rem;line-height:1.7;overflow-x:auto;
+  }
+  .term-body .prompt{color:#7ee1a8;}
+  .term-body .cmd{color:#ffe08a;}
+  .term-body .cmt{color:#8f88b3;}
+  .cmd-note{font-size:.9rem;color:var(--ink-soft);margin:6px 2px 0;}
+  .cmd-title{font-weight:800;margin:20px 0 4px;display:flex;align-items:center;gap:8px;}
+  .cmd-title .b{background:var(--ink);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:999px;}
+
+  /* コラム */
+  .column{
+    background:linear-gradient(#fffaf0,#fff);border:2px dashed var(--banana);
+    border-radius:18px;padding:20px 22px;margin:22px 0;
+  }
+  .column h4{margin:0 0 6px;display:flex;align-items:center;gap:8px;font-size:1.05rem;}
+
+  /* スクショ */
+  .shot{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-top:10px;}
+  .shot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:560px){.shot-row{grid-template-columns:1fr;}}
+  figure{margin:0;}
+  figcaption{font-size:.82rem;color:var(--ink-soft);margin-top:6px;text-align:center;}
+
+  /* まとめチップ */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+  .chip{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+    box-shadow:var(--shadow);font-size:.92rem;
+  }
+  .chip b{color:var(--apple);}
+
+  .divider{height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px);margin:10px 0;border:0;}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:.85rem;padding:30px 0 0;}
+
+  .keyline{
+    background:#fff;border-left:5px solid var(--strawberry);border-radius:0 12px 12px 0;
+    padding:10px 16px;margin:14px 0;box-shadow:var(--shadow);font-size:.95rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ヒーロー ===== -->
+<header class="hero">
+  <span class="eyebrow">はじめての SQL</span>
+  <h1>第4章<br><span class="accent">データを変更してみよう</span></h1>
+  <p class="lead">データは作って終わりじゃない。増やしたり・書き換えたり・消したり——<br>INSERT・UPDATE・DELETE で、データを自由に変更してみましょう✏️</p>
+  <div class="hero-illust">
+    <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="フルーツ店の売上データを書き換えるイラスト">
+      <!-- 地面 -->
+      <ellipse cx="260" cy="200" rx="230" ry="16" fill="#f3ecdf"/>
+      <!-- データベースの円柱 -->
+      <g>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#7fd3f7"/>
+        <path d="M70 70 v70 a60 20 0 0 0 120 0 v-70" fill="#5bc0eb"/>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#a6e2fb"/>
+        <path d="M70 100 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <path d="M70 128 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <text x="130" y="76" text-anchor="middle" font-size="15" font-weight="800" fill="#1f6d8c">DB</text>
+      </g>
+      <!-- 矢印（キャラの上を通る弧） -->
+      <path d="M194 108 Q 242 76 286 92" stroke="#ffb45c" stroke-width="4" fill="none" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#ffb45c"/></marker></defs>
+      <!-- sales テーブルのボックス -->
+      <g>
+        <rect x="290" y="70" width="180" height="110" rx="14" fill="#fff" stroke="#efe1cf" stroke-width="2"/>
+        <rect x="290" y="70" width="180" height="30" rx="14" fill="#ff8fab"/>
+        <text x="380" y="91" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">🍎 sales テーブル</text>
+        <!-- 上段：ふえる(＋) / かわる(鉛筆) / けす(×) の3アイコン -->
+        <g>
+          <circle cx="330" cy="126" r="15" fill="#eefbf0" stroke="#5cb85c" stroke-width="2"/>
+          <path d="M330 118 v16 M322 126 h16" stroke="#2f7a2f" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g>
+          <circle cx="380" cy="126" r="15" fill="#fffaf0" stroke="#f0932b" stroke-width="2"/>
+          <path d="M374 132 l9 -9 l3 3 l-9 9 Z" fill="#ffd23f" stroke="#c9760f" stroke-width="1.5" stroke-linejoin="round"/>
+        </g>
+        <g>
+          <circle cx="430" cy="126" r="15" fill="#fff0f0" stroke="#ff6b6b" stroke-width="2"/>
+          <path d="M424 120 l12 12 M436 120 l-12 12" stroke="#d64545" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <!-- 下段：3件のデータ行 -->
+        <rect x="312" y="146" width="136" height="8" rx="4" fill="#ffd23f"/>
+        <rect x="312" y="157" width="136" height="8" rx="4" fill="#5cb85c"/>
+        <rect x="312" y="168" width="90" height="8" rx="4" fill="#9b6dd6"/>
+      </g>
+      <!-- 動物客（地面に座らせ、矢印と離す） -->
+      <g transform="translate(240,171)">
+        <circle cx="0" cy="0" r="22" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="-9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <circle cx="-7" cy="-2" r="2.5" fill="#3a3550"/><circle cx="7" cy="-2" r="2.5" fill="#3a3550"/>
+        <path d="M-5 6 q5 4 10 0" stroke="#3a3550" stroke-width="2" fill="none"/>
+        <circle cx="-12" cy="4" r="3" fill="#ffc2d1"/><circle cx="12" cy="4" r="3" fill="#ffc2d1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===== 目次 ===== -->
+<nav class="toc">
+  <h2>📖 この章で分かること</h2>
+  <ol>
+    <li><a href="#s1">CRUD ってなんだろう？</a></li>
+    <li><a href="#s2">操作の前に！バックアップとレストア</a></li>
+    <li><a href="#s3">INSERT文でデータを作る</a></li>
+    <li><a href="#s4">カラム名の省略と NULL値</a></li>
+    <li><a href="#s5">UPDATE文でデータを更新する</a></li>
+    <li><a href="#s6">DELETE文でデータを削除する</a></li>
+    <li><a href="#s7">DROP TABLE でテーブルごと削除</a></li>
+    <li><a href="#s8">まとめ：覚えた言葉</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 1 CRUD ===== -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num c1">1</div><h2>CRUD ってなんだろう？</h2></div>
+
+  <div class="card">
+    <p><span class="term t-purple">DBMS</span>（データベースを管理するソフト）が持つ基本機能は、次の <b>4つ</b>だけ。それぞれの頭文字を取って <span class="term">CRUD</span>（クラッド）と呼ばれます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CRUDの4機能と対応するSQL文">
+        <!-- Create -->
+        <g>
+          <rect x="20" y="20" width="300" height="100" rx="14" fill="#eefbf0" stroke="#c9ecc9" stroke-width="2"/>
+          <circle cx="60" cy="70" r="24" fill="#5cb85c"/>
+          <text x="60" y="76" text-anchor="middle" font-size="22" font-weight="900" fill="#fff">C</text>
+          <text x="98" y="58" font-size="15" font-weight="800" fill="#2f7a2f">Create ＝ 作成</text>
+          <text x="98" y="82" font-size="12" fill="#4d8a4d">データを作る</text>
+          <text x="98" y="102" font-size="12" font-weight="800" fill="#2f7a2f">CREATE文 / INSERT文</text>
+        </g>
+        <!-- Read -->
+        <g>
+          <rect x="340" y="20" width="300" height="100" rx="14" fill="#eefaff" stroke="#cfeefb" stroke-width="2"/>
+          <circle cx="380" cy="70" r="24" fill="#5bc0eb"/>
+          <text x="380" y="76" text-anchor="middle" font-size="22" font-weight="900" fill="#fff">R</text>
+          <text x="418" y="58" font-size="15" font-weight="800" fill="#1f7fa3">Read ＝ 読み込み</text>
+          <text x="418" y="82" font-size="12" fill="#5f9bb3">データを取り出す</text>
+          <text x="418" y="102" font-size="12" font-weight="800" fill="#1f7fa3">SELECT文</text>
+        </g>
+        <!-- Update -->
+        <g>
+          <rect x="20" y="140" width="300" height="100" rx="14" fill="#fffaf0" stroke="#f6e2bf" stroke-width="2"/>
+          <circle cx="60" cy="190" r="24" fill="#f0932b"/>
+          <text x="60" y="196" text-anchor="middle" font-size="22" font-weight="900" fill="#fff">U</text>
+          <text x="98" y="178" font-size="15" font-weight="800" fill="#c9760f">Update ＝ 更新</text>
+          <text x="98" y="202" font-size="12" fill="#b07d2e">データを書き換える</text>
+          <text x="98" y="222" font-size="12" font-weight="800" fill="#c9760f">UPDATE文</text>
+        </g>
+        <!-- Delete -->
+        <g>
+          <rect x="340" y="140" width="300" height="100" rx="14" fill="#fff0f0" stroke="#ffd3d3" stroke-width="2"/>
+          <circle cx="380" cy="190" r="24" fill="#ff6b6b"/>
+          <text x="380" y="196" text-anchor="middle" font-size="22" font-weight="900" fill="#fff">D</text>
+          <text x="418" y="178" font-size="15" font-weight="800" fill="#c23c3c">Delete ＝ 削除</text>
+          <text x="418" y="202" font-size="12" fill="#c76b6b">データを消す</text>
+          <text x="418" y="222" font-size="12" font-weight="800" fill="#c23c3c">DELETE文</text>
+        </g>
+      </svg>
+      <div class="caption">▲ CRUD の4機能と、それぞれに使う SQL文。この章では <b>C・U・D</b> の3つを学びます（R＝SELECT は前の章まででバッチリ）。</div>
+    </div>
+
+    <div class="keyline">
+      データの読み込み（<b>Read</b>）を行うのが <span class="term t-blue">SELECT文</span>。テーブルを作る <b>CREATE文</b> と、テーブルにデータを入れる <b>INSERT文</b> は、どちらも <b>作成（Create）</b>の機能を使う SQL文です。更新は <b>UPDATE文</b>、削除は <b>DELETE文</b> を使います。
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="14" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="14" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="14" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="14" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble"><b>豆知識🍋</b> どんなアプリも、やっていることを突き詰めれば「作る・読む・書き換える・消す」の CRUD の組み合わせ。この4つを覚えれば、データ操作の全体像がつかめるよ！</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2 バックアップとレストア ===== -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num c2">2</div><h2>操作の前に！バックアップとレストア</h2></div>
+
+  <div class="card">
+    <p>データの作成や更新を行う前には、データベースを <span class="term t-purple">バックアップ</span>しておきましょう。バックアップとは、<b>データを別のファイルにコピーして保管しておく</b>こと。</p>
+    <p>操作を間違えたときや、不慮の事故でデータが消えてしまったとき、バックアップしたファイルを使って <b>もとの状態に戻せます</b>。もとに戻すことを <span class="term t-green">レストア</span>（restore）といいます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="データベースをコピーしてバックアップファイルを作り、レストアで戻す図">
+        <defs>
+          <marker id="ab" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#9b6dd6"/></marker>
+          <marker id="ar" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5cb85c"/></marker>
+        </defs>
+        <!-- 元DB -->
+        <g transform="translate(120,110)">
+          <ellipse cx="0" cy="-40" rx="46" ry="16" fill="#a6e2fb"/>
+          <path d="M-46 -40 v66 a46 16 0 0 0 92 0 v-66" fill="#5bc0eb"/>
+          <ellipse cx="0" cy="-40" rx="46" ry="16" fill="#a6e2fb"/>
+          <path d="M-46 -14 a46 16 0 0 0 92 0" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+          <text x="0" y="-36" text-anchor="middle" font-size="12" font-weight="800" fill="#1f6d8c">sample.db</text>
+          <text x="0" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#6b6580">今のデータベース</text>
+        </g>
+        <!-- バックアップファイル -->
+        <g transform="translate(500,110)">
+          <path d="M-40 -46 h58 l22 22 v88 h-80 Z" fill="#fff" stroke="#c9b3e8" stroke-width="2"/>
+          <path d="M18 -46 v22 h22" fill="#efe4fb" stroke="#c9b3e8" stroke-width="2"/>
+          <text x="0" y="6" text-anchor="middle" font-size="12" font-weight="800" fill="#6f42b3">sample</text>
+          <text x="0" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#6f42b3">.back</text>
+          <text x="0" y="86" text-anchor="middle" font-size="12" font-weight="700" fill="#6b6580">バックアップファイル</text>
+        </g>
+        <!-- バックアップ矢印（上） -->
+        <path d="M186 78 Q 310 42 434 74" stroke="#9b6dd6" stroke-width="3" fill="none" marker-end="url(#ab)"/>
+        <text x="310" y="44" text-anchor="middle" font-size="12.5" font-weight="800" fill="#6f42b3">.backup でコピー →</text>
+        <!-- レストア矢印（下） -->
+        <path d="M444 140 Q 310 178 176 142" stroke="#5cb85c" stroke-width="3" fill="none" marker-end="url(#ar)"/>
+        <text x="310" y="196" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f7a2f">← .restore で戻す（レストア）</text>
+      </svg>
+      <div class="caption">▲ <b>.backup</b> で今のデータベースをファイルにコピー。もし失敗しても <b>.restore</b> でその状態に戻せます。</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">書式</span>バックアップと復元のコマンド</div>
+    <p class="cmd-note"><code>.backup</code> でバックアップする対象は、いま操作しているデータベース。<code>sqlite3 sample.db</code> で起動していれば <code>sample.db</code> が対象になります。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmt">-- データベースのバックアップファイルを作る</span><br><span class="cmd">.backup</span> 作成するファイル名<br><br><span class="cmt">-- バックアップファイルからの復元（レストア）</span><br><span class="cmd">.restore</span> バックアップファイル名</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">chap4-1</span>sample.db をバックアップしてみる</div>
+    <p class="cmd-note">次のコマンドで <code>sample.db</code> を <code>sample.back</code> という名前でバックアップします。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-1.sql</span></div>
+      <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">.backup sample.back</span><br><span class="cmt">-- 何も表示されなければ成功！</span></div>
+    </div>
+
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON17-1.png" alt=".backup sample.back を実行した画面">
+        <figcaption>① <code>.backup</code> を実行（表示が出なければ成功）</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON17-2.png" alt="sql1nen フォルダに sample.back ファイルができた画面">
+        <figcaption>② <code>sql1nen</code> フォルダにファイルができたか確認</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note"><code>.backup</code> を実行して何も表示されなければ、バックアップファイルの作成に成功しています。作業用の <code>sql1nen</code> フォルダを開いて、ファイルがあるか確認しましょう。</p>
+
+    <div class="column">
+      <h4>💡 コラム：直接ファイルをコピーしてバックアップする</h4>
+      <p style="margin:0;">SQLite はデータベースがファイルとして保存されます。そのため、エクスプローラーやファインダーなどの操作でファイルを複製し、バックアップを作ることも可能です。</p>
+      <p style="margin:.5em 0 0;">しかしその方法だと、<b>SQLite を終了させないと復元できません</b>。<code>.backup</code> コマンドなら SQLite を起動させたまま復元できるため、<b>コマンドを使ったバックアップがおすすめ</b>です。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3 INSERT ===== -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num c3">3</div><h2>INSERT文でデータを作る</h2></div>
+
+  <div class="card">
+    <p>データベースにデータを作成するときは <span class="term t-green">INSERT文</span>を使います。INSERT には「挿入」という意味があり、「データの作成」を「データの挿入」と表現することもあります。</p>
+
+    <div class="cmd-title"><span class="b">書式 ①</span>カラム名を指定してデータを追加</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> テーブル名 (カラム名1, カラム名2, ...)<br><span class="cmd">VALUES</span> (値1, 値2, ...);</div>
+    </div>
+    <p class="cmd-note"><code>INSERT INTO</code> のあとにデータを作成したいテーブルを指定します。次にカッコの中にカラム名を「,」で区切って入れ、最後に <code>VALUES</code> のあとのカッコに入れたい値を「,」で区切って入れます。<b>列挙したカラム名と値の順番は連動させる</b>必要があります。</p>
+
+    <div class="cmd-title"><span class="b">確認</span>.sql ファイルの中身を見てみよう</div>
+    <p class="cmd-note"><code>.sql</code> ファイルの中身はすべてテキストデータです。Windows では <b>メモ帳</b>、macOS では <b>テキストエディット</b>で開けます。Windows なら、①ファイル名を右クリック →②［プログラムから開く］→③［メモ帳］をクリック。</p>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-1.png" alt=".sql ファイルを右クリックしてメモ帳で開くメニュー">
+        <figcaption>① 右クリック →「プログラムから開く」→「メモ帳」</figcaption>
+      </figure>
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-2.png" alt="メモ帳で開いた SQL 文の中身">
+        <figcaption>② ファイル内の SQL文が表示される</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">最初の7行は <code>sales</code> テーブルを作る SQL文で、8〜23行目が INSERT文。1件のデータごとに INSERT文を1回実行しています。カラム名と値を列挙すると1つの SQL文が長くなるため、<b>改行して2行に分けて</b>います。</p>
+
+    <div class="cmd-title"><span class="b">例</span>8・9行目の INSERT文を読む</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">SQL文</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales (date, item_name, item_count, price, customer)<br><span class="cmd">VALUES</span> ('2023-04-10', 'リンゴ', 3, 360, 'ウサ田');</div>
+    </div>
+    <p class="cmd-note">1行目のカッコ内が値を入れる <b>カラム名</b>、2行目のカッコ内が各カラムに入れる <b>値</b>です。カラムの順番と値の順番は対応関係にあり、対応するカラムに値が入ります。順番が一致しないと <b>意図しないカラムに値が入ってしまう</b>ので注意しましょう。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="カラム名と値が上下で対応して入る図">
+        <defs>
+          <marker id="av1" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5cb85c"/></marker>
+        </defs>
+        <!-- 見出し -->
+        <text x="320" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#2f7a2f">🔗 同じ順番で対応</text>
+        <!-- カラム名の行 -->
+        <text x="30" y="44" font-size="12" font-weight="800" fill="#2f7a2f">カラム名</text>
+        <g font-size="12" font-weight="800" fill="#2f7a2f">
+          <rect x="120" y="26" width="90" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/><text x="165" y="46" text-anchor="middle">date</text>
+          <rect x="220" y="26" width="110" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/><text x="275" y="46" text-anchor="middle">item_name</text>
+          <rect x="340" y="26" width="70" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/><text x="375" y="46" text-anchor="middle">price</text>
+          <rect x="420" y="26" width="100" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/><text x="470" y="46" text-anchor="middle">customer</text>
+        </g>
+        <!-- 対応の矢印（ギャップ中央に配置） -->
+        <g stroke="#5cb85c" stroke-width="2" fill="none">
+          <path d="M165 96 V66" marker-end="url(#av1)"/>
+          <path d="M275 96 V66" marker-end="url(#av1)"/>
+          <path d="M375 96 V66" marker-end="url(#av1)"/>
+          <path d="M470 96 V66" marker-end="url(#av1)"/>
+        </g>
+        <!-- 値の行 -->
+        <text x="30" y="126" font-size="12" font-weight="800" fill="#c23c72">値</text>
+        <g font-size="12" fill="#3a3550">
+          <rect x="120" y="106" width="90" height="30" rx="6" fill="#ffe4ee" stroke="#ffbcd3"/><text x="165" y="126" text-anchor="middle">'2023-04-10'</text>
+          <rect x="220" y="106" width="110" height="30" rx="6" fill="#ffe4ee" stroke="#ffbcd3"/><text x="275" y="126" text-anchor="middle">'リンゴ'</text>
+          <rect x="340" y="106" width="70" height="30" rx="6" fill="#ffe4ee" stroke="#ffbcd3"/><text x="375" y="126" text-anchor="middle">360</text>
+          <rect x="420" y="106" width="100" height="30" rx="6" fill="#ffe4ee" stroke="#ffbcd3"/><text x="470" y="126" text-anchor="middle">'ウサ田'</text>
+        </g>
+        <text x="320" y="180" text-anchor="middle" font-size="12" fill="#6b6580">▲ 順番がズレると、ちがうカラムに値が入ってしまう</text>
+      </svg>
+      <div class="caption">▲ カラム名と値は「上から順」で対応。この対応関係が INSERT文のキモです。</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">chap4-2</span>データを追加して確認する</div>
+    <p class="cmd-note">INSERT文でデータの追加に成功すると <b>何も表示されません</b>。そこで、続けて SELECT文を実行してテーブルの中身を確認します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-2.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales (date, item_name, item_count, price, customer)<br><span class="cmd">VALUES</span> ('2023-04-15', 'イチゴ', 2, 800, 'クマ井');<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-3.png" alt="chap4-2 の実行結果。イチゴのレコードが追加された画面">
+        <figcaption>▲ イチゴのレコードが追加された</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 カラム名の省略と NULL ===== -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num c4">4</div><h2>カラム名の省略と NULL値</h2></div>
+
+  <div class="card">
+    <p>INSERT文で <b>すべてのカラムに値を入れる場合</b>、カラム名は省略できます。省略するときは、テーブルのカラムの数だけ、カラムの順番にあわせて値を列挙します。</p>
+
+    <div class="cmd-title"><span class="b">書式 ②</span>カラム名を省略して追加</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> テーブル名 <span class="cmd">VALUES</span> (値1, 値2, ...);</div>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-3.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales<br><span class="cmd">VALUES</span> ('2023-04-15', 'イチゴ', 1, 400, 'ウサ田');<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-4.png" alt="chap4-3 の実行結果。カラム名を省略して追加した画面">
+        <figcaption>▲ カラム名を省略してもデータを追加できた</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">カラム名を指定する INSERT文では、誤って <b>NULL値</b>が入ってしまうことがあります。特別な理由がない限りは、<b>カラム名を省略した書き方がおすすめ</b>です。</p>
+
+    <div class="keyline">
+      <span class="term t-pink">NULL値</span>（ヌル）とは、<b>セルに値が入っていないこと</b>を表します。「0」でも「空文字」でもなく、"何も入っていない" という状態です。
+    </div>
+
+    <p style="margin-top:20px;"><b>▼ NULL値が生まれる例</b>：カラム名に <code>customer</code> がなく、値も1つ足りない INSERT文</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-4.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales (date, item_name, item_count, price)<br><span class="cmd">VALUES</span> ('2023-04-16', 'ブドウ', 1, 500);<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-5.png" alt="chap4-4 の実行結果。customer が空欄（NULL）のレコード">
+        <figcaption>▲ <code>customer</code> の欄が空（NULL値）になっている</figcaption>
+      </figure>
+    </div>
+
+    <p style="margin-top:16px;"><b>▼ カラム名を省略すれば入れ漏れを防げる</b>：値が足りないと <b>エラー</b>になる</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-5.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-16', 'バナナ', 2, 400);</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-6.png" alt="chap4-5 の実行結果。Parse エラーが表示された画面">
+        <figcaption>▲ Parse エラーが表示される（値の数が足りない）</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note"><b>Parse エラー</b>は、SQL文の構文に誤りがあると発生するエラー。メッセージは「<code>sales</code> テーブルには5つのカラムがあるが、指定された値は4つ」という意味です。カラム名を省略するときは、<b>カラムの数と値の数を一致</b>させる必要があります。あえて NULL値を入れたい場合以外は、カラム名を省略した INSERT文を作りましょう。</p>
+
+    <div class="column">
+      <h4>💡 コラム：NULL値があるときの COUNT関数</h4>
+      <p style="margin:0;"><code>COUNT</code> 関数を使うと、レコードの件数を数えられます。引数に「<code>*</code>」を指定すると <b>すべてのレコード件数</b>を数えますが、カラム名を引数にすると <b>NULL値以外</b>の値が入ったレコード数を数えます。</p>
+      <div class="term-card">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-6.sql</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> <span class="cmd">COUNT</span>(*), <span class="cmd">COUNT</span>(customer) <span class="cmd">FROM</span> sales;</div>
+      </div>
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-7.png" alt="COUNT(*) と COUNT(customer) の結果が異なる画面">
+        <figcaption>▲ <code>COUNT(*)</code> と <code>COUNT(customer)</code> で件数が変わる（NULL は数えない）</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>🔍 コラム：NULL値を持つデータの探し方</h4>
+      <p style="margin:0;">指定したカラムに NULL値が入っているかは、<code>IS NULL</code> 演算子で調べられます。WHERE句でカラム名のあとに <code>IS NULL</code> と書きます。</p>
+      <div class="term-card">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-7.sql</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> date, item_name, item_count, price<br><span class="cmd">FROM</span> sales <span class="cmd">WHERE</span> customer <span class="cmd">IS NULL</span>;</div>
+      </div>
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-8.png" alt="IS NULL で customer が空のレコードを絞り込んだ画面">
+        <figcaption>▲ <code>customer</code> が NULL のレコードだけを取り出せた</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>📝 コラム：コメント機能</h4>
+      <p style="margin:0;">SQLite はテキストファイルから読み込んだ SQL文を実行できます。SQL文の働きが分かるようにしたいときに使うのが <b>コメント機能</b>。<code>/*</code> から <code>*/</code> の範囲は <b>コメント</b>と呼ばれ、SQL文の一部とは見なされません。注釈を付けたいときに利用しましょう。</p>
+      <div class="term-card">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">コメントの例</span></div>
+        <div class="term-body"><span class="cmt">/*salesテーブルからデータを取り出す*/</span><br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+      </div>
+    </div>
+
+    <div class="cmd-title"><span class="b">chap4-8</span>データを復元する（レストア）</div>
+    <p class="cmd-note">ここまでの状態を <code>sample2.back</code> としてバックアップしてから、<code>.restore</code> で <code>sample.back</code> の状態に戻します。実行後、SELECT文で復元されたか確認します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-8.sql</span></div>
+      <div class="term-body"><span class="cmd">.backup sample2.back</span><br><span class="cmd">.restore sample.back</span><br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON18-9.png" alt="chap4-8 の実行結果。バックアップした状態に復元された画面">
+        <figcaption>▲ <code>sample.back</code> の状態に復元された</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5 UPDATE ===== -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num c5">5</div><h2>UPDATE文でデータを更新する</h2></div>
+
+  <div class="card">
+    <p>すでにあるデータを <b>書き換える</b>には <span class="term t-pink">UPDATE文</span>を使います。</p>
+
+    <div class="cmd-title"><span class="b">書式</span>データを更新する</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">UPDATE</span> テーブル名 <span class="cmd">SET</span> カラム名 = 値 <span class="cmd">WHERE</span> 条件式;</div>
+    </div>
+    <p class="cmd-note"><code>UPDATE</code> のあとに更新したいテーブルを指定。<code>SET</code> のあとに更新したいカラム名と入れたい値を「＝」でつなぎます。ふつう「＝」は左辺と右辺が同じか判定する働きですが、<code>SET</code> の「＝」は <b>左辺のカラムに右辺の値を入れる</b>働きになります。そして最後に <b>WHERE句</b>を付けます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WHERE で対象を絞り、SET で値を書き換える図">
+        <defs>
+          <marker id="au" markerWidth="10" markerHeight="10" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f0932b"/></marker>
+        </defs>
+        <!-- テーブル（ヘッダ30px＋データ行40px×3＝bottom 190） -->
+        <rect x="40" y="40" width="360" height="150" rx="10" fill="#fff" stroke="#c9b48f" stroke-width="2"/>
+        <rect x="40" y="40" width="360" height="30" rx="10" fill="#eefbf0" stroke="#c9ecc9"/>
+        <g font-size="12" font-weight="800" fill="#2f7a2f"><text x="90" y="60" text-anchor="middle">date</text><text x="210" y="60" text-anchor="middle">item_name</text><text x="330" y="60" text-anchor="middle">price</text></g>
+        <g font-size="12" fill="#3a3550">
+          <text x="90" y="94" text-anchor="middle">2023-04-14</text><text x="210" y="94" text-anchor="middle">リンゴ</text><text x="330" y="94" text-anchor="middle">360</text>
+          <text x="90" y="134" text-anchor="middle">2023-04-15</text><text x="210" y="134" text-anchor="middle">イチゴ</text><text x="330" y="134" text-anchor="middle">800</text>
+          <text x="90" y="174" text-anchor="middle">2023-04-16</text><text x="210" y="174" text-anchor="middle">バナナ</text><text x="330" y="174" text-anchor="middle">400</text>
+        </g>
+        <g stroke="#e7dcc9" stroke-width="1"><line x1="40" y1="110" x2="400" y2="110"/><line x1="40" y1="150" x2="400" y2="150"/><line x1="150" y1="40" x2="150" y2="190"/><line x1="270" y1="40" x2="270" y2="190"/></g>
+        <!-- WHERE で1行を選択（1行目 70-110 内に収める） -->
+        <rect x="42" y="72" width="356" height="36" rx="5" fill="none" stroke="#f0932b" stroke-width="2.5"/>
+        <text x="486" y="84" font-size="12.5" font-weight="800" fill="#c9760f">① WHERE で</text>
+        <text x="486" y="101" font-size="12.5" font-weight="800" fill="#c9760f">対象の行を絞る</text>
+        <path d="M478 90 H404" stroke="#f0932b" stroke-width="2.5" fill="none" marker-end="url(#au)"/>
+        <!-- SET で書き換え -->
+        <text x="486" y="158" font-size="12.5" font-weight="800" fill="#c9760f">② SET で</text>
+        <text x="486" y="175" font-size="12.5" font-weight="800" fill="#c9760f">値を書き換える</text>
+      </svg>
+      <div class="caption">▲ <b>WHERE で「どの行を」</b>絞り込み、<b>SET で「何に書き換えるか」</b>を指定する。この2つがUPDATEの両輪。</div>
+    </div>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-9.sql</span></div>
+      <div class="term-body"><span class="cmd">UPDATE</span> sales <span class="cmd">SET</span> date = '2023-04-15' <span class="cmd">WHERE</span> date = '2023-04-14';<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON19-1.png" alt="chap4-9 の実行結果。date が書き換わった画面">
+        <figcaption>▲ <code>date</code> が「2023-04-14 → 2023-04-15」に更新された</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">更新するデータの条件は <code>date</code> カラムが「2023-04-14」のレコード。<code>SET</code> 句で <code>date</code> カラムに「2023-04-15」を指定しています。</p>
+
+    <div class="cmd-title"><span class="b">応用</span>複数の値をまとめて更新する</div>
+    <p class="cmd-note"><code>SET</code> 句を「,」で区切ると、複数の値を同時に更新できます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">UPDATE</span> テーブル名 <span class="cmd">SET</span> カラム名1 = 値1, カラム名2 = 値2 <span class="cmd">WHERE</span> 条件式;</div>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-10.sql</span></div>
+      <div class="term-body"><span class="cmd">UPDATE</span> sales <span class="cmd">SET</span> item_count = 1, price = 400<br><span class="cmd">WHERE</span> item_name = 'イチゴ' <span class="cmd">AND</span> customer = 'ネコ村';<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON19-2.png" alt="chap4-10 の実行結果。item_count と price がまとめて更新された画面">
+        <figcaption>▲ <code>item_count</code> と <code>price</code> が同時に更新された</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">更新対象の条件は、<code>item_name</code> が「イチゴ」かつ <code>customer</code> が「ネコ村」。SET句により、対象レコードの <code>item_count</code> が「1」、<code>price</code> が「400」に更新されます。</p>
+
+    <div class="cmd-title"><span class="b">要注意</span>WHERE句を忘れると…？</div>
+    <p class="cmd-note">UPDATE文では、WHERE句で更新する条件を指定します。<b>条件の指定を忘れると、SET句で指定したカラムの値が全て同じになってしまいます。</b></p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-11.sql（WHERE なし！）</span></div>
+      <div class="term-body"><span class="cmd">UPDATE</span> sales <span class="cmd">SET</span> date = '2023-04-16';<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON19-3.png" alt="chap4-11 の実行結果。全レコードの date が同じ値になった画面">
+        <figcaption>▲ 全レコードの <code>date</code> が「2023-04-16」になってしまった😱</figcaption>
+      </figure>
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="14" r="9" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="48" cy="14" r="9" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><ellipse cx="32" cy="41" rx="7" ry="5" fill="#ffe8ef"/><path d="M28 41 q4 4 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">こんなときこそ <b>バックアップ</b>の出番！ <code>.restore sample.back</code> で、変更する前の状態に戻しておこう。だから操作の前に必ずバックアップしておくんだね🐻</div>
+    </div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-12.sql</span></div>
+      <div class="term-body"><span class="cmd">.restore sample.back</span><br><span class="cmt">-- 変更する前の状態に戻す</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6 DELETE ===== -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num c6">6</div><h2>DELETE文でデータを削除する</h2></div>
+
+  <div class="card">
+    <p>データを削除するための SQL文は <span class="term">DELETE文</span>。SELECT文と同じように <code>FROM</code> 句で削除したいテーブルを指定し、<code>WHERE</code> 句で削除したいデータの条件を指定します。</p>
+
+    <div class="cmd-title"><span class="b">書式</span>データの削除</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">DELETE FROM</span> テーブル名 <span class="cmd">WHERE</span> 条件式;</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">chap4-13</span>条件に合うレコードを削除</div>
+    <p class="cmd-note">次の DELETE文は、<code>date</code> カラムが「2023-04-10」のレコードが削除対象です。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-13.sql</span></div>
+      <div class="term-body"><span class="cmd">DELETE FROM</span> sales <span class="cmd">WHERE</span> date = '2023-04-10';<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON20-1.png" alt="chap4-13 の実行結果。指定した日付のレコードが消えた画面">
+        <figcaption>▲ 「2023-04-10」のレコードが削除された</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">削除するレコードをしぼりたい場合は、WHERE句で <b>複数の条件式を組み合わせ</b>ます。</p>
+
+    <div class="cmd-title"><span class="b">要注意</span>WHERE句を使わないと全部消える</div>
+    <p class="cmd-note">DELETE文で WHERE句を使わなかった場合、<b>すべてのレコードが削除</b>されます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-14.sql（WHERE なし！）</span></div>
+      <div class="term-body"><span class="cmd">DELETE FROM</span> sales;<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;</div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON20-2.png" alt="chap4-14 の実行結果。テーブルが空になった画面">
+        <figcaption>▲ SELECT しても何も出ない＝テーブルが空っぽに</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note">SELECT を実行しても何も表示されないのは、テーブルが空っぽである証拠。<b>WHERE句がないと全て削除される</b>ので、付け忘れないよう注意しましょう。</p>
+  </div>
+</section>
+
+<!-- ===== 7 DROP TABLE ===== -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num c7">7</div><h2>DROP TABLE でテーブルごと削除</h2></div>
+
+  <div class="card">
+    <p>最後は、テーブルそのものを削除する <span class="term">DROP TABLE</span>（ドロップ テーブル）文。<code>DROP TABLE</code> に続けて、削除したいテーブル名を指定します。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DELETE は中身だけ消し、DROP TABLE は表ごと消す違いの図">
+        <!-- DELETE -->
+        <g>
+          <text x="165" y="30" text-anchor="middle" font-size="14" font-weight="800" fill="#c23c3c">DELETE ＝ 中身を消す</text>
+          <rect x="50" y="46" width="230" height="120" rx="10" fill="#fff" stroke="#c9b48f" stroke-width="2"/>
+          <rect x="50" y="46" width="230" height="30" rx="10" fill="#ffe4ee" stroke="#ffbcd3"/>
+          <text x="165" y="66" text-anchor="middle" font-size="11" font-weight="800" fill="#c23c72">sales（表は残る）</text>
+          <g stroke="#e7dcc9" stroke-width="1"><line x1="50" y1="106" x2="280" y2="106"/><line x1="50" y1="136" x2="280" y2="136"/></g>
+          <text x="165" y="124" text-anchor="middle" font-size="12" fill="#c0b9a8">（空っぽ）</text>
+          <text x="165" y="188" text-anchor="middle" font-size="11" fill="#6b6580">表の"入れ物"は残る</text>
+        </g>
+        <!-- 区切り -->
+        <line x1="330" y1="40" x2="330" y2="180" stroke="#efe9df" stroke-width="2" stroke-dasharray="4 5"/>
+        <!-- DROP TABLE -->
+        <g>
+          <text x="495" y="30" text-anchor="middle" font-size="14" font-weight="800" fill="#8a6d00">DROP TABLE ＝ 表ごと消す</text>
+          <rect x="380" y="46" width="230" height="120" rx="10" fill="#fbf7ee" stroke="#e6dcc6" stroke-width="2" stroke-dasharray="6 5" opacity=".8"/>
+          <text x="495" y="112" text-anchor="middle" font-size="30">💨</text>
+          <text x="495" y="188" text-anchor="middle" font-size="11" fill="#6b6580">テーブルそのものが消える</text>
+        </g>
+      </svg>
+      <div class="caption">▲ <b>DELETE</b> はデータ（中身）だけを消し、テーブルは残る。<b>DROP TABLE</b> はテーブルそのものを消す。</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">書式</span>指定したテーブルを削除する</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">書式</span></div>
+      <div class="term-body"><span class="cmd">DROP TABLE</span> テーブル名;</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">chap4-15</span>sales テーブルを削除する</div>
+    <p class="cmd-note">次の DROP TABLE文を実行すると <code>sales</code> テーブルが削除されます。実行後、<code>.tables</code> コマンドでテーブルの一覧を表示させます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-15.sql</span></div>
+      <div class="term-body"><span class="cmd">DROP TABLE</span> sales;<br><span class="cmd">.tables</span></div>
+    </div>
+    <div class="shot-row" style="grid-template-columns:1fr;">
+      <figure>
+        <img class="shot" style="display:block;margin:10px auto 0;" src="第4章/LESSON20-3.png" alt="chap4-15 の実行結果。.tables に何も表示されない画面">
+        <figcaption>▲ <code>.tables</code> に何も出ない＝テーブルが1つもない</figcaption>
+      </figure>
+    </div>
+    <p class="cmd-note"><code>.tables</code> を実行しても何も表示されないということは、テーブルが1つもないということ。DROP TABLE文もデータを削除する機能の1つで、テーブルを削除できます。最後に、レストアして変更する前の状態に戻しておきましょう。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap4-16.sql</span></div>
+      <div class="term-body"><span class="cmd">.restore sample.back</span><br><span class="cmt">-- 変更する前の状態に戻す</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8 まとめ ===== -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num c8">8</div><h2>まとめ：この章で覚えた言葉</h2></div>
+  <div class="card">
+    <p>おつかれさまでした🎉 第4章では、データを <b>作る・書き換える・消す</b> 操作を学びました。大事な言葉とSQL文を並べておきます。</p>
+    <div class="chips">
+      <div class="chip"><b>CRUD</b>：作成・読込・更新・削除の4機能</div>
+      <div class="chip"><b>INSERT文</b>：データを作成（追加）する</div>
+      <div class="chip"><b>UPDATE文</b>：データを更新（書き換え）する</div>
+      <div class="chip"><b>DELETE文</b>：レコードを削除する</div>
+      <div class="chip"><b>DROP TABLE</b>：テーブルごと削除する</div>
+      <div class="chip"><b>SET句</b>：更新するカラムと値を指定</div>
+      <div class="chip"><b>NULL値</b>：セルに値が入っていない状態</div>
+      <div class="chip"><b>.backup / .restore</b>：バックアップと復元</div>
+    </div>
+
+    <div class="keyline">
+      <b>UPDATE・DELETE では WHERE句を忘れない！</b> 忘れると全レコードが対象になってしまいます。だからこそ、操作の前に <code>.backup</code> しておくのが安全のコツです。
+    </div>
+
+    <div class="speech" style="margin-top:20px;">
+      <div class="avatar">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="14" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="14" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="14" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="14" rx="3" ry="6" fill="#ffc2d1"/><path d="M22 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><path d="M38 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M27 41 q5 5 10 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">これで CRUD の <b>C・U・D</b> がそろいました！ SELECT でデータを読み、INSERT・UPDATE・DELETE で変更する——SQL の基本操作はもうバッチリだね。ここまで本当におつかれさまでした🍓</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  第4章「データを変更してみよう」 ／ はじめての SQL 入門
+</footer>
+
+</div>
+</body>
+</html>
