@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第5章 複数のテーブルでデータを管理しよう｜はじめてのSQL</title>
+<style>
+  :root{
+    --apple:#ff6b6b;      /* リンゴ赤 */
+    --strawberry:#ff8fab;  /* いちご桃 */
+    --grape:#9b6dd6;      /* ぶどう紫 */
+    --banana:#ffd23f;     /* バナナ黄 */
+    --leaf:#5cb85c;       /* 葉緑 */
+    --sky:#5bc0eb;        /* 空色 */
+    --ink:#3a3550;
+    --ink-soft:#6b6580;
+    --paper:#fffdf8;
+    --card:#ffffff;
+    --line:#efe9df;
+    --shadow:0 8px 24px rgba(120,100,80,.10);
+    --shadow-lg:0 16px 40px rgba(120,100,80,.16);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI","Segoe UI",system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, #fff2f5 0, transparent 40%),
+      radial-gradient(circle at 88% 4%, #fef7d6 0, transparent 38%),
+      radial-gradient(circle at 50% 100%, #eef8ee 0, transparent 45%),
+      var(--paper);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+  img{max-width:100%;height:auto;}
+
+  /* ===== ヒーロー ===== */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:56px 20px 44px;
+    margin-bottom:8px;
+  }
+  .hero .eyebrow{
+    display:inline-block;background:#fff;border:2px solid var(--banana);
+    color:var(--ink-soft);font-weight:700;font-size:.8rem;letter-spacing:.15em;
+    padding:6px 16px;border-radius:999px;box-shadow:var(--shadow);
+  }
+  .hero h1{
+    font-size:clamp(1.9rem,6vw,3.1rem);margin:.5em 0 .2em;line-height:1.25;
+    letter-spacing:.02em;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(transparent 62%, var(--banana) 62%);
+    padding:0 .1em;
+  }
+  .hero p.lead{font-size:1.05rem;color:var(--ink-soft);margin:.4em auto 0;max-width:560px;}
+  .hero-illust{max-width:520px;margin:14px auto 0;}
+
+  /* ===== 目次 ===== */
+  .toc{
+    background:var(--card);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);padding:22px 24px;margin:24px 0 44px;
+  }
+  .toc h2{margin:0 0 12px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;counter-reset:t;}
+  .toc li{counter-increment:t;}
+  .toc a{
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+    padding:8px 10px;border-radius:12px;transition:background .15s,transform .15s;
+  }
+  .toc a:hover{background:#fff6ef;transform:translateX(3px);}
+  .toc a::before{
+    content:counter(t);flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--strawberry);color:#fff;font-weight:800;font-size:.85rem;
+    display:grid;place-items:center;
+  }
+  @media(max-width:560px){.toc ol{grid-template-columns:1fr;}}
+
+  /* ===== セクション ===== */
+  section{margin:0 0 52px;}
+  .sec-head{display:flex;align-items:center;gap:14px;margin:0 0 18px;}
+  .sec-num{
+    flex:0 0 auto;width:52px;height:52px;border-radius:18px;
+    display:grid;place-items:center;font-weight:900;font-size:1.5rem;color:#fff;
+    box-shadow:var(--shadow);transform:rotate(-4deg);
+  }
+  .sec-head h2{margin:0;font-size:clamp(1.3rem,3.6vw,1.7rem);line-height:1.3;}
+  .c1{background:var(--apple);}
+  .c2{background:var(--grape);}
+  .c3{background:var(--leaf);}
+  .c4{background:var(--sky);}
+  .c5{background:var(--strawberry);}
+  .c6{background:#f0932b;}
+  .c7{background:var(--banana);color:var(--ink)!important;}
+  .c8{background:#2d2b40;}
+  .c9{background:var(--leaf);}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);padding:24px 26px;margin:16px 0;
+  }
+  p{margin:.6em 0;}
+  .fig{margin:20px 0;text-align:center;}
+  .fig svg{max-width:100%;height:auto;border-radius:16px;}
+  .caption{font-size:.85rem;color:var(--ink-soft);margin-top:8px;}
+
+  /* 用語タグ */
+  .term{
+    display:inline-block;font-weight:800;padding:.05em .45em;border-radius:8px;
+    background:#fff3c4;color:#8a6d00;white-space:nowrap;
+  }
+  .term.t-blue{background:#dff3fd;color:#1f7fa3;}
+  .term.t-green{background:#e2f6e2;color:#2f7a2f;}
+  .term.t-purple{background:#efe4fb;color:#6f42b3;}
+  .term.t-pink{background:#ffe4ee;color:#c23c72;}
+
+  /* 吹き出し */
+  .speech{
+    display:flex;gap:14px;align-items:flex-start;margin:18px 0;
+  }
+  .speech .avatar{flex:0 0 auto;width:64px;height:64px;}
+  .bubble{
+    position:relative;background:#fff7ef;border:2px solid #ffe3c9;border-radius:16px;
+    padding:12px 16px;font-size:.96rem;box-shadow:var(--shadow);
+  }
+  .bubble::before{
+    content:"";position:absolute;left:-11px;top:20px;
+    border-width:8px 11px 8px 0;border-style:solid;border-color:transparent #ffe3c9 transparent transparent;
+  }
+
+  /* RDBMSカード */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .rdbms{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;box-shadow:var(--shadow);border-top:5px solid var(--sky);
+  }
+  .rdbms h4{margin:0 0 4px;font-size:1.05rem;display:flex;align-items:center;gap:8px;}
+  .rdbms .ruby{font-size:.72rem;color:var(--ink-soft);font-weight:600;}
+  .rdbms p{margin:.3em 0 0;font-size:.9rem;color:var(--ink-soft);}
+  .rdbms .ic{width:30px;height:30px;flex:0 0 auto;}
+
+  /* メリデメ */
+  .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:560px){.pros-cons{grid-template-columns:1fr;}}
+  .pc{border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);}
+  .pc.pro{background:#effaf0;border:1px solid #c9ecc9;}
+  .pc.con{background:#fff0f0;border:1px solid #ffd3d3;}
+  .pc h4{margin:0 0 8px;font-size:1rem;display:flex;align-items:center;gap:8px;}
+  .pc ul{margin:0;padding-left:4px;list-style:none;}
+  .pc li{padding:4px 0 4px 26px;position:relative;font-size:.94rem;}
+  .pc.pro li::before{content:"○";position:absolute;left:0;color:var(--leaf);font-weight:900;}
+  .pc.con li::before{content:"×";position:absolute;left:0;color:var(--apple);font-weight:900;}
+
+  /* ステップタイムライン */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+  @media(max-width:720px){.steps{grid-template-columns:1fr 1fr;}}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:16px 14px;text-align:center;box-shadow:var(--shadow);position:relative;
+  }
+  .step .n{
+    width:34px;height:34px;border-radius:50%;background:var(--leaf);color:#fff;
+    font-weight:900;display:grid;place-items:center;margin:0 auto 8px;
+  }
+  .step h4{margin:0 0 4px;font-size:.95rem;}
+  .step p{margin:0;font-size:.82rem;color:var(--ink-soft);}
+  .step svg{width:44px;height:44px;margin:0 auto 4px;display:block;}
+
+  /* ターミナル風 */
+  .term-card{
+    background:#221f33;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);
+    margin:14px 0;
+  }
+  .term-bar{background:#312d47;padding:9px 14px;display:flex;align-items:center;gap:7px;}
+  .term-bar .dot{width:11px;height:11px;border-radius:50%;}
+  .term-bar .t{color:#aaa2c9;font-size:.78rem;margin-left:8px;}
+  .term-body{
+    padding:16px 18px;color:#e8e6f5;font-family:"Cascadia Code","Consolas","SF Mono",monospace;
+    font-size:.9rem;line-height:1.7;overflow-x:auto;
+  }
+  .term-body .prompt{color:#7ee1a8;}
+  .term-body .cmd{color:#ffe08a;}
+  .term-body .cmt{color:#8f88b3;}
+  .cmd-note{font-size:.9rem;color:var(--ink-soft);margin:6px 2px 0;}
+  .cmd-title{font-weight:800;margin:20px 0 4px;display:flex;align-items:center;gap:8px;}
+  .cmd-title .b{background:var(--ink);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:999px;}
+
+  /* コラム */
+  .column{
+    background:linear-gradient(#fffaf0,#fff);border:2px dashed var(--banana);
+    border-radius:18px;padding:20px 22px;margin:22px 0;
+  }
+  .column h4{margin:0 0 6px;display:flex;align-items:center;gap:8px;font-size:1.05rem;}
+
+  /* スクショ */
+  .shot{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-top:10px;}
+  .shot-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+  @media(max-width:560px){.shot-row{grid-template-columns:1fr;}}
+  figure{margin:0;}
+  figcaption{font-size:.82rem;color:var(--ink-soft);margin-top:6px;text-align:center;}
+
+  /* まとめチップ */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+  .chip{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+    box-shadow:var(--shadow);font-size:.92rem;
+  }
+  .chip b{color:var(--apple);}
+
+  .divider{height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px);margin:10px 0;border:0;}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:.85rem;padding:30px 0 0;}
+
+  .keyline{
+    background:#fff;border-left:5px solid var(--strawberry);border-radius:0 12px 12px 0;
+    padding:10px 16px;margin:14px 0;box-shadow:var(--shadow);font-size:.95rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== ヒーロー ===== -->
+<header class="hero">
+  <span class="eyebrow">はじめての SQL</span>
+  <h1>第5章<br><span class="accent">複数のテーブルでデータを管理しよう</span></h1>
+  <p class="lead">売上と商品、ぜんぶ1つの表に詰め込むと…実は困りごとが起きます。<br>データを2つのテーブルに分けて、あとで"合体"させる技を覚えましょう🍎</p>
+  <div class="hero-illust">
+    <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2つのテーブルとデータベースのイラスト">
+      <!-- 地面 -->
+      <ellipse cx="260" cy="200" rx="230" ry="16" fill="#f3ecdf"/>
+      <!-- データベースの円柱 -->
+      <g>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#7fd3f7"/>
+        <path d="M70 70 v70 a60 20 0 0 0 120 0 v-70" fill="#5bc0eb"/>
+        <ellipse cx="130" cy="70" rx="60" ry="20" fill="#a6e2fb"/>
+        <path d="M70 100 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <path d="M70 128 a60 20 0 0 0 120 0" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <text x="130" y="76" text-anchor="middle" font-size="15" font-weight="800" fill="#1f6d8c">DB</text>
+      </g>
+      <!-- 矢印（キャラの上を通る弧。この高さは変えない） -->
+      <path d="M194 108 Q 242 76 286 92" stroke="#ffb45c" stroke-width="4" fill="none" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#ffb45c"/></marker></defs>
+      <!-- テーマのボックス：2つのテーブル -->
+      <g>
+        <rect x="290" y="70" width="180" height="110" rx="14" fill="#fff" stroke="#efe1cf" stroke-width="2"/>
+        <rect x="290" y="70" width="180" height="30" rx="14" fill="#ff8fab"/>
+        <text x="380" y="91" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">🗂 2つのテーブル</text>
+        <!-- 上段：sales テーブル -->
+        <rect x="306" y="108" width="148" height="28" rx="5" fill="#fff" stroke="#e7dbc7" stroke-width="1.5"/>
+        <rect x="306" y="108" width="148" height="10" rx="5" fill="#ff8fab"/>
+        <line x1="352" y1="118" x2="352" y2="136" stroke="#f0e0e6" stroke-width="1.5"/>
+        <line x1="306" y1="127" x2="454" y2="127" stroke="#f4e9ee" stroke-width="1"/>
+        <text x="312" y="132" font-size="7.5" fill="#c98aa4">sales</text>
+        <!-- 下段：item テーブル -->
+        <rect x="306" y="146" width="148" height="28" rx="5" fill="#fff" stroke="#e7dbc7" stroke-width="1.5"/>
+        <rect x="306" y="146" width="148" height="10" rx="5" fill="#5cb85c"/>
+        <line x1="352" y1="156" x2="352" y2="174" stroke="#e4f2e4" stroke-width="1.5"/>
+        <line x1="306" y1="165" x2="454" y2="165" stroke="#eaf5ea" stroke-width="1"/>
+        <text x="312" y="170" font-size="7.5" fill="#7bb37b">item</text>
+        <!-- 結合キーのリンク -->
+        <path d="M300 122 Q 292 141 300 160" stroke="#ffd23f" stroke-width="2.5" fill="none"/>
+        <circle cx="300" cy="122" r="3" fill="#ffd23f"/><circle cx="300" cy="160" r="3" fill="#ffd23f"/>
+      </g>
+      <!-- 動物客（位置固定：矢印と重ねない） -->
+      <g transform="translate(240,171)">
+        <circle cx="0" cy="0" r="22" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="-9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <ellipse cx="9" cy="-22" rx="5" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/>
+        <circle cx="-7" cy="-2" r="2.5" fill="#3a3550"/><circle cx="7" cy="-2" r="2.5" fill="#3a3550"/>
+        <path d="M-5 6 q5 4 10 0" stroke="#3a3550" stroke-width="2" fill="none"/>
+        <circle cx="-12" cy="4" r="3" fill="#ffc2d1"/><circle cx="12" cy="4" r="3" fill="#ffc2d1"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ===== 目次 ===== -->
+<nav class="toc">
+  <h2>📖 この章で分かること</h2>
+  <ol>
+    <li><a href="#s1">名前のつけ方には決まりがある</a></li>
+    <li><a href="#s2">テーブルを2つに分けて設計する</a></li>
+    <li><a href="#s3">テーブルの名前を変える（ALTER）</a></li>
+    <li><a href="#s4">CREATE文でテーブルを作る／データ型</a></li>
+    <li><a href="#s5">制約 —— 主キーと NOT NULL</a></li>
+    <li><a href="#s6">データを入れて制約を試す</a></li>
+    <li><a href="#s7">INNER JOIN でテーブルを合体させる</a></li>
+    <li><a href="#s8">結合に条件・集計を組み合わせる</a></li>
+    <li><a href="#s9">テーブルのデータで計算する</a></li>
+    <li><a href="#s10">CSVファイルに書き出して Excel で開く</a></li>
+    <li><a href="#s11">まとめ／これから何を勉強する？</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 1 命名規則 ===== -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num c1">1</div><h2>名前のつけ方には決まりがある</h2></div>
+
+  <div class="card">
+    <p>テーブルやカラムの名前は、どんな RDBMS でも使えるように <b>英語で</b> つけるのがおすすめでした。じつは英語にする以外にも、いくつかの <span class="term">命名規則</span>（名前をつけるときのルール）があります。まずはここから確認しましょう。</p>
+
+    <div class="keyline">
+      <b>① 半角のアルファベット・数字・_（アンダースコア）を使う</b><br>
+      <code>a〜z</code> <code>A〜Z</code> <code>0〜9</code> と <code>_</code> を組み合わせます。全角のひらがなや漢字も使える RDBMS もありますが、使えないものもあるので避けます。日本語のローマ字ではなく <b>英単語</b> を使うと読みやすいです。<br>
+      <span style="color:var(--leaf);font-weight:800;">良い例</span> <code>name</code> <code>item_id</code> <code>type1</code>　／　<span style="color:var(--apple);font-weight:800;">悪い例</span> <code>名前</code> <code>種類1</code> <code>namae</code>
+    </div>
+
+    <div class="keyline">
+      <b>② 大文字・小文字はどちらかに統一する</b><br>
+      すべて小文字、もしくはすべて大文字にそろえます。<br>
+      <span style="color:var(--leaf);font-weight:800;">良い例</span> <code>customer</code> <code>item_id</code>　／　<span style="color:var(--apple);font-weight:800;">悪い例</span> <code>Customer</code> <code>ItemID</code>
+    </div>
+
+    <div class="keyline">
+      <b>③ アルファベットで始め、単語は「_」で区切る</b><br>
+      SQLite では数字から始まる名前はつけられず、必ずアルファベットで始めます。単語をつなげたいときは <code>_</code> で区切ります。<br>
+      <span style="color:var(--leaf);font-weight:800;">良い例</span> <code>item_name</code> <code>item_id</code>　／　<span style="color:var(--apple);font-weight:800;">悪い例</span> <code>itemname</code> <code>1name</code>
+    </div>
+
+    <div class="keyline">
+      <b>④ 名前の重複はNG</b><br>
+      同じ名前のテーブルは作れないので、別々の名前にします。同じテーブルの中でカラム名が重複するのもダメ。ただし <b>別のテーブルどうしなら同じカラム名があってもOK</b> です（あとで出てくる <code>item_id</code> がまさにそれ）。
+    </div>
+
+    <div class="keyline">
+      <b>⑤ キーワードとの重複を避ける</b><br>
+      <span class="term t-purple">キーワード</span> とは、SQLite であらかじめ用途が決まっている単語のこと。これまで使ってきた <code>SELECT</code> <code>INSERT</code> <code>UPDATE</code> などがキーワードです。これらは名前に使いません。
+    </div>
+
+    <div class="speech">
+      <div class="avatar">
+        <svg viewBox="0 -4 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><circle cx="24" cy="32" r="3" fill="#3a3550"/><circle cx="40" cy="32" r="3" fill="#3a3550"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M28 42 q4 3 8 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">ルールは5つあるけど、要は <b>「半角英語・小文字にそろえ・_で区切る」</b> を守ればだいたいOK。この本のテーブルもぜんぶこの形だよ🐰</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2 テーブルを2つに分ける設計 ===== -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num c2">2</div><h2>テーブルを2つに分けて設計する</h2></div>
+
+  <div class="card">
+    <p>これまでは売上情報を <code>sales</code> テーブル1つにまとめていました。でも「代金」は <b>売れた個数 × 商品の価格</b> で決まります。そこで今回は、<b>売上情報</b>と<b>商品情報</b>を別々のテーブルに分けて管理します。</p>
+    <p>売上は <span class="term t-pink">sales</span> テーブル、商品は <span class="term t-green">item</span> テーブル。商品には識別用の <b>ID（<code>item_id</code>）</b> をつけて、この ID で2つのテーブルをつなぎます。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 660 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="1つのテーブルを2つに分ける図">
+        <!-- 左：ぜんぶ1つ -->
+        <text x="150" y="24" text-anchor="middle" font-size="14" font-weight="800" fill="#c23c72">1つの表にぜんぶ😵</text>
+        <g>
+          <rect x="30" y="42" width="240" height="150" rx="10" fill="#fff" stroke="#f0d3dc" stroke-width="2"/>
+          <rect x="30" y="42" width="240" height="26" rx="10" fill="#ff8fab"/>
+          <text x="150" y="60" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">売上＋商品がごちゃまぜ</text>
+          <g font-size="10.5" fill="#3a3550">
+            <text x="44" y="88">リンゴ</text><text x="120" y="88">120円</text><text x="196" y="88">ウサ田</text>
+            <text x="44" y="112">リンゴ</text><text x="120" y="112">120円</text><text x="196" y="112">サル橋</text>
+            <text x="44" y="136">リンゴ</text><text x="120" y="136">120円</text><text x="196" y="136">ウサ田</text>
+            <text x="44" y="160">バナナ</text><text x="120" y="160">200円</text><text x="196" y="160">サル橋</text>
+          </g>
+          <text x="150" y="184" text-anchor="middle" font-size="10" fill="#c23c72">↑ 同じ「120円」を何度も書いてムダ</text>
+        </g>
+        <!-- 矢印（マーカーは固定サイズにして文字を覆わない） -->
+        <text x="315" y="94" text-anchor="middle" font-size="12" font-weight="800" fill="#5cb85c">分ける！</text>
+        <path d="M289 116 h44" stroke="#5cb85c" stroke-width="5" fill="none" marker-end="url(#a2)"/>
+        <defs><marker id="a2" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="7" refY="8" orient="auto"><path d="M0 2 L11 8 L0 14 z" fill="#5cb85c"/></marker></defs>
+        <!-- 右：2つに分割 -->
+        <text x="480" y="24" text-anchor="middle" font-size="14" font-weight="800" fill="#2f7a2f">2つに分けてスッキリ✨</text>
+        <!-- sales -->
+        <g>
+          <rect x="360" y="42" width="130" height="88" rx="9" fill="#fff" stroke="#f0d3dc" stroke-width="2"/>
+          <rect x="360" y="42" width="130" height="22" rx="9" fill="#ff8fab"/>
+          <text x="425" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">sales（売上）</text>
+          <g font-size="10" fill="#3a3550">
+            <text x="372" y="82" font-weight="800" fill="#c23c72">item_id</text><text x="452" y="82">客</text>
+            <text x="378" y="102">6</text><text x="446" y="102">ウサ田</text>
+            <text x="378" y="120">7</text><text x="446" y="120">サル橋</text>
+          </g>
+        </g>
+        <!-- item -->
+        <g>
+          <rect x="360" y="150" width="240" height="88" rx="9" fill="#fff" stroke="#cdeccd" stroke-width="2"/>
+          <rect x="360" y="150" width="240" height="22" rx="9" fill="#5cb85c"/>
+          <text x="480" y="166" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">item（商品）</text>
+          <g font-size="10" fill="#3a3550">
+            <text x="372" y="190" font-weight="800" fill="#2f7a2f">item_id</text><text x="446" y="190">名前</text><text x="536" y="190">価格</text>
+            <text x="378" y="210">6</text><text x="440" y="210">リンゴ</text><text x="536" y="210">120</text>
+            <text x="378" y="228">7</text><text x="440" y="228">バナナ</text><text x="536" y="228">200</text>
+          </g>
+        </g>
+        <!-- 結合キー（2つの item_id 列の左端に沿ってすっきり結ぶ） -->
+        <path d="M366 120 Q 344 155 366 190" stroke="#ffd23f" stroke-width="3.5" fill="none"/>
+        <circle cx="366" cy="120" r="4" fill="#ffd23f"/><circle cx="366" cy="190" r="4" fill="#ffd23f"/>
+        <text x="475" y="145" text-anchor="middle" font-size="10.5" font-weight="800" fill="#c9760f">item_id でつながる🔗</text>
+      </svg>
+      <div class="caption">▲ 商品の価格を <code>item</code> テーブルに1回だけ書き、<code>sales</code> からは <code>item_id</code> で参照。同じ値を何度も書かずにすみます。</div>
+    </div>
+
+    <p>実際に作る2つのテーブルは、次のようなデータになります👇</p>
+
+    <p style="margin-top:14px;"><b>🗂 sales テーブル（売上情報）</b></p>
+    <div class="fig">
+      <svg viewBox="0 0 460 296" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="salesテーブルのデータ一覧">
+        <!-- item_id 列ハイライト（結合キー） -->
+        <rect x="130" y="20" width="90" height="254" fill="#fff6d6"/>
+        <!-- ヘッダ -->
+        <g font-size="12" font-weight="800" fill="#2f7a2f">
+          <rect x="20" y="20" width="420" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/>
+          <text x="75" y="40" text-anchor="middle">date</text>
+          <text x="175" y="40" text-anchor="middle" fill="#8a6d00">item_id</text>
+          <text x="275" y="40" text-anchor="middle">item_count</text>
+          <text x="385" y="40" text-anchor="middle">customer</text>
+        </g>
+        <!-- データ -->
+        <g font-size="11.5" fill="#3a3550">
+          <text x="75" y="68" text-anchor="middle">2023-04-10</text><text x="175" y="68" text-anchor="middle" font-weight="800">6</text><text x="275" y="68" text-anchor="middle">3</text><text x="385" y="68" text-anchor="middle">ウサ田</text>
+          <text x="75" y="96" text-anchor="middle">2023-04-10</text><text x="175" y="96" text-anchor="middle" font-weight="800">4</text><text x="275" y="96" text-anchor="middle">1</text><text x="385" y="96" text-anchor="middle">クマ井</text>
+          <text x="75" y="124" text-anchor="middle">2023-04-10</text><text x="175" y="124" text-anchor="middle" font-weight="800">7</text><text x="275" y="124" text-anchor="middle">2</text><text x="385" y="124" text-anchor="middle">サル橋</text>
+          <text x="75" y="152" text-anchor="middle">2023-04-11</text><text x="175" y="152" text-anchor="middle" font-weight="800">6</text><text x="275" y="152" text-anchor="middle">5</text><text x="385" y="152" text-anchor="middle">サル橋</text>
+          <text x="75" y="180" text-anchor="middle">2023-04-12</text><text x="175" y="180" text-anchor="middle" font-weight="800">8</text><text x="275" y="180" text-anchor="middle">2</text><text x="385" y="180" text-anchor="middle">イヌ山</text>
+          <text x="75" y="208" text-anchor="middle">2023-04-12</text><text x="175" y="208" text-anchor="middle" font-weight="800">7</text><text x="275" y="208" text-anchor="middle">3</text><text x="385" y="208" text-anchor="middle">サル橋</text>
+          <text x="75" y="236" text-anchor="middle">2023-04-13</text><text x="175" y="236" text-anchor="middle" font-weight="800">7</text><text x="275" y="236" text-anchor="middle">2</text><text x="385" y="236" text-anchor="middle">ウサ田</text>
+          <text x="75" y="264" text-anchor="middle">2023-04-14</text><text x="175" y="264" text-anchor="middle" font-weight="800">8</text><text x="275" y="264" text-anchor="middle">2</text><text x="385" y="264" text-anchor="middle">ネコ村</text>
+        </g>
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="20" y1="78" x2="440" y2="78"/><line x1="20" y1="106" x2="440" y2="106"/><line x1="20" y1="134" x2="440" y2="134"/><line x1="20" y1="162" x2="440" y2="162"/><line x1="20" y1="190" x2="440" y2="190"/><line x1="20" y1="218" x2="440" y2="218"/><line x1="20" y1="246" x2="440" y2="246"/>
+          <line x1="130" y1="20" x2="130" y2="274"/><line x1="220" y1="20" x2="220" y2="274"/><line x1="330" y1="20" x2="330" y2="274"/>
+        </g>
+        <rect x="20" y="20" width="420" height="254" rx="6" fill="none" stroke="#c9b48f" stroke-width="2"/>
+      </svg>
+      <div class="caption">▲ どの商品が売れたかは <b>商品名ではなく <code>item_id</code></b> で記録します（黄色の列）。</div>
+    </div>
+
+    <p style="margin-top:14px;"><b>🍎 item テーブル（商品情報）</b></p>
+    <div class="fig">
+      <svg viewBox="0 0 560 296" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="itemテーブルのデータ一覧">
+        <!-- item_id 列ハイライト（結合キー） -->
+        <rect x="20" y="20" width="80" height="254" fill="#fff6d6"/>
+        <!-- ヘッダ -->
+        <g font-size="12" font-weight="800" fill="#2f7a2f">
+          <rect x="20" y="20" width="520" height="30" rx="6" fill="#eefbf0" stroke="#c9ecc9"/>
+          <text x="60" y="40" text-anchor="middle" fill="#8a6d00">item_id</text>
+          <text x="155" y="40" text-anchor="middle">item_name</text>
+          <text x="255" y="40" text-anchor="middle">price</text>
+          <text x="345" y="40" text-anchor="middle">farm</text>
+          <text x="465" y="40" text-anchor="middle">date</text>
+        </g>
+        <!-- データ -->
+        <g font-size="11.5" fill="#3a3550">
+          <text x="60" y="68" text-anchor="middle" font-weight="800">1</text><text x="155" y="68" text-anchor="middle">ブドウ</text><text x="255" y="68" text-anchor="middle">480</text><text x="345" y="68" text-anchor="middle">長野</text><text x="465" y="68" text-anchor="middle">2023-04-01</text>
+          <text x="60" y="96" text-anchor="middle" font-weight="800">2</text><text x="155" y="96" text-anchor="middle">イチゴ</text><text x="255" y="96" text-anchor="middle">460</text><text x="345" y="96" text-anchor="middle">熊本</text><text x="465" y="96" text-anchor="middle">2023-04-01</text>
+          <text x="60" y="124" text-anchor="middle" font-weight="800">3</text><text x="155" y="124" text-anchor="middle">リンゴ</text><text x="255" y="124" text-anchor="middle">140</text><text x="345" y="124" text-anchor="middle">長野</text><text x="465" y="124" text-anchor="middle">2023-04-03</text>
+          <text x="60" y="152" text-anchor="middle" font-weight="800">4</text><text x="155" y="152" text-anchor="middle">ブドウ</text><text x="255" y="152" text-anchor="middle">500</text><text x="345" y="152" text-anchor="middle">山梨</text><text x="465" y="152" text-anchor="middle">2023-04-03</text>
+          <text x="60" y="180" text-anchor="middle" font-weight="800">5</text><text x="155" y="180" text-anchor="middle">イチゴ</text><text x="255" y="180" text-anchor="middle">500</text><text x="345" y="180" text-anchor="middle">福岡</text><text x="465" y="180" text-anchor="middle">2023-04-05</text>
+          <text x="60" y="208" text-anchor="middle" font-weight="800">6</text><text x="155" y="208" text-anchor="middle">リンゴ</text><text x="255" y="208" text-anchor="middle">120</text><text x="345" y="208" text-anchor="middle">青森</text><text x="465" y="208" text-anchor="middle">2023-04-09</text>
+          <text x="60" y="236" text-anchor="middle" font-weight="800">7</text><text x="155" y="236" text-anchor="middle">バナナ</text><text x="255" y="236" text-anchor="middle">200</text><text x="345" y="236" text-anchor="middle">沖縄</text><text x="465" y="236" text-anchor="middle">2023-04-09</text>
+          <text x="60" y="264" text-anchor="middle" font-weight="800">8</text><text x="155" y="264" text-anchor="middle">イチゴ</text><text x="255" y="264" text-anchor="middle">400</text><text x="345" y="264" text-anchor="middle">栃木</text><text x="465" y="264" text-anchor="middle">2023-04-09</text>
+        </g>
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="20" y1="78" x2="540" y2="78"/><line x1="20" y1="106" x2="540" y2="106"/><line x1="20" y1="134" x2="540" y2="134"/><line x1="20" y1="162" x2="540" y2="162"/><line x1="20" y1="190" x2="540" y2="190"/><line x1="20" y1="218" x2="540" y2="218"/><line x1="20" y1="246" x2="540" y2="246"/>
+          <line x1="100" y1="20" x2="100" y2="274"/><line x1="210" y1="20" x2="210" y2="274"/><line x1="300" y1="20" x2="300" y2="274"/><line x1="390" y1="20" x2="390" y2="274"/>
+        </g>
+        <rect x="20" y="20" width="520" height="254" rx="6" fill="none" stroke="#c9b48f" stroke-width="2"/>
+      </svg>
+      <div class="caption">▲ 商品の名前・価格・産地（<code>farm</code>）はここに1回だけ。<code>item_id</code> が同じ「6」でも <code>sales</code> の6と結びつきます。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3 テーブル名を変える ===== -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num c3">3</div><h2>既存のテーブル名を変える（ALTER）</h2></div>
+
+  <div class="card">
+    <p>新しい <code>sales</code> テーブルを作りたいのですが、今までの <code>sales</code> テーブルがあると名前がぶつかってしまいます。そこで、古いほうを消さずに <b><code>old_sales</code> という名前に変更</b> しておきましょう。テーブル名の変更には <span class="term t-purple">ALTER文</span> を使います。</p>
+
+    <div class="keyline">
+      <b>書式：テーブル名を変更する</b><br>
+      <code>ALTER TABLE テーブル名 RENAME TO 新しいテーブル名;</code><br>
+      <b>ALTER</b>＝「変更する」、<b>RENAME</b>＝「名前を変える」。<code>TABLE</code> のあとに今の名前、<code>TO</code> のあとに新しい名前を書きます。
+    </div>
+
+    <p>次の SQL文を実行すると、<code>sales</code> テーブルの名前が <code>old_sales</code> に変わります。変えたあと、<code>SELECT</code> 文でちゃんとデータを取り出せるか確認しましょう。</p>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-1.sql</span></div>
+      <div class="term-body"><span class="cmd">ALTER TABLE</span> sales <span class="cmd">RENAME TO</span> old_sales;<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> old_sales;</div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="salesがold_salesに名前だけ変わる図">
+        <rect x="30" y="30" width="170" height="60" rx="12" fill="#fff" stroke="#f0d3dc" stroke-width="2"/>
+        <rect x="30" y="30" width="170" height="24" rx="12" fill="#ff8fab"/>
+        <text x="115" y="47" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">sales</text>
+        <text x="115" y="78" text-anchor="middle" font-size="10.5" fill="#6b6580">中身はそのまま</text>
+        <text x="258" y="40" text-anchor="middle" font-size="11" font-weight="800" fill="#6f42b3">RENAME</text>
+        <path d="M213 60 h84" stroke="#9b6dd6" stroke-width="5" fill="none" marker-end="url(#ar)"/>
+        <defs><marker id="ar" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="7" refY="8" orient="auto"><path d="M0 2 L11 8 L0 14 z" fill="#9b6dd6"/></marker></defs>
+        <rect x="320" y="30" width="170" height="60" rx="12" fill="#fff" stroke="#e6d8f5" stroke-width="2"/>
+        <rect x="320" y="30" width="170" height="24" rx="12" fill="#9b6dd6"/>
+        <text x="405" y="47" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">old_sales</text>
+        <text x="405" y="78" text-anchor="middle" font-size="10.5" fill="#6b6580">名前だけ変わった</text>
+      </svg>
+      <div class="caption">▲ テーブルを消さずに名前だけ変更。いつでも前の <code>sales</code> の中身を確認できます。</div>
+    </div>
+
+    <div class="fig">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON22-1.png" alt="ALTER TABLE で old_sales に名前を変え、SELECT で取り出した画面">
+        <figcaption>▲ 名前を変えたあと、<code>old_sales</code> のデータが取り出せた</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 CREATE文とデータ型 ===== -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num c4">4</div><h2>CREATE文でテーブルを作る／データ型</h2></div>
+
+  <div class="card">
+    <p>データベースにテーブルを作るには <span class="term t-blue">CREATE文</span> を使います。テーブル名のあとの <code>( )</code> の中に、カラム名を <code>,（カンマ）</code> で区切って並べます。それぞれのカラムには <b>データ型</b> と <b>制約</b> を指定できます。</p>
+
+    <div class="keyline">
+      <b>書式：テーブルの作成</b><br>
+      <code>CREATE TABLE テーブル名 (</code><br>
+      　<code>カラム名1 データ型 制約,</code><br>
+      　<code>カラム名2 データ型 制約,</code><br>
+      　<code>…</code><br>
+      <code>);</code>
+    </div>
+
+    <p>第1章で読み込んだ <code>chap1_sales.sql</code> の CREATE文はこうなっていました。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap1_sales.sql</span></div>
+      <div class="term-body"><span class="cmd">CREATE TABLE</span> sales (<br>&nbsp;&nbsp;date TEXT,<br>&nbsp;&nbsp;item_name TEXT,<br>&nbsp;&nbsp;item_count INTEGER,<br>&nbsp;&nbsp;price INTEGER,<br>&nbsp;&nbsp;customer TEXT<br>);</div>
+    </div>
+    <p><code>date</code> <code>item_name</code> … が <b>カラム名</b>、<code>TEXT</code> <code>INTEGER</code> が <b>データ型</b>。ここでは制約は書かれていません。制約を書かない場合は「カラム名＋データ型」だけの指定になります。ミスを防ぐには、どんなデータを入れるか・どんな制約をつけるかをきちんと考えることが大切です。</p>
+
+    <p style="margin-top:18px;"><b>📦 データの種類（データ型）</b><br>データベースで扱うデータには「数値」「文字列」などの種類があり、これを <span class="term t-blue">データ型</span> と呼びます。SQLite で使えるのは次の5つです。</p>
+
+    <div class="fig">
+      <svg viewBox="0 0 620 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SQLiteのデータ型一覧">
+        <g font-size="13" font-weight="800" fill="#1f7fa3">
+          <rect x="20" y="16" width="580" height="34" rx="6" fill="#eefaff" stroke="#cfeefb"/>
+          <text x="105" y="37" text-anchor="middle">型</text>
+          <text x="395" y="37" text-anchor="middle">意味</text>
+        </g>
+        <g font-size="12" fill="#3a3550">
+          <text x="105" y="71" text-anchor="middle" font-weight="800" fill="#6f42b3">NULL</text><text x="205" y="71">何もデータが入っていないことを表す NULL 値のこと</text>
+          <text x="105" y="105" text-anchor="middle" font-weight="800" fill="#2f7a2f">TEXT</text><text x="205" y="105">文字列</text>
+          <text x="105" y="139" text-anchor="middle" font-weight="800" fill="#c9760f">INTEGER</text><text x="205" y="139">整数</text>
+          <text x="105" y="173" text-anchor="middle" font-weight="800" fill="#c23c72">REAL</text><text x="205" y="173">浮動小数点数（小数点のある数）</text>
+          <text x="105" y="207" text-anchor="middle" font-weight="800" fill="#1f7fa3">BLOB</text><text x="205" y="207">Binary Large OBject の略。画像や音声などのバイナリデータ</text>
+        </g>
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="20" y1="50" x2="600" y2="50"/><line x1="20" y1="84" x2="600" y2="84"/><line x1="20" y1="118" x2="600" y2="118"/><line x1="20" y1="152" x2="600" y2="152"/><line x1="20" y1="186" x2="600" y2="186"/>
+          <line x1="190" y1="16" x2="190" y2="220"/>
+        </g>
+        <rect x="20" y="16" width="580" height="204" rx="6" fill="none" stroke="#c9b48f" stroke-width="2"/>
+      </svg>
+      <div class="caption">▲ SQLite の5つのデータ型。この章で使うのは <code>TEXT</code> と <code>INTEGER</code> の2つです。</div>
+    </div>
+
+    <p>売れた個数や価格は数値なので <b>INTEGER 型</b>。商品名やお客さんの名前は文字列なので <b>TEXT 型</b>。日付は数字が入っていますが記号の <code>-</code> を含むので、文字列＝ <b>TEXT 型</b> です。<code>REAL</code>（小数）と <code>BLOB</code>（画像・音声など）は今回のテーブルでは使いません。</p>
+
+    <div class="column">
+      <h4>💡 コラム：RDBMS ごとにデータ型が異なる</h4>
+      <p style="margin:0;">ここで紹介したのは SQLite で使えるデータ型です。データ型は RDBMS によって違うため、ほかの RDBMS を使うときは、その RDBMS で使える型を指定します。たとえば MySQL には、日付を入れるための <code>DATE</code> 型が用意されています。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5 制約 ===== -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num c5">5</div><h2>制約 —— 主キーと NOT NULL</h2></div>
+
+  <div class="card">
+    <p><span class="term t-pink">制約</span> とは、テーブルに設定する <b>ルール</b> のようなもの。データの整合性（つじつま）や一貫性を保つために使います。制約を設定すると、不正なデータの追加や更新を防げます。この章では2つの制約を使います。</p>
+
+    <p style="margin-top:16px;"><b>🔑 ① 主キー制約（PRIMARY KEY）</b></p>
+    <p>テーブル内の各レコードを <b>一意に（＝ダブりなく1つに）識別</b> するためのルールです。主キーに設定したカラムは、<b>値の重複</b>と<b>NULL値</b>が禁止されます。この設定をしたカラムを <span class="term t-pink">主キー</span> と呼びます。</p>
+    <div class="keyline">
+      <b>書式：主キー制約の設定</b><br>
+      <code>カラム名 データ型 PRIMARY KEY</code>　… データ型のあとに <code>PRIMARY KEY</code> と書きます。
+    </div>
+    <p>新しい <code>item</code> テーブルの <code>item_id</code> は「どの商品か」を判別するために使うので、値がダブらないようにします。たとえば <code>item_id</code> の <code>7</code> はもう使われているので、次のデータは入れられません。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">入れられない例</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (7, 'スイカ', 600, '2023-04-10');<br><span class="cmt">-- item_id の 7 はすでに使用済み → 重複でNG</span></div>
+    </div>
+
+    <p style="margin-top:18px;"><b>🚫 ② NOT NULL 制約</b></p>
+    <p>このカラムには <b>NULL値を入れられない</b> というルール。つまり <b>必ずデータが入っている</b> ことが保証されます。</p>
+    <div class="keyline">
+      <b>書式：NOT NULL制約の設定</b><br>
+      <code>カラム名 データ型 NOT NULL</code>　… データ型のあとに <code>NOT NULL</code> と書きます。
+    </div>
+    <p>NOT NULL 制約を設定すると、データの入れ忘れを防げます。たとえば <code>price</code> や <code>date</code> を書かずに追加しようとすると、失敗します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">入れられない例</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> item (item_id, item_name, farm)<br><span class="cmd">VALUES</span> (9, 'スイカ', '沖縄');<br><span class="cmt">-- price と date がない → NOT NULL でNG</span></div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="主キー制約とNOT NULL制約のイメージ">
+        <!-- 主キー -->
+        <g>
+          <rect x="20" y="24" width="290" height="166" rx="14" fill="#fff0f6" stroke="#ffd0e2" stroke-width="2"/>
+          <text x="165" y="50" text-anchor="middle" font-size="13" font-weight="800" fill="#c23c72">🔑 主キー（PRIMARY KEY）</text>
+          <text x="165" y="72" text-anchor="middle" font-size="11" fill="#a85278">item_id 列</text>
+          <g font-size="12" fill="#3a3550">
+            <rect x="60" y="84" width="90" height="24" rx="5" fill="#fff" stroke="#e7dcc9"/><text x="105" y="101" text-anchor="middle">6</text>
+            <rect x="60" y="112" width="90" height="24" rx="5" fill="#fff" stroke="#e7dcc9"/><text x="105" y="129" text-anchor="middle">7</text>
+            <rect x="60" y="140" width="90" height="24" rx="5" fill="#fff" stroke="#e7dcc9"/><text x="105" y="157" text-anchor="middle">8</text>
+            <rect x="180" y="112" width="90" height="24" rx="5" fill="#ffe0e0" stroke="#ff9a9a"/><text x="225" y="129" text-anchor="middle" fill="#c0392b" font-weight="800">7</text>
+            <text x="225" y="102" text-anchor="middle" font-size="15" fill="#ff6b6b" font-weight="900">✕</text>
+            <text x="225" y="156" text-anchor="middle" font-size="9.5" fill="#c0392b">重複はダメ</text>
+          </g>
+        </g>
+        <!-- NOT NULL -->
+        <g>
+          <rect x="330" y="24" width="290" height="166" rx="14" fill="#eefbf0" stroke="#c9ecc9" stroke-width="2"/>
+          <text x="475" y="50" text-anchor="middle" font-size="13" font-weight="800" fill="#2f7a2f">🚫 NOT NULL</text>
+          <text x="475" y="72" text-anchor="middle" font-size="11" fill="#4d8a4d">空っぽ（NULL）はダメ</text>
+          <g font-size="12" fill="#3a3550">
+            <rect x="360" y="84" width="110" height="24" rx="5" fill="#fff" stroke="#c9ecc9"/><text x="415" y="101" text-anchor="middle">120</text><text x="492" y="101" text-anchor="middle" font-size="14" fill="#5cb85c" font-weight="900">○</text>
+            <rect x="360" y="112" width="110" height="24" rx="5" fill="#fff" stroke="#c9ecc9"/><text x="415" y="129" text-anchor="middle">200</text><text x="492" y="129" text-anchor="middle" font-size="14" fill="#5cb85c" font-weight="900">○</text>
+            <rect x="360" y="140" width="110" height="24" rx="5" fill="#ffe0e0" stroke="#ff9a9a"/><text x="415" y="157" text-anchor="middle" fill="#b0879a">（空）</text><text x="492" y="157" text-anchor="middle" font-size="14" fill="#ff6b6b" font-weight="900">✕</text>
+          </g>
+        </g>
+      </svg>
+      <div class="caption">▲ 主キー＝ダブり・空っぽを禁止して1件を特定。NOT NULL＝空っぽ（NULL）を禁止して入れ忘れを防止。</div>
+    </div>
+
+    <p style="margin-top:16px;"><b>📋 テーブルの構造を整理する</b><br>SQL文を書く前に、カラム名・データ型・制約を整理しておくと分かりやすくなります。</p>
+
+    <p style="margin:14px 0 6px;"><b>sales テーブル</b>（すべてのカラムに NOT NULL 制約）</p>
+    <div class="chips">
+      <div class="chip"><b>date</b>：TEXT／NOT NULL</div>
+      <div class="chip"><b>item_id</b>：INTEGER／NOT NULL</div>
+      <div class="chip"><b>item_count</b>：INTEGER／NOT NULL</div>
+      <div class="chip"><b>customer</b>：TEXT／NOT NULL</div>
+    </div>
+
+    <p style="margin:14px 0 6px;"><b>item テーブル</b>（<code>item_id</code> は主キー、ほかは NOT NULL）</p>
+    <div class="chips">
+      <div class="chip">🔑 <b>item_id</b>：INTEGER／主キー</div>
+      <div class="chip"><b>item_name</b>：TEXT／NOT NULL</div>
+      <div class="chip"><b>price</b>：INTEGER／NOT NULL</div>
+      <div class="chip"><b>farm</b>：TEXT／NOT NULL</div>
+      <div class="chip"><b>date</b>：TEXT／NOT NULL</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6 テーブル作成＆データ投入＆制約チェック ===== -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num c6">6</div><h2>テーブルを作り、データを入れて、制約を試す</h2></div>
+
+  <div class="card">
+    <p>整理した内容をもとに、いよいよ2つのテーブルを作ります。</p>
+
+    <div class="cmd-title"><span class="b">STEP 1</span>sales テーブルを作る</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-2.sql</span></div>
+      <div class="term-body"><span class="cmd">CREATE TABLE</span> sales (<br>&nbsp;&nbsp;date TEXT <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;item_id INTEGER <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;item_count INTEGER <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;customer TEXT <span class="cmd">NOT NULL</span><br>);</div>
+    </div>
+
+    <div class="cmd-title"><span class="b">STEP 2</span>item テーブルを作る</div>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-3.sql</span></div>
+      <div class="term-body"><span class="cmd">CREATE TABLE</span> item (<br>&nbsp;&nbsp;item_id INTEGER <span class="cmd">PRIMARY KEY</span>,<br>&nbsp;&nbsp;item_name TEXT <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;price INTEGER <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;farm TEXT <span class="cmd">NOT NULL</span>,<br>&nbsp;&nbsp;date TEXT <span class="cmd">NOT NULL</span><br>);</div>
+    </div>
+    <p class="cmd-note">実行しても何も表示されなければ、作成に成功しています。<code>.tables</code> コマンドでテーブルができているか確認しましょう。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">テーブルの一覧を表示</span></div>
+      <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">.tables</span><br>item&nbsp;&nbsp;old_sales&nbsp;&nbsp;sales<br><span class="cmt">-- テーブル名が表示されれば作られている</span></div>
+    </div>
+
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-1.png" alt="sales テーブルを作成した画面">
+        <figcaption>① sales を作成</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-2.png" alt="item テーブルを作成した画面">
+        <figcaption>② item を作成</figcaption>
+      </figure>
+    </div>
+    <div class="fig">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-3.png" alt=".tables でテーブル一覧を確認した画面">
+        <figcaption>▲ <code>.tables</code> でテーブルができているか確認</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cmd-title"><span class="b">STEP 3</span>データを入れる（INSERT）</div>
+    <p class="cmd-note"><code>INSERT</code> 文で、2つのテーブルにデータを入れます。まずは <code>sales</code> テーブルから。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-4.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-10', 6, 3, 'ウサ田');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-10', 4, 1, 'クマ井');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-10', 7, 2, 'サル橋');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-11', 6, 5, 'サル橋');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-12', 8, 2, 'イヌ山');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-12', 7, 3, 'サル橋');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-13', 7, 2, 'ウサ田');<br><span class="cmd">INSERT INTO</span> sales <span class="cmd">VALUES</span> ('2023-04-14', 8, 2, 'ネコ村');</div>
+    </div>
+    <p class="cmd-note">つづいて <code>item</code> テーブルにも入れます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-5.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (1, 'ブドウ', 480, '長野', '2023-04-01');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (2, 'イチゴ', 460, '熊本', '2023-04-01');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (3, 'リンゴ', 140, '長野', '2023-04-03');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (4, 'ブドウ', 500, '山梨', '2023-04-03');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (5, 'イチゴ', 500, '福岡', '2023-04-05');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (6, 'リンゴ', 120, '青森', '2023-04-09');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (7, 'バナナ', 200, '沖縄', '2023-04-09');<br><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (8, 'イチゴ', 400, '栃木', '2023-04-09');</div>
+    </div>
+    <p class="cmd-note">入ったか <code>SELECT</code> 文で確認します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-6.sql / chap5-7.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales;<br><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> item;</div>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-4.png" alt="sales テーブルのデータを SELECT した画面">
+        <figcaption>③ sales のデータを確認</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-5.png" alt="item テーブルのデータを SELECT した画面">
+        <figcaption>④ item のデータを確認</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cmd-title"><span class="b">STEP 4</span>制約がちゃんと効くか試す</div>
+    <p class="cmd-note">わざと失敗するデータを入れて、制約が働いているか確認します。まずは <code>sales</code> で、<code>customer</code> のデータを抜いてみます（3つしか値がないので、4つ目の <code>customer</code> が NULL になってしまう）。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-8.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> sales (date, item_id, item_count)<br><span class="cmd">VALUES</span> ('2023-04-15', 2, 3);<br><span class="cmt">-- Runtime error: NOT NULL constraint failed: sales.customer</span></div>
+    </div>
+    <p class="cmd-note"><b>Runtimeエラー</b>＝実行に失敗したという意味。メッセージは「NOT NULL 制約が失敗しました：sales.customer」＝ <code>customer</code> が NULL になるからエラー。つまり <b>NOT NULL 制約が効いている証拠</b> です。</p>
+
+    <p class="cmd-note" style="margin-top:14px;">つづいて <code>item</code> テーブル。<code>item_id</code> が <code>7</code> のデータはもうあるので、同じ 7 を入れてみます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-9.sql</span></div>
+      <div class="term-body"><span class="cmd">INSERT INTO</span> item <span class="cmd">VALUES</span> (7, 'スイカ', 600, '千葉', '2023-04-10');<br><span class="cmt">-- Runtime error: UNIQUE constraint failed: item.item_id</span></div>
+    </div>
+    <p class="cmd-note">こちらも Runtimeエラー。「UNIQUE（ユニーク＝一意）制約が失敗した：item_id」＝ <b>値が重複している</b> のが原因。<code>item_id</code> が 7 のレコードはすでにあるので失敗します。これで <b>主キー制約も効いている</b> ことが確認できました。</p>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-6.png" alt="NOT NULL 制約でエラーになった画面">
+        <figcaption>⑤ NOT NULL 制約でエラー</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON23-7.png" alt="UNIQUE 制約でエラーになった画面">
+        <figcaption>⑥ 主キー（UNIQUE）制約でエラー</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7 INNER JOIN ===== -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num c7">7</div><h2>INNER JOIN でテーブルを合体させる</h2></div>
+
+  <div class="card">
+    <p>いよいよこの章の主役。<span class="term">テーブルの結合</span> とは、複数のテーブルを <b>指定したカラムで関連づけて、1つの表として合体させる</b> ことです。別々の <code>sales</code> と <code>item</code> を結合すれば、売上と商品情報をまとめて取り出せます。</p>
+    <p>結合のうち、両方のテーブルに一致するデータだけを取り出す方法を <span class="term t-green">内部結合</span> といい、<span class="term t-green">INNER JOIN</span> 句を使います（INNER JOIN ＝そのまま「内部結合」）。</p>
+
+    <div class="keyline">
+      <b>書式：テーブルの内部結合の基本</b><br>
+      <code>SELECT カラム名 FROM テーブル名1</code><br>
+      <code>INNER JOIN テーブル名2 ON テーブル名1.カラム名 = テーブル名2.カラム名;</code>
+    </div>
+    <p><code>INNER JOIN</code> は <code>FROM</code> 句のあとに続けて、合体させたいもう片方のテーブルを指定します。さらに <code>ON</code> のあとに <b>関連づけるカラム</b> を書きます。2つのテーブルに同じ名前のカラムがあるときは、<code>テーブル名.カラム名</code> のように <code>.</code> でつなげて書きます。</p>
+
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-10.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> * <span class="cmd">FROM</span> sales<br><span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="salesとitemをitem_idで結合するイメージ">
+        <!-- sales 側 -->
+        <text x="115" y="30" text-anchor="middle" font-size="12" font-weight="800" fill="#c23c72">sales</text>
+        <g font-size="11" fill="#3a3550">
+          <rect x="20" y="40" width="190" height="26" rx="5" fill="#ffeef4" stroke="#ffd0e2"/>
+          <text x="55" y="57" text-anchor="middle" font-weight="800" fill="#c23c72">item_id</text><text x="160" y="57" text-anchor="middle" font-weight="800" fill="#c23c72">customer</text>
+          <rect x="20" y="66" width="190" height="26" rx="0" fill="#fff" stroke="#f0e0e6"/>
+          <text x="55" y="83" text-anchor="middle" font-weight="800">6</text><text x="160" y="83" text-anchor="middle">ウサ田</text>
+        </g>
+        <!-- item 側（重なり回避のため下げて余白を確保） -->
+        <text x="115" y="150" text-anchor="middle" font-size="12" font-weight="800" fill="#2f7a2f">item</text>
+        <g font-size="11" fill="#3a3550">
+          <rect x="20" y="160" width="190" height="26" rx="5" fill="#eefbf0" stroke="#c9ecc9"/>
+          <text x="55" y="177" text-anchor="middle" font-weight="800" fill="#2f7a2f">item_id</text><text x="120" y="177" text-anchor="middle" font-weight="800" fill="#2f7a2f">name</text><text x="180" y="177" text-anchor="middle" font-weight="800" fill="#2f7a2f">price</text>
+          <rect x="20" y="186" width="190" height="26" fill="#fff" stroke="#e6f2e6"/>
+          <text x="55" y="203" text-anchor="middle" font-weight="800">6</text><text x="120" y="203" text-anchor="middle">リンゴ</text><text x="180" y="203" text-anchor="middle">120</text>
+        </g>
+        <!-- ONでつなぐ（数字の左側を通して重なりを避ける） -->
+        <path d="M40 82 Q 6 143 40 201" stroke="#ffd23f" stroke-width="3" fill="none"/>
+        <circle cx="40" cy="82" r="3.5" fill="#ffd23f"/><circle cx="40" cy="201" r="3.5" fill="#ffd23f"/>
+        <text x="120" y="120" text-anchor="middle" font-size="10.5" font-weight="800" fill="#c9760f">item_id が一致🔗</text>
+        <!-- 矢印（マーカーは固定サイズにして文字を覆わない） -->
+        <text x="258" y="100" text-anchor="middle" font-size="11" font-weight="800" fill="#6f42b3">JOIN</text>
+        <path d="M225 116 h70" stroke="#9b6dd6" stroke-width="5" fill="none" marker-end="url(#aj)"/>
+        <defs><marker id="aj" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="7" refY="8" orient="auto"><path d="M0 2 L11 8 L0 14 z" fill="#9b6dd6"/></marker></defs>
+        <!-- 結合結果 -->
+        <text x="490" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#6f42b3">結合した表（合体！）</text>
+        <g font-size="10.5" fill="#3a3550">
+          <rect x="310" y="100" width="360" height="26" rx="5" fill="#f4edfb" stroke="#e0cef5"/>
+          <text x="360" y="117" text-anchor="middle" font-weight="800" fill="#6f42b3">item_id</text><text x="440" y="117" text-anchor="middle" font-weight="800" fill="#6f42b3">customer</text><text x="540" y="117" text-anchor="middle" font-weight="800" fill="#6f42b3">item_name</text><text x="630" y="117" text-anchor="middle" font-weight="800" fill="#6f42b3">price</text>
+          <rect x="310" y="126" width="360" height="28" fill="#fff" stroke="#ece3f7"/>
+          <text x="360" y="144" text-anchor="middle" font-weight="800">6</text><text x="440" y="144" text-anchor="middle">ウサ田</text><text x="540" y="144" text-anchor="middle">リンゴ</text><text x="630" y="144" text-anchor="middle">120</text>
+        </g>
+        <text x="490" y="182" text-anchor="middle" font-size="10.5" fill="#6b6580">売上（誰が）と商品（何を・いくら）が1行にまとまる</text>
+      </svg>
+      <div class="caption">▲ <code>sales.item_id</code> と <code>item.item_id</code> が同じ行どうしを、横につないで1つの表にします。</div>
+    </div>
+
+    <p>結合で大切なのは <b>どのカラムで関連づけるか</b>。<code>sales</code> と <code>item</code> は同じ意味を持つ <code>item_id</code> があるので、これを指定します。同じ意味のカラムを指定しないと結合できず、何も表示されないので注意しましょう。</p>
+
+    <p style="margin-top:16px;"><b>取り出すカラムを選ぶ</b><br>結合した表からも、取り出すカラムを個別に選べます。両方のテーブルに同じ名前のカラムがある場合は <code>テーブル名.カラム名</code>、片方にしかないカラムはテーブル名を省略できます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-11.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+    <p class="cmd-note"><code>SELECT *</code> にすると結合した全カラムが出てしまうので、必要なカラムだけを指定します。</p>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON24-1.png" alt="INNER JOIN で結合した全カラムの画面">
+        <figcaption>① <code>*</code> で全カラムを結合</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON24-2.png" alt="必要なカラムだけを指定して結合した画面">
+        <figcaption>② 必要なカラムだけを指定</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 8 結合＋条件・集計 ===== -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num c8">8</div><h2>結合に条件・集計を組み合わせる</h2></div>
+
+  <div class="card">
+    <p><code>INNER JOIN</code> で結合した表に対しても、これまでの <code>WHERE</code> 句や <code>GROUP BY</code> 句を組み合わせられます。</p>
+
+    <p style="margin-top:8px;"><b>🔍 INNER JOIN ＋ WHERE 句</b><br>条件は <b>結合した表に対して</b> つけられます。<code>ON</code> 句のあとに続けて <code>WHERE</code> 句を書きます。</p>
+    <div class="keyline">
+      <b>書式：テーブルを結合し、条件を指定して取り出す</b><br>
+      <code>SELECT カラム名1, カラム名2, … FROM テーブル名1</code><br>
+      <code>INNER JOIN テーブル名2 ON テーブル名1.カラム名 = テーブル名2.カラム名</code><br>
+      <code>WHERE 条件式;</code>
+    </div>
+    <p>次の SQL文は、結合した表から <code>item_name</code> が「リンゴ」のデータだけを取り出します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-12.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id<br><span class="cmd">WHERE</span> item_name = 'リンゴ';</div>
+    </div>
+    <div class="fig">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON24-3.png" alt="結合した表からリンゴだけを取り出した画面">
+        <figcaption>▲ 結合＋条件で「リンゴ」の売上だけを取り出せた</figcaption>
+      </figure>
+    </div>
+
+    <div class="keyline">
+      <b>SQL文が処理される順番</b><br>
+      ①<code>FROM</code>（取り出すテーブル）→ ②<code>INNER JOIN … ON</code>（結合）→ ③<code>WHERE</code>（条件）→ ④<code>SELECT</code>（取り出すカラム）<br>
+      <code>INNER JOIN</code> は、ほかにも <code>GROUP BY</code>・<code>HAVING</code>・<code>ORDER BY</code> とも組み合わせられます。
+    </div>
+
+    <p style="margin-top:16px;"><b>📊 INNER JOIN ＋ GROUP BY 句</b><br>結合した表に対してグループ化もできます。<code>sales.item_id</code> でグループ化し、<code>SUM</code> 関数の引数に <code>item_count</code> を指定して、商品ごとに売れた個数を合計します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-13.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.item_id, item_name, <span class="cmd">SUM</span>(item_count)<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id<br><span class="cmd">GROUP BY</span> sales.item_id;</div>
+    </div>
+    <div class="fig">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON24-4.png" alt="結合した表をグループ化して売れた個数を合計した画面">
+        <figcaption>▲ 結合した表でも集計関数が使える。商品ごとの売れた個数が一目で分かる</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 9 テーブルのデータで計算 ===== -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num c9">9</div><h2>テーブルのデータで計算する</h2></div>
+
+  <div class="card">
+    <p>コンピュータ上で行う数値の計算を <span class="term t-green">算術演算</span>、そこで使う記号を <span class="term t-green">算術演算子</span> と呼びます。足し算は紙の計算と同じ <code>+</code> を使います。</p>
+    <p>次の SQL文は 5 足す 5 の計算をします。テーブルを使わない <code>SELECT</code> 文には <code>FROM</code> 句をつけません。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-14.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> 5 + 5;<br><span class="cmt">-- 結果は 10</span></div>
+    </div>
+
+    <div class="fig">
+      <svg viewBox="0 0 620 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="算術演算子の一覧">
+        <g font-size="13" font-weight="800" fill="#2f7a2f">
+          <rect x="20" y="16" width="580" height="34" rx="6" fill="#eefbf0" stroke="#c9ecc9"/>
+          <text x="90" y="37" text-anchor="middle">演算子</text>
+          <text x="380" y="37" text-anchor="middle">意味</text>
+        </g>
+        <g fill="#3a3550">
+          <text x="90" y="73" text-anchor="middle" font-size="17" font-weight="800" fill="#c9760f">+</text><text x="180" y="71" font-size="12.5">足し算</text>
+          <text x="90" y="107" text-anchor="middle" font-size="17" font-weight="800" fill="#c9760f">-</text><text x="180" y="105" font-size="12.5">引き算</text>
+          <text x="90" y="141" text-anchor="middle" font-size="17" font-weight="800" fill="#c9760f">*</text><text x="180" y="139" font-size="12.5">掛け算</text>
+          <text x="90" y="175" text-anchor="middle" font-size="17" font-weight="800" fill="#c9760f">/</text><text x="180" y="173" font-size="12.5">割り算</text>
+          <text x="90" y="209" text-anchor="middle" font-size="17" font-weight="800" fill="#c9760f">%</text><text x="180" y="207" font-size="12.5">割り算の余りを求める</text>
+        </g>
+        <g stroke="#e7dcc9" stroke-width="1">
+          <line x1="20" y1="50" x2="600" y2="50"/><line x1="20" y1="84" x2="600" y2="84"/><line x1="20" y1="118" x2="600" y2="118"/><line x1="20" y1="152" x2="600" y2="152"/><line x1="20" y1="186" x2="600" y2="186"/>
+          <line x1="160" y1="16" x2="160" y2="220"/>
+        </g>
+        <rect x="20" y="16" width="580" height="204" rx="6" fill="none" stroke="#c9b48f" stroke-width="2"/>
+      </svg>
+      <div class="caption">▲ 5つの算術演算子。<code>%</code> は割り算の「余り」を求めます。</div>
+    </div>
+
+    <p>複数の計算をまとめて行うときは <code>,</code> で区切ります。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-15.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> 5 + 2, 5 - 2, 5 * 2, 5 / 2, 5 % 2;<br><span class="cmt">-- 7, 3, 10, 2, 1（5÷2は2あまり1なので % は 1）</span></div>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-1.png" alt="5+5 を計算した画面">
+        <figcaption>① <code>5 + 5</code> の結果</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-2.png" alt="複数の算術演算を行った画面">
+        <figcaption>② 5つの演算子をまとめて</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>💰 カラムの値を使って計算する</b><br>代金を求めるには、<code>sales</code> の <code>item_count</code>（個数）と <code>item</code> の <code>price</code>（価格）を掛け算します。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-16.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.date, sales.item_id, item_name, item_count * price<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+    <p class="cmd-note">算術演算子を使った式にも、別名をつける <code>AS</code> キーワードが使えます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-17.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.date, sales.item_id, item_name,<br>&nbsp;&nbsp;item_count * price <span class="cmd">AS</span> total_price<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-3.png" alt="個数×価格で代金を計算した画面">
+        <figcaption>③ <code>item_count * price</code> で代金</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-4.png" alt="AS で total_price と別名をつけた画面">
+        <figcaption>④ <code>AS total_price</code> で見出しを付与</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="margin-top:16px;"><b>🧮 集計関数の引数に計算式を渡す</b><br>関数の引数には、算術演算子を使った式を渡すこともできます。</p>
+    <div class="keyline">
+      <b>書式：関数の引数に式を渡す</b><br>
+      <code>関数名(カラム名1 算術演算子 カラム名2)</code>
+    </div>
+    <p>次の SQL文は <code>SUM</code> 関数の引数に <code>item_count * price</code> を渡し、全商品の合計金額を求めます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-18.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> <span class="cmd">SUM</span>(item_count * price)<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+
+    <p>逆に、関数の <b>結果</b> を使って計算することもできます。</p>
+    <div class="keyline">
+      <b>書式：関数の結果を使って計算する</b><br>
+      <code>関数名(カラム名1) 算術演算子 カラム名2</code>
+    </div>
+    <p>次は <code>SUM</code> 関数で <code>item_count</code> を合計し、その結果に <code>price</code> を掛けます。<code>item_id</code> でグループ化し、代金で降順に並べ替えています。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-19.sql</span></div>
+      <div class="term-body"><span class="cmd">SELECT</span> sales.item_id, item_name, <span class="cmd">SUM</span>(item_count) * price<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item<br><span class="cmd">ON</span> sales.item_id = item.item_id<br><span class="cmd">GROUP BY</span> sales.item_id<br><span class="cmd">ORDER BY</span> <span class="cmd">SUM</span>(item_count) * price <span class="cmd">DESC</span>;</div>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-5.png" alt="SUMの引数に式を渡して合計金額を求めた画面">
+        <figcaption>⑤ <code>SUM(item_count * price)</code> で総額</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON25-6.png" alt="グループごとの代金を求めて降順に並べた画面">
+        <figcaption>⑥ 商品ごとの代金を降順に</figcaption>
+      </figure>
+    </div>
+
+    <div class="column">
+      <h4>💡 コラム：算術関数（ROUND）</h4>
+      <p style="margin:0;">集計関数のほかにも、<b>算術関数</b>や<b>日付関数</b>があります。よく使う <code>ROUND</code> 関数は、数値を四捨五入します。1つ目の引数に四捨五入したい数値、2つ目に表示する小数点以下の桁数を指定します。次の例では <code>5.678</code> が四捨五入されて <code>5.68</code> になります。</p>
+      <div class="term-card">
+        <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-20.sql</span></div>
+        <div class="term-body"><span class="cmd">SELECT</span> <span class="cmd">ROUND</span>(5.678, 2);<br><span class="cmt">-- 結果は 5.68</span></div>
+      </div>
+      <figure style="margin-top:10px;">
+        <img class="shot" style="display:block;margin:0 auto;max-width:360px;" src="第5章/LESSON25-7.png" alt="ROUND関数で四捨五入した画面">
+        <figcaption>▲ <code>ROUND(5.678, 2)</code> → 5.68</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 10 CSV書き出し ===== -->
+<section id="s10">
+  <div class="sec-head"><div class="sec-num c1">10</div><h2>CSVファイルに書き出して Excel で開く</h2></div>
+
+  <div class="card">
+    <p>最後に、取り出したデータをテキストファイルに出力し、表計算ソフトの Excel で表として表示してみましょう。</p>
+
+    <div class="cmd-title"><span class="b">STEP 1</span>表示モードを CSV に変える</div>
+    <p class="cmd-note">Excel で表にするために、まず結果の表示モードを <span class="term">csv形式</span> に変更します。csv 形式にすると、データが <code>,</code> 区切りで表示されます。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">csv形式に変更</span></div>
+      <div class="term-body"><span class="prompt">sqlite&gt;</span> <span class="cmd">.mode csv</span></div>
+    </div>
+
+    <div class="cmd-title"><span class="b">STEP 2</span>次の結果をファイルに書き出す</div>
+    <p class="cmd-note"><code>.once</code> コマンドの直後に実行した SQL文の結果を、テキストファイルとして出力できます。書式は <code>.once ファイル名</code>。出力するファイル名は <code>export_sample.csv</code> にします。</p>
+    <div class="term-card">
+      <div class="term-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">chap5-21.sql</span></div>
+      <div class="term-body"><span class="cmd">.mode csv</span><br><span class="cmd">.once export_sample.csv</span><br><span class="cmd">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer<br><span class="cmd">FROM</span> sales <span class="cmd">INNER JOIN</span> item <span class="cmd">ON</span> sales.item_id = item.item_id;</div>
+    </div>
+    <p class="cmd-note"><code>.once</code> のあとの <code>SELECT</code> 文は、画面ではなくテキストファイルに書き出されます。<code>sql1nen</code> フォルダに <code>export_sample.csv</code> が作られます。</p>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-1.png" alt=".mode csv と .once を実行した画面">
+        <figcaption>① CSV モードにして書き出し</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-2.png" alt="export_sample.csv が作成された画面">
+        <figcaption>② ファイルが作成された</figcaption>
+      </figure>
+    </div>
+
+    <div class="cmd-title"><span class="b">STEP 3</span>メモ帳で中身を確認する</div>
+    <p class="cmd-note">Excel で開く前に、メモ帳などのテキストエディタで中身を確認しましょう。①ファイル名を右クリック → ②［プログラムから開く］→ ③［メモ帳］をクリック。csv 形式では、値は <code>,</code> 区切りで、文字列は <code>"</code> で囲まれます。</p>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-3.png" alt="csvファイルを右クリックしてメモ帳で開くメニュー">
+        <figcaption>③ 右クリック→メモ帳で開く</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-4.png" alt="メモ帳で開いた csv の中身">
+        <figcaption>④ カンマ区切りの中身を確認</figcaption>
+      </figure>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cmd-title" style="color:#2f7a2f;"><span class="b" style="background:#2f7a2f;">Excel</span>Windows で CSV を Excel に読み込む</div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#eefbf0"/><rect x="14" y="14" width="20" height="20" rx="3" fill="#fff" stroke="#2f7a2f" stroke-width="2"/><path d="M18 20 l12 8 M30 20 l-12 8" stroke="#2f7a2f" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <h4>形式を選ぶ</h4>
+        <p>［データ］→［テキストまたはCSVから］</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fffaf0"/><path d="M11 18 h9 l2 -3 h8 v3 h9 v14 a2 2 0 0 1 -2 2 H13 a2 2 0 0 1 -2 -2 Z" fill="#ffd23f" stroke="#c9760f" stroke-width="1.5"/></svg>
+        <h4>ファイル選択</h4>
+        <p>export_sample.csv →［インポート］</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#eefaff"/><rect x="14" y="16" width="20" height="16" rx="2" fill="#fff" stroke="#1f7fa3" stroke-width="2"/><line x1="24" y1="16" x2="24" y2="32" stroke="#1f7fa3" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="#1f7fa3" stroke-width="2"/></svg>
+        <h4>区切りを確認</h4>
+        <p>コンマ区切り＆表を確認→［読み込む］</p>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#eefbf0"/><path d="M15 24 l6 7 l13 -15" stroke="#2f7a2f" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h4>読み込み完了！</h4>
+        <p>表形式で表示された</p>
+      </div>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-5.png" alt="ExcelでデータタブからテキストまたはCSVを選ぶ画面">
+        <figcaption>① 読み込む形式を選択</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-6.png" alt="読み込むcsvファイルを選択する画面">
+        <figcaption>② ファイルを選んでインポート</figcaption>
+      </figure>
+    </div>
+    <div class="shot-row">
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-7.png" alt="区切り記号がコンマになっているか確認する画面">
+        <figcaption>③ コンマ区切りを確認して読み込む</figcaption>
+      </figure>
+      <figure style="display:flex;flex-direction:column;height:100%">
+        <img class="shot" style="display:block;margin:auto;" src="第5章/LESSON26-8.png" alt="Excelに表として読み込みが完了した画面">
+        <figcaption>④ 表として読み込み完了✨</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 11 まとめ／これから ===== -->
+<section id="s11">
+  <div class="sec-head"><div class="sec-num c2">11</div><h2>まとめ／これから何を勉強する？</h2></div>
+
+  <div class="card">
+    <p>おつかれさまでした🎉 第5章では、データを複数のテーブルに分けて管理し、必要なときに結合して取り出す流れを学びました。大事な言葉を並べておきます。</p>
+    <div class="chips">
+      <div class="chip"><b>命名規則</b>：半角英語・小文字・_区切りで名前をつける</div>
+      <div class="chip"><b>ALTER … RENAME TO</b>：テーブル名を変更</div>
+      <div class="chip"><b>CREATE TABLE</b>：データ型・制約を指定してテーブル作成</div>
+      <div class="chip"><b>データ型</b>：NULL / TEXT / INTEGER / REAL / BLOB</div>
+      <div class="chip"><b>主キー（PRIMARY KEY）</b>：重複とNULLを禁止し1件を特定</div>
+      <div class="chip"><b>NOT NULL</b>：空っぽを禁止し入れ忘れを防ぐ</div>
+      <div class="chip"><b>INNER JOIN … ON</b>：テーブルを結合して合体</div>
+      <div class="chip"><b>算術演算子</b>：+ - * / % で計算</div>
+      <div class="chip"><b>.mode csv / .once</b>：結果をCSVに書き出す</div>
+    </div>
+
+    <div class="keyline" style="border-left-color:var(--grape);">
+      <b>これから何を勉強したらいいの？</b><br>
+      今回はシンプルなデータベースでしたが、<b>3つ以上のテーブルの結合</b>や、SQL文の中に SQL文を入れた複雑な SQL文も作れます。取り出したデータをさらに <code>SELECT</code> 文で取り出す操作は <span class="term t-purple">サブクエリ</span> と呼ばれます。次のステップとして覚えると、できることがぐっと広がります。
+    </div>
+
+    <div class="speech" style="margin-top:20px;">
+      <div class="avatar">
+        <svg viewBox="0 -4 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="34" r="24" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="44" cy="10" rx="7" ry="12" fill="#fff" stroke="#e7dbc7" stroke-width="2"/><ellipse cx="20" cy="10" rx="3" ry="6" fill="#ffc2d1"/><ellipse cx="44" cy="10" rx="3" ry="6" fill="#ffc2d1"/><path d="M22 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><path d="M38 30 q2 -3 4 0" stroke="#3a3550" stroke-width="2" fill="none"/><circle cx="17" cy="40" r="4" fill="#ffc2d1"/><circle cx="47" cy="40" r="4" fill="#ffc2d1"/><path d="M27 41 q5 5 10 0" stroke="#3a3550" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bubble">テーブルを分けて、必要なときに <b>JOIN で合体</b>。これがデータベースの醍醐味だよ。ここまで来たキミなら、もう立派な SQL 1年生🎓 本当におつかれさま！🐻</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  第5章「複数のテーブルでデータを管理しよう」 ／ はじめての SQL 入門
+</footer>
+
+</div>
+</body>
+</html>
