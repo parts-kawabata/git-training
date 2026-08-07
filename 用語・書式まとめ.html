@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>SQL用語まとめ ─ 逆引きリファレンス</title>
+<style>
+:root{
+ --ink:#22303c; --sub:#5a6b78; --line:#dfe6ec; --bg:#ffffff;
+ --kw:#1565c0; --dot:#7b1fa2; --func:#2e7d32; --type:#00838f;
+ --str:#e65100; --ph:#8a94a0; --op:#c62828;
+ --note:#fff8e1; --noteln:#f6c344; --card:#ffffff;
+}
+*{box-sizing:border-box}
+html{font-family:"Yu Gothic","Meiryo","Segoe UI",sans-serif;color:var(--ink);}
+body{margin:0;padding:13mm 12mm 16mm;font-size:10.3pt;line-height:1.55;}
+code,pre,.ic{font-family:"Consolas","Yu Gothic",monospace;}
+
+/* ---- cover / header ---- */
+.cover{background:linear-gradient(135deg,#1565c0,#00838f);color:#fff;padding:26px 30px 22px;border-radius:14px;margin-bottom:16px;}
+.cover h1{margin:0 0 4px;font-size:23pt;letter-spacing:.02em;}
+.cover .lead{margin:0;font-size:10.5pt;opacity:.92;}
+.legend{display:flex;flex-wrap:wrap;gap:6px 8px;margin:12px 0 4px;}
+.legend .lg{font-size:8.6pt;padding:2px 9px;border-radius:20px;border:1px solid var(--line);background:#fafcfe;font-weight:700;}
+
+/* ---- reverse index ---- */
+.rev-h{font-size:13.5pt;margin:18px 0 8px;padding-left:10px;border-left:6px solid #1565c0;color:#0d47a1;}
+.rev-note{color:var(--sub);font-size:9pt;margin:0 0 8px;}
+.revtbl{width:100%;border-collapse:collapse;font-size:9.4pt;}
+.revtbl th{background:#e8f0fe;color:#0d47a1;text-align:left;padding:6px 9px;border:1px solid #cdd9ea;}
+.revtbl td{padding:5px 9px;border:1px solid #e4ebf3;vertical-align:top;}
+.revtbl tbody tr:nth-child(even){background:#f7fafd;}
+.rv-want{font-weight:700;width:26%;}
+.rv-kw{color:#0d47a1;font-weight:700;width:24%;font-size:9pt;}
+.rv-core{width:50%;}
+
+/* ---- sections ---- */
+.sec{margin-top:20px;break-inside:auto;}
+.sec-h{display:flex;align-items:center;gap:10px;font-size:14.5pt;margin:0 0 10px;
+ padding:7px 12px;border-radius:10px;background:#f0f5fb;color:#123;border-left:8px solid #1565c0;}
+.sec-n{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;
+ background:#1565c0;color:#fff;border-radius:50%;font-size:11pt;font-weight:800;}
+
+.cards{display:block;}
+.card{border:1px solid var(--line);border-radius:11px;padding:10px 13px;margin:0 0 10px;background:var(--card);
+ break-inside:avoid;box-shadow:0 1px 2px rgba(20,40,60,.05);}
+.card.def{background:#fbfdff;border-color:#d8e6f2;}
+.card.mini{display:inline-block;width:calc(50% - 6px);vertical-align:top;margin-right:8px;}
+.card.mini:nth-of-type(2n){margin-right:0;}
+
+.term{font-size:12.5pt;font-weight:800;color:#0d47a1;margin-bottom:3px;}
+.badge{display:inline-block;font-weight:800;font-size:10pt;color:#0d47a1;background:#e8f2fe;
+ border:1px solid #c9def6;border-radius:7px;padding:3px 10px;margin:2px 0 7px;}
+.def .badge{color:#00695c;background:#e0f2f1;border-color:#bfe0dc;}
+.desc{margin:3px 0 7px;color:#2c3a45;font-size:9.8pt;}
+
+.cw{display:flex;align-items:stretch;gap:8px;margin:5px 0;}
+.lbl{flex:0 0 auto;align-self:flex-start;font-size:8.4pt;font-weight:800;color:#fff;border-radius:5px;padding:3px 8px;margin-top:2px;letter-spacing:.05em;}
+.lbl-fmt{background:#5c6bc0;}
+.lbl-ex{background:#26a69a;}
+pre.code{flex:1 1 auto;margin:0;background:#f6f9fc;border:1px solid #e3ebf3;border-left:4px solid #b7c6d8;
+ border-radius:7px;padding:8px 11px;white-space:pre-wrap;word-break:break-word;font-size:9.6pt;line-height:1.5;overflow-wrap:anywhere;}
+
+.note{background:var(--note);border:1px solid #f2e2a8;border-left:4px solid var(--noteln);
+ border-radius:6px;padding:5px 10px;margin:5px 0;font-size:9pt;color:#5d4d16;}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:7px 0 2px;}
+.flow .chip{background:#eef4fb;border:1px solid #cddcee;color:#154a8a;border-radius:16px;padding:2px 10px;font-size:8.7pt;font-weight:700;}
+.flow .arw{color:#9db2c8;font-weight:800;}
+
+/* ---- data tables ---- */
+.tbl{border-collapse:collapse;width:100%;margin:6px 0;font-size:9.4pt;}
+.tbl th{background:#eef3f8;border:1px solid #d2dde8;padding:5px 9px;text-align:left;color:#234;}
+.tbl td{border:1px solid #e2e9f0;padding:5px 9px;vertical-align:top;}
+.tbl tbody tr:nth-child(even){background:#f8fafc;}
+.tbl.two td{width:50%;}
+.tbl.prio th{background:#fde9e9;color:#a01818;width:44px;text-align:center;font-size:11pt;}
+.ruby{color:#8593a0;font-size:8.2pt;}
+.ic{font-size:9.3pt;}
+
+/* ---- token colors ---- */
+.t-kw{color:var(--kw);font-weight:800;}
+.t-multikw{color:var(--kw);font-weight:800;}
+.t-dotcmd,.t-shell{color:var(--dot);font-weight:700;}
+.t-func{color:var(--func);font-weight:800;}
+.t-type{color:var(--type);font-weight:800;}
+.t-string{color:var(--str);font-weight:700;}
+.t-ph{color:var(--ph);font-style:italic;}
+.t-op{color:var(--op);font-weight:800;}
+.t-comment{color:#90a4ae;font-style:italic;}
+.ic .t-kw,.ic .t-multikw{color:var(--kw);}
+
+@page{size:A4;margin:0;}
+@media print{.card,.sec,.revtbl tr{break-inside:avoid;} .sec{break-inside:auto;}}
+</style></head>
+<body>
+<div class="cover">
+ <h1>SQL用語まとめ ─ 逆引きリファレンス</h1>
+ <p class="lead">「こういうときは、どの句を使い、どんな書式だったか」を一目で引くためのカード集。（内容は原資料のまま）</p>
+</div>
+<div class="legend"><span class="lg t-kw">キーワード</span><span class="lg t-dotcmd">コマンド</span><span class="lg t-func">関数</span><span class="lg t-type">データ型</span><span class="lg t-string">文字列・日付</span><span class="lg t-ph">可変部（表・列名など）</span><span class="lg t-op">演算子</span></div>
+<h2 class="rev-h">■ 逆引きインデックス（やりたいこと → 使う句）</h2>
+<p class="rev-note">まず下の表で目的を探し、詳しい書式・例は各セクションのカードで確認できます。</p>
+<table class="revtbl"><thead><tr><th>やりたいこと</th><th>使う句・コマンド</th><th>書式の核</th></tr></thead><tbody><tr><td class="rv-want">データベースを開く</td><td class="rv-kw">sqlite3</td><td class="rv-core"><code class="ic"><span class="t-shell">sqlite3</span> <span class="t-ph">データベース名</span></code></td></tr><tr><td class="rv-want">SQLファイルを実行する</td><td class="rv-kw">.read</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.read</span> <span class="t-ph">ファイル名</span></code></td></tr><tr><td class="rv-want">テーブルの一覧を見る</td><td class="rv-kw">.tables</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.tables</span></code></td></tr><tr><td class="rv-want">SQLiteを終了する</td><td class="rv-kw">.exit</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.exit</span></code></td></tr><tr><td class="rv-want">見出し・整形して表示</td><td class="rv-kw">.header on / .mode column</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.header</span> on <span class="t-op">/</span> <span class="t-dotcmd">.mode</span> column</code></td></tr><tr><td class="rv-want">全カラムを取り出す</td><td class="rv-kw">SELECT *</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">特定のカラムを取り出す</td><td class="rv-kw">SELECT カラム</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">重複を消して取り出す</td><td class="rv-kw">DISTINCT</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-kw">DISTINCT</span> <span class="t-ph">カラム名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">見出しに別名を付ける</td><td class="rv-kw">AS</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span> <span class="t-kw">AS</span> <span class="t-ph">別名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">条件で絞り込む</td><td class="rv-kw">WHERE</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</code></td></tr><tr><td class="rv-want">文字列と一致で絞る</td><td class="rv-kw">= と '…'</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-op">=</span> <span class="t-string">'値'</span></code></td></tr><tr><td class="rv-want">大小で絞る</td><td class="rv-kw">比較演算子 &lt; &gt; &lt;= &gt;= &lt;&gt;</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-op">&gt;=</span> <span class="t-ph">値</span></code></td></tr><tr><td class="rv-want">両方の条件を満たす</td><td class="rv-kw">AND</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">条件式1</span> <span class="t-kw">AND</span> <span class="t-ph">条件式2</span></code></td></tr><tr><td class="rv-want">どちらかの条件を満たす</td><td class="rv-kw">OR</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">条件式1</span> <span class="t-kw">OR</span> <span class="t-ph">条件式2</span></code></td></tr><tr><td class="rv-want">条件を満たさない</td><td class="rv-kw">NOT</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-kw">NOT</span> <span class="t-ph">条件式</span></code></td></tr><tr><td class="rv-want">複数のどれかに一致</td><td class="rv-kw">IN</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-kw">IN</span> (<span class="t-ph">データ1</span>, <span class="t-ph">データ2</span>, ...)</code></td></tr><tr><td class="rv-want">複数のどれにも一致しない</td><td class="rv-kw">NOT IN</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-multikw">NOT IN</span> (<span class="t-ph">データ1</span>, ...)</code></td></tr><tr><td class="rv-want">範囲で絞る</td><td class="rv-kw">BETWEEN</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-kw">BETWEEN</span> <span class="t-ph">値1</span> <span class="t-kw">AND</span> <span class="t-ph">値2</span></code></td></tr><tr><td class="rv-want">範囲外で絞る</td><td class="rv-kw">NOT BETWEEN</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-multikw">NOT BETWEEN</span> <span class="t-ph">値1</span> <span class="t-kw">AND</span> <span class="t-ph">値2</span></code></td></tr><tr><td class="rv-want">NULLの行を探す</td><td class="rv-kw">IS NULL</td><td class="rv-core"><code class="ic"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-multikw">IS NULL</span></code></td></tr><tr><td class="rv-want">件数/合計/平均/最小/最大</td><td class="rv-kw">COUNT/SUM/AVG/MIN/MAX</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-func">SUM</span>(<span class="t-ph">カラム名</span>) <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">グループごとに集計</td><td class="rv-kw">GROUP BY</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span>, 関数(<span class="t-ph">引数</span>) <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-multikw">GROUP BY</span> <span class="t-ph">カラム名</span>;</code></td></tr><tr><td class="rv-want">値をつないで表示</td><td class="rv-kw">GROUP_CONCAT</td><td class="rv-core"><code class="ic"><span class="t-func">GROUP_CONCAT</span>(<span class="t-ph">カラム名</span>)</code></td></tr><tr><td class="rv-want">集計した結果に条件</td><td class="rv-kw">HAVING</td><td class="rv-core"><code class="ic">... <span class="t-multikw">GROUP BY</span> <span class="t-ph">カラム名</span> <span class="t-kw">HAVING</span> <span class="t-ph">条件式</span>;</code></td></tr><tr><td class="rv-want">並べ替える(降順/昇順)</td><td class="rv-kw">ORDER BY (DESC/ASC)</td><td class="rv-core"><code class="ic">... <span class="t-multikw">ORDER BY</span> <span class="t-ph">カラム名</span> <span class="t-kw">DESC</span>;</code></td></tr><tr><td class="rv-want">四捨五入する</td><td class="rv-kw">ROUND</td><td class="rv-core"><code class="ic"><span class="t-func">ROUND</span>(数<span class="t-ph">値</span>, 桁)</code></td></tr><tr><td class="rv-want">行を追加する</td><td class="rv-kw">INSERT INTO</td><td class="rv-core"><code class="ic"><span class="t-multikw">INSERT INTO</span> <span class="t-ph">テーブル名</span> (…) <span class="t-kw">VALUES</span> (…);</code></td></tr><tr><td class="rv-want">値を更新する</td><td class="rv-kw">UPDATE</td><td class="rv-core"><code class="ic"><span class="t-kw">UPDATE</span> <span class="t-ph">テーブル名</span> <span class="t-kw">SET</span> <span class="t-ph">カラム名</span> <span class="t-op">=</span> <span class="t-ph">値</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</code></td></tr><tr><td class="rv-want">行を削除する</td><td class="rv-kw">DELETE</td><td class="rv-core"><code class="ic"><span class="t-kw">DELETE</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</code></td></tr><tr><td class="rv-want">テーブルを削除する</td><td class="rv-kw">DROP TABLE</td><td class="rv-core"><code class="ic"><span class="t-multikw">DROP TABLE</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">テーブル名を変える</td><td class="rv-kw">ALTER … RENAME TO</td><td class="rv-core"><code class="ic"><span class="t-multikw">ALTER TABLE</span> <span class="t-ph">テーブル名</span> <span class="t-multikw">RENAME TO</span> <span class="t-ph">新しいテーブル名</span>;</code></td></tr><tr><td class="rv-want">テーブルを作る</td><td class="rv-kw">CREATE TABLE</td><td class="rv-core"><code class="ic"><span class="t-multikw">CREATE TABLE</span> <span class="t-ph">テーブル名</span> (<span class="t-ph">カラム名</span> データ型 <span class="t-ph">制約</span>, ...);</code></td></tr><tr><td class="rv-want">2つのテーブルを結合</td><td class="rv-kw">INNER JOIN … ON</td><td class="rv-core"><code class="ic">... <span class="t-multikw">INNER JOIN</span> <span class="t-ph">テーブル名2</span> <span class="t-kw">ON</span> 表1.列 <span class="t-op">=</span> 表2.列</code></td></tr><tr><td class="rv-want">計算する</td><td class="rv-kw">算術演算子 + - * / %</td><td class="rv-core"><code class="ic"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名1</span> <span class="t-op">*</span> <span class="t-ph">カラム名2</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</code></td></tr><tr><td class="rv-want">バックアップ/復元</td><td class="rv-kw">.backup / .restore</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.backup</span> <span class="t-ph">ファイル名</span> <span class="t-op">/</span> <span class="t-dotcmd">.restore</span> <span class="t-ph">ファイル名</span></code></td></tr><tr><td class="rv-want">CSVに書き出す</td><td class="rv-kw">.mode csv / .once</td><td class="rv-core"><code class="ic"><span class="t-dotcmd">.mode</span> csv <span class="t-op">/</span> <span class="t-dotcmd">.once</span> <span class="t-ph">ファイル名</span></code></td></tr><tr><td class="rv-want">コメントを書く</td><td class="rv-kw">/* */</td><td class="rv-core"><code class="ic"><span class="t-comment">/* コメント */</span></code></td></tr></tbody></table>
+<section class="sec" data-sec="1">
+<h2 class="sec-h"><span class="sec-n">1</span>データベースの基礎</h2>
+<div class="cards">
+<div class="card def">
+<div class="term">データベース（DataBase）</div>
+<p class="desc">保管されたデータの集まりと、そのデータを管理するシステムのこと。</p>
+<div class="note">例）ショッピングサイトの商品情報や顧客情報などがデータベースで管理されている。大量のデータの中から目的のデータを迅速に取り出せる。</div>
+</div>
+<div class="card def">
+<div class="term">DBMS（DataBase Management System）</div>
+<p class="desc">コンピュータ上でデータの管理を行うソフトウェア。データベース管理システムを略してDBMSという。</p>
+<p class="desc">＜種類＞ ・階層型データベース ／ ・ネットワーク型データベース ／ ・リレーショナルデータベース</p>
+</div>
+<div class="card def">
+<div class="term">RDBMS</div>
+<p class="desc">リレーショナルデータベースの管理を行うDBMSのこと。RはRelational（関係のある）の略。</p>
+<div class="note">例）大規模なシステム向けから小規模なシステム向けまで、さまざまな種類がある。</div>
+<div class="badge">【代表的なRDBMS】</div>
+<table class="tbl"><thead><tr><th>名前</th><th>説明</th></tr></thead><tbody><tr><td><code class="ic">Oracle Database</code><br><span class="ruby">（オラクルデータベース）</span></td><td>商用でのシェアが高く、大規模なシステムで利用される</td></tr><tr><td><code class="ic">MySQL</code><br><span class="ruby">（マイエスキューエル）</span></td><td>オープンソースで、Webアプリケーションの開発に利用される</td></tr><tr><td><code class="ic">PostgreSQL</code><br><span class="ruby">（ポストグレスキューエル）</span></td><td>拡張性があり独自の処理を追加できることから、複雑なデータ構造のシステムに利用される</td></tr><tr><td><code class="ic">SQLite</code><br><span class="ruby">（エスキューライト）</span></td><td>小規模で高速に動作することから、小規模なシステムやIoT機器（電子機器）などに利用される</td></tr></tbody></table>
+</div>
+<div class="card def">
+<div class="term">リレーショナルデータベースの構造</div>
+<p class="desc">データをテーブルと呼ばれる2次元の表形式で表す。列にあたる部分をカラム、行にあたる部分をレコード、レコード内の個々のデータが入る場所をフィールドと呼ぶ。</p>
+</div>
+<div class="card def">
+<div class="term">SQL</div>
+<p class="desc">RDBMSでデータを操作するためのデータベース言語。SQLで書いた「SQL文」という命令で、データを入れたり取り出したりできる。</p>
+<div class="badge">【SQLiteの特徴】</div>
+<table class="tbl two"><thead><tr><th>メリット</th><th>デメリット</th></tr></thead><tbody><tr><td>・軽量なため、動作が高速<br>・複雑な設定が不要<br>・導入が容易</td><td>・複数人で同時に操作できない<br>・パスワード機能がないため、セキュリティ面に不安がある<br>・何十万件もデータがある大規模なデータベースには不向き</td></tr></tbody></table>
+</div>
+</div></section>
+<section class="sec" data-sec="2">
+<h2 class="sec-h"><span class="sec-n">2</span>SQLite操作の基本（コマンド）</h2>
+<div class="cards">
+<div class="card ">
+<div class="badge">カレントディレクトリを変更する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-shell">cd</span> <span class="t-ph">フォルダのパス</span></pre></div>
+</div>
+<div class="card ">
+<div class="badge">SQLiteを起動する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-shell">sqlite3</span> <span class="t-ph">開きたいデータベース名</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-shell">sqlite3</span> sample.db</pre></div>
+</div>
+<div class="card ">
+<div class="badge">ファイルを読み込む</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.read</span> <span class="t-ph">ファイル名</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-dotcmd">.read</span> chap1_sales.sql</pre></div>
+</div>
+<div class="card mini">
+<div class="badge">テーブルの一覧を表示</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.tables</span></pre></div>
+</div>
+<div class="card mini">
+<div class="badge">SQLiteを終了する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.exit</span></pre></div>
+</div>
+<div class="card mini">
+<div class="badge">ヘッダー（見出し）を表示する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.header</span> on</pre></div>
+</div>
+<div class="card mini">
+<div class="badge">表示モードをカラムにする</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.mode</span> column</pre></div>
+</div>
+<div class="card ">
+<div class="badge">見やすく整形して表示する（組み合わせ例）</div>
+<div class="cw"><pre class="code"><span class="t-dotcmd">.header</span> on
+<span class="t-dotcmd">.mode</span> column
+<span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales;</pre></div>
+</div>
+</div></section>
+<section class="sec" data-sec="3">
+<h2 class="sec-h"><span class="sec-n">3</span>SELECT ─ データを取り出す</h2>
+<div class="cards">
+<div class="card ">
+<div class="badge">テーブルから全カラムを取り出す</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales;</pre></div>
+<div class="note">「*（アスタリスク）」は全カラムを取り出す指定。「FROM」のあとに操作するテーブル名を書く。</div>
+<div class="note">SQL文の終わりには「;（セミコロン）」を付ける決まり。付け忘れるとエラーになる。</div>
+</div>
+<div class="card ">
+<div class="badge">指定したカラムのデータを取り出す</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer <span class="t-kw">FROM</span> sales;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">重複した値を取り除く</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-kw">DISTINCT</span> <span class="t-ph">カラム名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-kw">DISTINCT</span> customer <span class="t-kw">FROM</span> sales;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">複数のカラムを取り出す</div>
+<p class="desc">カラム名は「,（カンマ）」で区切ると複数指定でき、指定した順番に取り出せる。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名1</span>, <span class="t-ph">カラム名2</span>, ... <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> date, item_name, item_count <span class="t-kw">FROM</span> sales;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">見出しに別名（エイリアス）を付ける</div>
+<p class="desc">ヘッダーに表示されるカラム名などに一時的な別名を付けられる。カラム名のあとに「AS 別名」と書く。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span> <span class="t-kw">AS</span> <span class="t-ph">別名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> item_name <span class="t-kw">AS</span> 商品名, item_count <span class="t-kw">AS</span> 個数 <span class="t-kw">FROM</span> sales;</pre></div>
+</div>
+</div></section>
+<section class="sec" data-sec="4">
+<h2 class="sec-h"><span class="sec-n">4</span>WHERE ─ 条件で絞り込む</h2>
+<div class="cards">
+<div class="card ">
+<div class="badge">条件を指定してデータを取り出す</div>
+<p class="desc">条件を指定するときは FROM句のあとに WHERE句で条件を指定する。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span>;</pre></div>
+<div class="note">条件式に使う値が文字列の場合は「’（シングルクォーテーション）」で囲む。</div>
+<div class="note">「=（イコール）」は比較演算子。演算子の左右にある値を比較する。</div>
+<div class="badge">【比較演算子】</div>
+<table class="tbl"><thead><tr><th>記号</th><th>意味</th></tr></thead><tbody><tr><td><code class="ic"><span class="t-op">=</span></code></td><td>右辺と左辺が同じ</td></tr><tr><td><code class="ic"><span class="t-op">&lt;</span></code></td><td>左辺が右辺より小さい</td></tr><tr><td><code class="ic"><span class="t-op">&gt;</span></code></td><td>左辺が右辺より大きい</td></tr><tr><td><code class="ic"><span class="t-op">&lt;=</span></code></td><td>左辺が右辺以下</td></tr><tr><td><code class="ic"><span class="t-op">&gt;=</span></code></td><td>左辺が右辺以上</td></tr><tr><td><code class="ic"><span class="t-op">&lt;&gt;</span></code></td><td>左辺と右辺が違う</td></tr></tbody></table>
+</div>
+<div class="card ">
+<div class="badge">大小を比較して絞る（比較演算子の例）</div>
+<div class="cw"><pre class="code">item_count <span class="t-op">&gt;</span> 2      -- 2より大きい（2は含まない）
+item_count <span class="t-op">&lt;</span> 2      -- 2より小さい（2は含まない）
+item_count <span class="t-op">&gt;=</span> 2     -- 2以上（2を含む）
+item_count <span class="t-op">&lt;=</span> 2     -- 2以下（2を含む）</pre></div>
+</div>
+<div class="card ">
+<div class="badge">日付で絞る</div>
+<p class="desc">日付は「yyyy-mm-dd」の形式で表す。</p>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> date <span class="t-op">&gt;=</span> <span class="t-string">‘2023-04-11’</span>;   -- 4<span class="t-op">/</span>11以降
+<span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> date <span class="t-op">&gt;</span>  <span class="t-string">‘2023-04-11’</span>;   -- 4<span class="t-op">/</span>11よりあと</pre></div>
+</div>
+<div class="card ">
+<div class="badge">両方の条件を満たす（かつ）</div>
+<p class="desc">左右どちらも満たすデータを取り出すときは「かつ」の意味の AND演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">条件式1</span> <span class="t-kw">AND</span> <span class="t-ph">条件式2</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> customer <span class="t-op">=</span> <span class="t-string">‘サル橋’</span> <span class="t-kw">AND</span> item_name <span class="t-op">=</span> <span class="t-string">‘バナナ’</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">どちらかの条件を満たす（もしくは）</div>
+<p class="desc">どちらかを満たすデータを取り出すときは「もしくは」の意味の OR演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">条件式1</span> <span class="t-kw">OR</span> <span class="t-ph">条件式2</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span> <span class="t-kw">OR</span> item_name <span class="t-op">=</span> <span class="t-string">‘ブドウ’</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">条件を満たさない（ではない）</div>
+<p class="desc">条件を満たさないデータを取り出すときは「ではない」の意味の NOT演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-kw">NOT</span> <span class="t-ph">条件式</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> <span class="t-kw">NOT</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">演算子の優先順位</div>
+<table class="tbl prio"><tbody><tr><th>高</th><td><code class="ic"><span class="t-op">&lt;</span></code><code class="ic"><span class="t-op">&gt;</span></code><code class="ic"><span class="t-op">&gt;=</span></code><code class="ic"><span class="t-op">&lt;=</span></code> ／ <code class="ic"><span class="t-op">=</span></code><code class="ic"><span class="t-op">&lt;&gt;</span></code></td></tr><tr><th>↓</th><td><code class="ic"><span class="t-kw">NOT</span></code></td></tr><tr><th>↓</th><td><code class="ic"><span class="t-kw">AND</span></code></td></tr><tr><th>低</th><td><code class="ic"><span class="t-kw">OR</span></code></td></tr></tbody></table>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> customer <span class="t-op">=</span> <span class="t-string">‘サル橋’</span> <span class="t-kw">OR</span> customer <span class="t-op">=</span> <span class="t-string">‘ウサ田’</span>
+<span class="t-kw">AND</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span>;</pre></div>
+<div class="note">※ AND演算子から先に処理される。</div>
+<p class="desc">優先順位の低い演算子から処理したい場合は、その部分をカッコで囲む。</p>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> (customer <span class="t-op">=</span> <span class="t-string">‘サル橋’</span> <span class="t-kw">OR</span> customer <span class="t-op">=</span> <span class="t-string">‘ウサ田’</span>)
+<span class="t-kw">AND</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span>;</pre></div>
+<div class="note">※ カッコで囲んだため、OR演算子から処理される。</div>
+</div>
+<div class="card ">
+<div class="badge">複数のどれかに一致（IN）</div>
+<p class="desc">複数の値のいずれかに一致するものを取り出すときは IN演算子が便利。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-kw">IN</span> (<span class="t-ph">データ1</span>, <span class="t-ph">データ2</span>, ...)</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> item_name <span class="t-kw">IN</span> (<span class="t-string">‘リンゴ’</span>, <span class="t-string">‘イチゴ’</span>);</pre></div>
+<div class="note">「=」と「OR」で書くと： WHERE item_name = ‘リンゴ’ OR item_name = ‘イチゴ’;</div>
+</div>
+<div class="card ">
+<div class="badge">複数のどれにも一致しない（NOT IN）</div>
+<p class="desc">いずれの値にも一致しないデータを取り出すときは NOT IN演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-multikw">NOT IN</span> (<span class="t-ph">データ1</span>, <span class="t-ph">データ2</span>, ...);</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> item_name <span class="t-multikw">NOT IN</span> (<span class="t-string">‘リンゴ’</span>, <span class="t-string">‘イチゴ’</span>);</pre></div>
+<div class="note">&lt;&gt;とANDで書くと： WHERE item_name &lt;&gt; ‘リンゴ’ AND item_name &lt;&gt; ’イチゴ’;</div>
+</div>
+<div class="card ">
+<div class="badge">範囲で絞る（BETWEEN）</div>
+<p class="desc">数や日付で特定の範囲を指定したいときは BETWEEN演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-kw">BETWEEN</span> <span class="t-ph">値1</span> <span class="t-kw">AND</span> <span class="t-ph">値2</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> date <span class="t-kw">BETWEEN</span> <span class="t-string">‘2023-04-11’</span> <span class="t-kw">AND</span> <span class="t-string">‘2023-04-13’</span>;</pre></div>
+<div class="note">※ BETWEENと組み合わせるANDは「かつ」ではなく「から」の意味になる。</div>
+<div class="note">比較演算子で書くと： WHERE date &gt;= ‘2023-04-11’ AND date &lt;= ‘2023-04-13’;</div>
+</div>
+<div class="card ">
+<div class="badge">範囲外で絞る（NOT BETWEEN）</div>
+<p class="desc">指定した範囲外のデータを取り出したいときは NOT BETWEEN演算子を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">WHERE</span> <span class="t-ph">カラム名</span> <span class="t-multikw">NOT BETWEEN</span> <span class="t-ph">値1</span> <span class="t-kw">AND</span> <span class="t-ph">値2</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> date <span class="t-multikw">NOT BETWEEN</span> <span class="t-string">‘2023-04-11’</span> <span class="t-kw">AND</span> <span class="t-string">‘2023-04-13’</span>;</pre></div>
+<div class="note">比較演算子で書くと： WHERE date &lt; ‘2023-04-11’ OR date &gt; ‘2023-04-13’;</div>
+</div>
+</div></section>
+<section class="sec" data-sec="5">
+<h2 class="sec-h"><span class="sec-n">5</span>集計・グループ化</h2>
+<div class="cards">
+<div class="card def">
+<div class="term">集計関数</div>
+<p class="desc">対象テーブルのカラムの合計値や平均値など、数値から何らかの結果を返す関数。関数に渡すデータや条件を引数、得られる結果を戻り値という。</p>
+<div class="badge">【集計関数】</div>
+<table class="tbl"><thead><tr><th>関数</th><th>意味</th></tr></thead><tbody><tr><td><code class="ic"><span class="t-func">COUNT</span></code> <span class="ruby">(カウント)</span></td><td>テーブルのレコード数を求める</td></tr><tr><td><code class="ic"><span class="t-func">SUM</span></code> <span class="ruby">(サム)</span></td><td>指定したカラムの合計値を求める</td></tr><tr><td><code class="ic"><span class="t-func">AVG</span></code> <span class="ruby">(エイブイジー)</span></td><td>指定したカラムの平均値を求める</td></tr><tr><td><code class="ic"><span class="t-func">MIN</span></code> <span class="ruby">(ミン)</span></td><td>指定したカラムの最小値を求める</td></tr><tr><td><code class="ic"><span class="t-func">MAX</span></code> <span class="ruby">(マックス)</span></td><td>指定したカラムの最大値を求める</td></tr></tbody></table>
+</div>
+<div class="card ">
+<div class="badge">関数を使う基本のSQL文</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">関数名</span>(<span class="t-ph">引数</span>) <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">レコード数を数える</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-kw">FROM</span> sales;</pre></div>
+<div class="note">ASで別名を付けられる： SELECT COUNT(*) AS records FROM sales;</div>
+</div>
+<div class="card ">
+<div class="badge">合計・平均を求める</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-func">SUM</span>(price) <span class="t-kw">FROM</span> sales;    -- 合計
+<span class="t-kw">SELECT</span> <span class="t-func">AVG</span>(price) <span class="t-kw">FROM</span> sales;    -- 平均</pre></div>
+</div>
+<div class="card ">
+<div class="badge">最小値・最大値を求める</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-func">SEECT</span> <span class="t-func">MIN</span>(price), <span class="t-func">MAX</span>(price) <span class="t-kw">FROM</span> sales;</pre></div>
+<div class="note">※ 関数も「,」で区切ると同時に使える。（原文の綴りママ）</div>
+</div>
+<div class="card ">
+<div class="badge">グループごとに集計する（GROUP BY）</div>
+<p class="desc">データをグループ化するには「グループ分けする」意味の GROUP BY句を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span>, 関数(<span class="t-ph">引数</span>) <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-multikw">GROUP BY</span> <span class="t-ph">カラム名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer, <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-kw">FROM</span> sales <span class="t-multikw">GROUP BY</span> customer;</pre></div>
+<div class="note">※ SELECT句とGROUP BY句で同じカラム名を指定しなければならない。</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> item_name, <span class="t-func">SUM</span>(price) <span class="t-kw">FROM</span> sales <span class="t-multikw">GROUP BY</span> item_name;
+<span class="t-kw">SELECT</span> date, <span class="t-func">AVG</span>(price) <span class="t-kw">FROM</span> sales <span class="t-multikw">GROUP BY</span> date;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">指定したカラムの値を結合する（GROUP_CONCAT）</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer, <span class="t-func">GROUP_CONCAT</span>(item_name) <span class="t-kw">FROM</span> sales
+<span class="t-multikw">GROUP BY</span> customer;</pre></div>
+<div class="note">引数にDISTINCTを付けると重複を除ける： GROUP_CONCAT(DISTINCT カラム名)</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer, <span class="t-func">GROUP_CONCAT</span>(<span class="t-kw">DISTINCT</span> item_name) <span class="t-kw">FROM</span> sales
+<span class="t-multikw">GROUP BY</span> customer;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">集計した結果に条件を付ける（HAVING）</div>
+<p class="desc">集計結果に対して条件を付けたい場合は HAVING句を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span>, <span class="t-ph">集計関数</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>
+<span class="t-multikw">GROUP BY</span> <span class="t-ph">カラム名</span> <span class="t-kw">HAVING</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer, <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-kw">FROM</span> sales
+<span class="t-multikw">GROUP BY</span> customer <span class="t-kw">HAVING</span> <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-op">&gt;=</span> 2;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">5つの句を使ったSQL文</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> customer, <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> customer <span class="t-op">&lt;&gt;</span> <span class="t-string">‘ウサ田’</span>
+<span class="t-multikw">GROUP BY</span> customer <span class="t-kw">HAVING</span> <span class="t-func">COUNT</span>(<span class="t-op">*</span>) <span class="t-op">&gt;=</span> 2;</pre></div>
+<div class="flow"><span class="chip">FROM句</span><span class="arw">→</span><span class="chip">WHERE句</span><span class="arw">→</span><span class="chip">GROUP BY句</span><span class="arw">→</span><span class="chip">HAVING句</span><span class="arw">→</span><span class="chip">SELECT句</span></div>
+</div>
+</div></section>
+<section class="sec" data-sec="6">
+<h2 class="sec-h"><span class="sec-n">6</span>ORDER BY ─ 並べ替える</h2>
+<div class="cards">
+<div class="card ">
+<div class="badge">取り出したデータを並べ替える</div>
+<p class="desc">並べ替えたいときは ORDER BY句を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-multikw">ORDER BY</span> <span class="t-ph">並べ替え基準のカラム名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-multikw">ORDER BY</span> price;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">降順に並べ替える（DESC）</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-multikw">ORDER BY</span> price <span class="t-kw">DESC</span>;</pre></div>
+<div class="note">※ DESCはDescendingの略で降順の意味。書かない場合は自動的に昇順（ASC）として実行される。</div>
+</div>
+<div class="card ">
+<div class="badge">複数の基準で並べ替える</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>
+<span class="t-multikw">ORDER BY</span> <span class="t-ph">並べ替え基準のカラム名1</span> <span class="t-kw">DESC</span>, <span class="t-ph">並べ替え基準のカラム名2</span> <span class="t-kw">DESC</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-multikw">ORDER BY</span> item_count <span class="t-kw">DESC</span>, price <span class="t-kw">DESC</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">WHERE句と組み合わせる</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span> <span class="t-multikw">ORDER BY</span> <span class="t-ph">カラム名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> item_name <span class="t-op">=</span> <span class="t-string">‘バナナ’</span> <span class="t-multikw">ORDER BY</span> price;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">GROUP BY句と組み合わせる</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名1</span>, <span class="t-ph">集計関数</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span>
+<span class="t-multikw">GROUP BY</span> <span class="t-ph">カラム名1</span> [<span class="t-kw">HAVING</span> <span class="t-ph">条件式</span>]
+<span class="t-multikw">ORDER BY</span> <span class="t-ph">並べ替え基準のカラム名</span>もしくは<span class="t-ph">集計関数</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> item_name, <span class="t-func">SUM</span>(item_count) <span class="t-kw">FROM</span> sales
+<span class="t-multikw">GROUP BY</span> item_name
+<span class="t-multikw">ORDER BY</span> <span class="t-func">SUM</span>(item_count) <span class="t-kw">DESC</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">6つの句を使ったSQL文</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> item_name, <span class="t-func">SUM</span>(item_count) <span class="t-kw">FROM</span> sales
+<span class="t-kw">WHERE</span> item_name <span class="t-op">&lt;&gt;</span> <span class="t-string">‘バナナ’</span>
+<span class="t-multikw">GROUP BY</span> item_name <span class="t-kw">HAVING</span> <span class="t-func">SUM</span>(item_count) <span class="t-op">&gt;</span> 2
+<span class="t-multikw">ORDER BY</span> <span class="t-func">SUM</span>(item_count) <span class="t-kw">DESC</span>;</pre></div>
+<div class="flow"><span class="chip">FROM句</span><span class="arw">→</span><span class="chip">WHERE句</span><span class="arw">→</span><span class="chip">GROUP BY句</span><span class="arw">→</span><span class="chip">HAVING句</span><span class="arw">→</span><span class="chip">SELECT句</span><span class="arw">→</span><span class="chip">ORDER BY句</span></div>
+</div>
+</div></section>
+<section class="sec" data-sec="7">
+<h2 class="sec-h"><span class="sec-n">7</span>データ操作 ─ 追加・更新・削除</h2>
+<div class="cards">
+<div class="card def">
+<div class="term">CRUD（クラッド）</div>
+<p class="desc">DBMSの基本機能 Create（作成）・Read（読み込み）・Update（更新）・Delete（削除）の頭文字。</p>
+<p class="desc">・読み込み＝SELECT文 ／ ・作成＝CREATE文・INSERT文 ／ ・更新＝UPDATE文 ／ ・削除＝DELETE文</p>
+</div>
+<div class="card ">
+<div class="badge">バックアップファイルを作る</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.backup</span> <span class="t-ph">作成するファイル名</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-dotcmd">.backup</span> sample.back</pre></div>
+</div>
+<div class="card ">
+<div class="badge">バックアップから復元する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.restore</span> <span class="t-ph">バックアップファイル名</span></pre></div>
+</div>
+<div class="card ">
+<div class="badge">データを追加する①（カラム名を指定）</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-multikw">INSERT INTO</span> <span class="t-ph">テーブル名</span> (<span class="t-ph">カラム名1</span>, <span class="t-ph">カラム名2</span>, ...)
+<span class="t-kw">VALUES</span> (<span class="t-ph">値1</span>, <span class="t-ph">値2</span>, ...);</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">INSERT INTO</span> sales (date, item_name, item_count, price, customer)
+<span class="t-kw">VALUES</span> (<span class="t-string">‘2023-04-15’</span>, <span class="t-string">‘イチゴ’</span>, 2, 800, <span class="t-string">‘クマ井’</span>);</pre></div>
+</div>
+<div class="card ">
+<div class="badge">データを追加する②（カラム名を省略）</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-multikw">INSERT INTO</span> <span class="t-ph">テーブル名</span> <span class="t-kw">VALUES</span> (<span class="t-ph">値1</span>, <span class="t-ph">値2</span>, ...);</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">INSERT INTO</span> sales
+<span class="t-kw">VALUES</span> (<span class="t-string">‘2023-04-15’</span>, <span class="t-string">‘イチゴ’</span>, 1, 400, <span class="t-string">‘ウサ田’</span>);</pre></div>
+</div>
+<div class="card ">
+<div class="badge">値が足りないINSERT文（注意例）</div>
+<div class="cw"><pre class="code">-- ① <span class="t-ph">カラム名</span>を指定・<span class="t-ph">値</span>が1つ足りない → NULL<span class="t-ph">値</span>のセルができる
+<span class="t-multikw">INSERT INTO</span> sales (date, item_name, item_count, price)
+<span class="t-kw">VALUES</span> (<span class="t-string">‘2023-04-16’</span>, <span class="t-string">‘ブドウ’</span>, 1, 500);
+
+-- ② <span class="t-ph">カラム名</span>を省略・<span class="t-ph">値</span>が足りない → Parseエラー
+<span class="t-multikw">INSERT INTO</span> sales <span class="t-kw">VALUES</span> (<span class="t-string">‘2023-04-16’</span>, <span class="t-string">‘バナナ’</span>, 2, 400);</pre></div>
+<div class="note">※ あえてNULLを入れる場合以外は、カラム名を省略したINSERT文にすると値の過不足ミスが起きにくい。</div>
+</div>
+<div class="card ">
+<div class="badge">NULL値があるときのCOUNT</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-func">COUNT</span>(<span class="t-op">*</span>), <span class="t-func">COUNT</span>(customer) <span class="t-kw">FROM</span> sales;</pre></div>
+<div class="note">※ 「*」は全レコード数を数えるが、カラム名を引数にするとNULL値以外の値が入ったレコード数を数える。</div>
+</div>
+<div class="card ">
+<div class="badge">NULL値を持つデータを探す（IS NULL）</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> date, item_name, item_count, price
+<span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> customer <span class="t-multikw">IS NULL</span>;</pre></div>
+<div class="note">※ IS NULL演算子でNULL値を持つデータを探せる。</div>
+</div>
+<div class="card ">
+<div class="badge">コメントを書く</div>
+<div class="cw"><pre class="code"><span class="t-comment">/*salesテーブルからデータを取り出す*/</span>
+<span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales;</pre></div>
+<div class="note">※ /* から */ の範囲はコメントで、SQL文の一部とは見なされない。</div>
+</div>
+<div class="card ">
+<div class="badge">実行前の状態へ復元する</div>
+<div class="cw"><pre class="code"><span class="t-dotcmd">.backup</span> sample2.back
+<span class="t-dotcmd">.restore</span> sample.back</pre></div>
+</div>
+<div class="card ">
+<div class="badge">データを更新する（UPDATE）</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">UPDATE</span> <span class="t-ph">テーブル名</span> <span class="t-kw">SET</span> <span class="t-ph">カラム名</span> <span class="t-op">=</span> <span class="t-ph">値</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">UPDATE</span> sales <span class="t-kw">SET</span> date <span class="t-op">=</span> <span class="t-string">‘2023-04-15’</span> <span class="t-kw">WHERE</span> date <span class="t-op">=</span> <span class="t-string">‘2023-04-14’</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">複数の値をまとめて更新する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">UPDATE</span> <span class="t-ph">テーブル名</span> <span class="t-kw">SET</span> <span class="t-ph">カラム名1</span> <span class="t-op">=</span> <span class="t-ph">値1</span>, <span class="t-ph">カラム名2</span> <span class="t-op">=</span> <span class="t-ph">値2</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">UPDATE</span> sales <span class="t-kw">SET</span> item_count <span class="t-op">=</span> 1, price <span class="t-op">=</span> 400
+<span class="t-kw">WHERE</span> item_name <span class="t-op">=</span> <span class="t-string">‘イチゴ’</span> <span class="t-kw">AND</span> customer <span class="t-op">=</span> <span class="t-string">‘ネコ村’</span>;</pre></div>
+<div class="note">※ WHERE句で条件を指定しないと、SET句で指定したカラムの値がすべて同じになってしまう。</div>
+</div>
+<div class="card ">
+<div class="badge">データを削除する（DELETE）</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">DELETE</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名</span> <span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">DELETE</span> <span class="t-kw">FROM</span> sales <span class="t-kw">WHERE</span> date <span class="t-op">=</span> <span class="t-string">‘2023-04-10’</span>;</pre></div>
+<div class="note">※ WHERE句を使わないと、すべてのレコードが削除される。</div>
+</div>
+<div class="card ">
+<div class="badge">テーブルを削除する（DROP TABLE）</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-multikw">DROP TABLE</span> <span class="t-ph">テーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">DROP TABLE</span> sales;</pre></div>
+</div>
+</div></section>
+<section class="sec" data-sec="8">
+<h2 class="sec-h"><span class="sec-n">8</span>テーブル設計 ─ 命名規則・CREATE・制約</h2>
+<div class="cards">
+<div class="card def">
+<div class="term">命名規則</div>
+<p class="desc">テーブル名やカラム名を付けるときのルール。</p>
+<p class="desc">・半角のアルファベット、数字、_（アンダースコア）を使う ／ ・大文字か小文字のどちらかに統一する ／ ・名前はアルファベットではじめ、単語は「_」で区切る ／ ・テーブル名やカラム名の重複はNG ／ ・キーワードとの重複を避ける</p>
+</div>
+<div class="card ">
+<div class="badge">テーブル名を変更する（ALTER）</div>
+<p class="desc">既存のテーブル名を変更するときは ALTER文を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-multikw">ALTER TABLE</span> <span class="t-ph">テーブル名</span> <span class="t-multikw">RENAME TO</span> <span class="t-ph">新しいテーブル名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">ALTER TABLE</span> sales <span class="t-multikw">RENAME TO</span> old_sales;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">テーブルを作成する（CREATE）</div>
+<p class="desc">データベースにテーブルを作るには CREATE文を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-multikw">CREATE TABLE</span> <span class="t-ph">テーブル名</span> (
+  <span class="t-ph">カラム名1</span> データ型 <span class="t-ph">制約</span>,
+  <span class="t-ph">カラム名2</span> データ型 <span class="t-ph">制約</span>,
+  ...
+);</pre></div>
+<div class="badge">【データ型の種類】</div>
+<table class="tbl"><thead><tr><th>型</th><th>意味</th></tr></thead><tbody><tr><td><code class="ic"><span class="t-type">NULL</span></code></td><td>何もデータが入っていないことを表すNULL値のこと</td></tr><tr><td><code class="ic"><span class="t-type">TEXT</span></code></td><td>文字列</td></tr><tr><td><code class="ic"><span class="t-type">INTEGER</span></code></td><td>整数</td></tr><tr><td><code class="ic"><span class="t-type">REAL</span></code></td><td>浮動小数点数</td></tr><tr><td><code class="ic"><span class="t-type">BLOB</span></code></td><td>Binary Large Objectの略で、バイナリデータのこと</td></tr></tbody></table>
+</div>
+<div class="card def">
+<div class="term">制約</div>
+<p class="desc">テーブルに設定するルールのようなもの。データの整合性や一貫性を維持するために使う。</p>
+</div>
+<div class="card ">
+<div class="badge">主キー制約</div>
+<p class="desc">各レコードを一意に識別するためのルール。主キーのカラムは値の重複とNULL値が禁止される。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-ph">カラム名</span> データ型 <span class="t-multikw">PRIMARY KEY</span></pre></div>
+</div>
+<div class="card ">
+<div class="badge">NOT NULL制約</div>
+<p class="desc">設定されたカラムはNULL値が禁止され、必ずデータが入っていることが保証される。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-ph">カラム名</span> データ型 <span class="t-multikw">NOT NULL</span></pre></div>
+</div>
+<div class="card ">
+<div class="badge">新しいテーブルを作る（例①・②）</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">CREATE TABLE</span> sales (
+  date <span class="t-type">TEXT</span> <span class="t-multikw">NOT NULL</span>,
+  item_id <span class="t-type">INTEGER</span> <span class="t-multikw">NOT NULL</span>,
+  item_count <span class="t-type">INTEGER</span> <span class="t-multikw">NOT NULL</span>,
+  customer <span class="t-type">TEXT</span> <span class="t-multikw">NOT NULL</span>
+);</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-multikw">CREATE TABLE</span> item (
+  item_id <span class="t-type">INTEGER</span> <span class="t-multikw">PRIMARY KEY</span>,
+  item_name <span class="t-type">TEXT</span> <span class="t-multikw">NOT NULL</span>,
+  price <span class="t-type">INTEGER</span> <span class="t-multikw">NOT NULL</span>,
+  farm <span class="t-type">TEXT</span> <span class="t-multikw">NOT NULL</span>,
+  date <span class="t-type">TEXT</span> <span class="t-multikw">NOT NULL</span>
+);</pre></div>
+</div>
+</div></section>
+<section class="sec" data-sec="9">
+<h2 class="sec-h"><span class="sec-n">9</span>INNER JOIN ─ テーブルを結合する</h2>
+<div class="cards">
+<div class="card ">
+<div class="badge">テーブルの内部結合の基本</div>
+<p class="desc">テーブルを結合するときは「内部結合」の意味の INNER JOIN句を使う。</p>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名</span> <span class="t-kw">FROM</span> <span class="t-ph">テーブル名1</span>
+<span class="t-multikw">INNER JOIN</span> <span class="t-ph">テーブル名2</span> <span class="t-kw">ON</span> <span class="t-ph">テーブル名1</span>.<span class="t-ph">カラム名</span> <span class="t-op">=</span> <span class="t-ph">テーブル名2</span>.<span class="t-ph">カラム名</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-op">*</span> <span class="t-kw">FROM</span> sales
+<span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">結合したテーブルからカラムを個別指定</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">結合して条件を指定する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-ph">カラム名1</span>, <span class="t-ph">カラム名2</span>, ... <span class="t-kw">FROM</span> <span class="t-ph">テーブル名1</span>
+<span class="t-multikw">INNER JOIN</span> <span class="t-ph">テーブル名2</span> <span class="t-kw">ON</span> <span class="t-ph">テーブル名1</span>.<span class="t-ph">カラム名</span> <span class="t-op">=</span> <span class="t-ph">テーブル名2</span>.<span class="t-ph">カラム名</span>
+<span class="t-kw">WHERE</span> <span class="t-ph">条件式</span>;</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id
+<span class="t-kw">WHERE</span> item_name <span class="t-op">=</span> <span class="t-string">‘リンゴ’</span>;</pre></div>
+<div class="flow"><span class="chip">FROM句</span><span class="arw">→</span><span class="chip">INNER JOIN句 ON句</span><span class="arw">→</span><span class="chip">WHERE句</span><span class="arw">→</span><span class="chip">SELECT句</span></div>
+</div>
+<div class="card ">
+<div class="badge">結合したテーブルをグループ化する</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> sales.item_id, item_name, <span class="t-func">SUM</span>(item_count)
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id
+<span class="t-multikw">GROUP BY</span> sales.item_id;</pre></div>
+</div>
+<div class="card def">
+<div class="badge">参考：itemテーブル（結合の相手）</div>
+<table class="tbl"><thead><tr><th>商品ID</th><th>商品名</th><th>価格</th></tr></thead><tbody><tr><td>1</td><td>イチゴ</td><td>400</td></tr><tr><td>2</td><td>リンゴ</td><td>200</td></tr><tr><td>3</td><td>ブドウ</td><td>300</td></tr><tr><td>4</td><td>モモ</td><td>350</td></tr></tbody></table>
+</div>
+</div></section>
+<section class="sec" data-sec="10">
+<h2 class="sec-h"><span class="sec-n">10</span>計算 ─ 算術演算子</h2>
+<div class="cards">
+<div class="card def">
+<div class="term">算術演算・算術演算子</div>
+<p class="desc">コンピュータ上で行う数値の計算を算術演算といい、計算に使う記号を算術演算子という。</p>
+<div class="badge">【算術演算子】</div>
+<table class="tbl"><thead><tr><th>演算子</th><th>意味</th></tr></thead><tbody><tr><td><code class="ic"><span class="t-op">+</span></code></td><td>足し算</td></tr><tr><td><code class="ic">-</code></td><td>引き算</td></tr><tr><td><code class="ic"><span class="t-op">*</span></code></td><td>掛け算</td></tr><tr><td><code class="ic"><span class="t-op">/</span></code></td><td>割り算</td></tr><tr><td><code class="ic"><span class="t-op">%</span></code></td><td>割り算の余りを求める</td></tr></tbody></table>
+</div>
+<div class="card ">
+<div class="badge">算術演算子を使った計算</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> 5 <span class="t-op">+</span> 2, 5 <span class="t-op">–</span> 2, 5 <span class="t-op">*</span> 2, 5 <span class="t-op">/</span> 2, 5 <span class="t-op">%</span> 2;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">テーブルのデータを使って計算する</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> sales.date, sales.item_id, item_name, item_count <span class="t-op">*</span> price
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id;</pre></div>
+<div class="note">別名を付ける： item_count * price AS total_price</div>
+</div>
+<div class="card ">
+<div class="badge">関数の引数に式を渡す</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-ph">関数名</span>(<span class="t-ph">カラム名1</span> 算術演算子 <span class="t-ph">カラム名2</span>)</pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-func">SUM</span>(item_count <span class="t-op">*</span> price)
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">関数の結果を使って計算する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-ph">関数名</span>(<span class="t-ph">カラム名1</span>) 算術演算子 <span class="t-ph">カラム名2</span></pre></div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> sales.item_id, item_name, <span class="t-func">SUM</span>(item_count) <span class="t-op">*</span> price
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item
+<span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id
+<span class="t-multikw">GROUP BY</span> sales.item_id
+<span class="t-multikw">ORDER BY</span> <span class="t-func">SUM</span>(item_count) <span class="t-op">*</span> price <span class="t-kw">DESC</span>;</pre></div>
+</div>
+<div class="card ">
+<div class="badge">四捨五入する（ROUND）</div>
+<div class="cw"><span class="lbl lbl-ex">例</span><pre class="code"><span class="t-kw">SELECT</span> <span class="t-func">ROUND</span>(5.678, 2);</pre></div>
+</div>
+</div></section>
+<section class="sec" data-sec="11">
+<h2 class="sec-h"><span class="sec-n">11</span>CSVファイルへの出力</h2>
+<div class="cards">
+<div class="card mini">
+<div class="badge">CSV形式の表示に変更する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.mode</span> csv</pre></div>
+</div>
+<div class="card mini">
+<div class="badge">SQL文の結果をファイルに出力する</div>
+<div class="cw"><span class="lbl lbl-fmt">書式</span><pre class="code"><span class="t-dotcmd">.once</span> <span class="t-ph">ファイル名</span></pre></div>
+</div>
+<div class="card ">
+<div class="badge">データをCSVファイルに書き出す（組み合わせ例）</div>
+<div class="cw"><pre class="code"><span class="t-dotcmd">.mode</span> csv
+<span class="t-dotcmd">.once</span> export_sample.csv
+<span class="t-kw">SELECT</span> sales.date, sales.item_id, item_name, item_count, customer
+<span class="t-kw">FROM</span> sales <span class="t-multikw">INNER JOIN</span> item <span class="t-kw">ON</span> sales.item_id <span class="t-op">=</span> item.item_id;</pre></div>
+</div>
+</div></section>
+</body></html>
