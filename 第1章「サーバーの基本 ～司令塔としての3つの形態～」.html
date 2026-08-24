@@ -203,6 +203,15 @@ ul.list.sun li::before{background:var(--sun)}
 ul.list li ul{margin:.2em 0 .4em;padding-left:0;list-style:none}
 ul.list li ul li::before{background:#b3e2f6;width:7px;height:7px}
 .desc{display:block;color:var(--ink-soft);font-size:.9rem;margin-top:.1em}
+/* 3つの利用形態のニックネーム（図1-3と同色） */
+.nick{
+  display:inline-block;vertical-align:.1em;margin-left:8px;
+  font-size:.74rem;font-weight:800;color:#fff;letter-spacing:.04em;
+  background:var(--sky);border-radius:999px;padding:2px 11px;white-space:nowrap;
+}
+.nick.k1{background:#4fc3f7}
+.nick.k2{background:#5ecfb0}
+.nick.k3{background:#ffb74d}
 
 /* 2カラム */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -378,9 +387,9 @@ footer b{color:var(--sky-dark);background:none;padding:0}
     <ol>
       <li><a href="#s1"><i>1-1</i>サーバーを理解することはシステムを理解すること</a></li>
       <li><a href="#s2"><i>1-2</i>サーバーはシステムの司令塔</a></li>
-      <li><a href="#s3"><i>1-3</i>クライアントからの要求に対応して処理を実行する形態</a></li>
-      <li><a href="#s4"><i>1-4</i>サーバーから能動的に処理を実行する形態</a></li>
-      <li><a href="#s5"><i>1-5</i>高い性能を活用した形態</a></li>
+      <li><a href="#s3"><i>1-3</i>クライアントからの要求に対応して処理を実行する形態（受け身）</a></li>
+      <li><a href="#s4"><i>1-4</i>サーバーから能動的に処理を実行する形態（自分から）</a></li>
+      <li><a href="#s5"><i>1-5</i>高い性能を活用した形態（力わざ）</a></li>
       <li><a href="#s6"><i>1-6</i>サーバーに接続する機器</a></li>
       <li><a href="#s7"><i>1-7</i>瞬発系か持久系か？</a></li>
       <li><a href="#s8"><i>1-8</i>システムをモデル化して整理する</a></li>
@@ -615,11 +624,11 @@ footer b{color:var(--sky-dark);background:none;padding:0}
     <div class="card">
       <h3>サーバーの3つの利用形態</h3>
       <ul class="list">
-        <li>クライアントからの要求に対応して処理を実行する形態
+        <li>クライアントからの要求に対応して処理を実行する形態<span class="nick k1">① 受け身</span>
           <span class="desc">サーバーに接続されているクライアントPCのような配下のコンピュータからの要求に対応して受動的に処理を実行する。</span></li>
-        <li>サーバーから能動的に処理を実行する形態
+        <li>サーバーから能動的に処理を実行する形態<span class="nick k2">② 自分から</span>
           <span class="desc">サーバーが配下のコンピュータやデバイスに対して能動的に処理を実行する。</span></li>
-        <li>高い性能を活用した形態
+        <li>高い性能を活用した形態<span class="nick k3">③ 力わざ</span>
           <span class="desc">サーバー自体が高性能なハードウェアであることから、その特長を活かした処理を実行する。</span></li>
       </ul>
     </div>
@@ -704,7 +713,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
   <section class="block" id="s3">
     <div class="sec-head">
       <div class="sec-num n3">1-3</div>
-      <h2 class="sec-title">クライアントからの要求に対応して処理を実行する形態</h2>
+      <h2 class="sec-title">クライアントからの要求に対応して処理を実行する形態<span class="nick k1">① 受け身</span></h2>
     </div>
 
     <div class="qa q">
@@ -811,7 +820,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
   <section class="block" id="s4">
     <div class="sec-head">
       <div class="sec-num n4">1-4</div>
-      <h2 class="sec-title">サーバーから能動的に処理を実行する形態</h2>
+      <h2 class="sec-title">サーバーから能動的に処理を実行する形態<span class="nick k2">② 自分から</span></h2>
     </div>
 
     <div class="qa q">
@@ -929,7 +938,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
   <section class="block" id="s5">
     <div class="sec-head">
       <div class="sec-num n5">1-5</div>
-      <h2 class="sec-title">高い性能を活用した形態</h2>
+      <h2 class="sec-title">高い性能を活用した形態<span class="nick k3">③ 力わざ</span></h2>
     </div>
 
     <div class="qa q">
@@ -1350,6 +1359,28 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <div class="bubble">
         <span class="who">そら先生</span>
         <p>間に<b class="em">ルータ</b>と<b class="em">ハブ</b>が入ります。この2つが分かれば、オフィスのネットワーク図はだいたい読めますよ。</p>
+      </div>
+    </div>
+
+    <div class="qa q">
+      <div class="ava q ch-kai" role="img" aria-label="かい"></div>
+      <div class="bubble">
+        <span class="who">かい</span>
+        <p>そのルータとハブって、何が違うんですか？<br>
+           名前は聞くけど、どっちがどっちだか……。</p>
+      </div>
+    </div>
+    <div class="qa a">
+      <div class="ava ch-sora" role="img" aria-label="そら先生"></div>
+      <div class="bubble">
+        <span class="who">そら先生</span>
+        <p><b class="em">ハブ</b>は、同じネットワークの中で機器を<b>まとめる</b>装置です。
+           LANケーブルの差込口（ポート）が並んでいて、同じ課のPCをそこに挿すと1つのネットワークになります。
+           口がたくさんあるテーブルタップのイメージですね。</p>
+        <p><b class="em">ルータ</b>は、<b>別のネットワークへ橋渡しする</b>装置。
+           A課のネットワークからサーバーのいる側へ、あるいは社外のインターネットへ、どの道を通すか判断して中継します。
+           建物の出入口に立つ案内係です。</p>
+        <p>ひとことで言えば、<b>ハブは「まとめる」、ルータは「つなぎ替える」</b>。それだけ押さえれば十分です。</p>
       </div>
     </div>
 
