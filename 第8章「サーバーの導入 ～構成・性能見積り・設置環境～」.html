@@ -791,6 +791,17 @@ footer b{color:var(--sky-dark);background:none;padding:0}
     </div>
 
     <div class="card">
+      <h3>計算のやり方は、実は“たし算”だけ</h3>
+      <p>数字がたくさん出てきて身構えますが、やっていることは次の3ステップです。</p>
+      <div class="feats">
+        <div class="feat"><i>① ひとり分を決める</i>ソフト1つが必要とする量を「基準値」にする。<br><span class="desc">今回はサーバー用＝4コア・8GB、<br>PC用＝2コア・4GB</span></div>
+        <div class="feat"><i>② 使う数だけ足す</i>基準値 × セット数 を積み上げる。<br><span class="desc">4コア×6 ＋ 2コア×5 ＝ 34コア（メモリも同様に68GB）</span></div>
+        <div class="feat"><i>③ 少し多めにする</i>将来やピークに備え、合計に係数（×1.25）を掛ける。<br><span class="desc">34コア → 約43コア → 構成に合わせ44コア・96GB</span></div>
+      </div>
+      <p style="margin-top:14px">たとえるなら<b class="em">パーティの料理</b>。ひとり分 × 人数を用意して、飛び入り用に少し多めに作る——それだけです。難しいのは数字ではなく、「何を"ひとり分"とするか」を決めるところ。下でその実例を見ていきます。</p>
+    </div>
+
+    <div class="card">
       <h3>前提条件のケーススタディ</h3>
       <p>性能見積りでポピュラーな机上計算と過去の導入事例を組み合わせたケース。筆者のチームでは、顧客企業向けにITのコンサルティングをしている。自らの業務の効率化、顧客向けシステム開発、新技術取得のために、オンプレミスのサーバーを設置することもある。仮想化環境の例で紹介するが、<strong>ラフスケッチ</strong>を描いてシステムやソフトウェアの構成に漏れがないように確認する。</p>
       <div class="grid2">
@@ -1526,6 +1537,10 @@ footer b{color:var(--sky-dark);background:none;padding:0}
 
 </main>
 
+<nav data-chapnav="1" aria-label="章の移動" style="max-width:940px;margin:0 auto;padding:28px 20px 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">
+  <a href="%E7%AC%AC7%E7%AB%A0%E3%80%8C%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%81%A8%E9%9A%9C%E5%AE%B3%E5%AF%BE%E7%AD%96%20%EF%BD%9E%E8%84%85%E5%A8%81%E3%81%AB%E5%BF%9C%E3%81%98%E3%81%9F%E5%AF%BE%E7%AD%96%E3%80%81%E8%A3%85%E7%BD%AE%E3%83%BB%E3%83%87%E3%83%BC%E3%82%BF%E3%81%A7%E3%81%AE%E9%81%95%E3%81%84%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">← 前の章（第7章）</a>
+  <a href="%E7%AC%AC9%E7%AB%A0%E3%80%8C%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%AE%E9%81%8B%E7%94%A8%E7%AE%A1%E7%90%86%20%EF%BD%9E%E5%AE%89%E5%AE%9A%E7%A8%BC%E5%83%8D%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B%E3%81%9F%E3%82%81%E3%81%AB%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">次の章（第9章） →</a>
+</nav>
 <footer>
   <p><b>第8章 サーバーの導入 ～構成・性能見積り・設置環境～</b></p>
   <p>まずクラウド、次にオンプレミスかレンタルか。性能はコア数とメモリで見積もる。<br>

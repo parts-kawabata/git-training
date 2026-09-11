@@ -709,6 +709,64 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <p style="margin-top:14px">個人でメールの受信を設定する際に重要なのは、<strong>メールを取りにいく定期的なタイミングと受信したメールをサーバーから削除するタイミング</strong>。</p>
     </div>
 
+    <div class="fig">
+      <div class="figbox">
+      <svg viewBox="0 0 760 250" role="img" aria-label="メール1通が届くまでの通しの流れ。送信者→自社SMTP→（DNSで宛先IPを確認）→相手SMTP→メールボックス→POP3/IMAPで受信者が取りに行く">
+        <defs>
+          <marker id="m5f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#0288d1"/>
+          </marker>
+          <marker id="m5d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5ecfb0"/>
+          </marker>
+        </defs>
+        <!-- DNS 上部 -->
+        <rect x="150" y="22" width="155" height="46" rx="10" fill="#e9faf5" stroke="#2fa88a" stroke-width="2"/>
+        <text x="227" y="42" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1d7f66">DNS</text>
+        <text x="227" y="60" text-anchor="middle" font-size="11" fill="#1d7f66">住所（IP）を教える</text>
+        <path d="M227 120 V 70" stroke="#2fa88a" stroke-width="2.5" stroke-dasharray="6 5" fill="none" marker-end="url(#m5d)"/>
+        <text x="237" y="100" font-size="11" font-weight="700" fill="#2fa88a">宛先IPを確認</text>
+        <!-- 主フロー5箱 -->
+        <g fill="#fff" stroke="#4fc3f7" stroke-width="2.5">
+          <rect x="10" y="120" width="118" height="64" rx="12"/>
+          <rect x="326" y="120" width="118" height="64" rx="12"/>
+          <rect x="642" y="120" width="110" height="64" rx="12"/>
+        </g>
+        <g fill="#f0f9fe" stroke="#0288d1" stroke-width="2.5">
+          <rect x="168" y="120" width="118" height="64" rx="12"/>
+          <rect x="484" y="120" width="118" height="64" rx="12"/>
+        </g>
+        <g text-anchor="middle" fill="#23405c">
+          <text x="69" y="148" font-size="12.5" font-weight="700">🧑 差出人</text>
+          <text x="69" y="168" font-size="11" fill="#5f7a91">メールソフト</text>
+          <text x="227" y="148" font-size="13" font-weight="800" fill="#01579b">SMTP</text>
+          <text x="227" y="168" font-size="11" fill="#5f7a91">送信担当</text>
+          <text x="385" y="148" font-size="13" font-weight="800" fill="#0288d1">SMTP</text>
+          <text x="385" y="168" font-size="11" fill="#5f7a91">受信の窓口</text>
+          <text x="543" y="148" font-size="12.5" font-weight="800" fill="#01579b">📥 メールボックス</text>
+          <text x="543" y="168" font-size="11" fill="#5f7a91">届いて保管</text>
+          <text x="697" y="148" font-size="12.5" font-weight="700">🧑 受取人</text>
+          <text x="697" y="168" font-size="11" fill="#5f7a91">PC・スマホ</text>
+        </g>
+        <!-- 矢印 -->
+        <g stroke="#0288d1" stroke-width="2.5" fill="none">
+          <path d="M128 152 L166 152" marker-end="url(#m5f)"/>
+          <path d="M286 152 L324 152" marker-end="url(#m5f)"/>
+          <path d="M444 152 L482 152" marker-end="url(#m5f)"/>
+          <path d="M602 152 L640 152" marker-end="url(#m5f)"/>
+        </g>
+        <g text-anchor="middle" font-size="10.5" fill="#0288d1" font-weight="700">
+          <text x="147" y="205">①送信</text>
+          <text x="305" y="205">②配送</text>
+          <text x="463" y="205">届く</text>
+          <text x="621" y="205">③受信</text>
+        </g>
+        <text x="380" y="232" text-anchor="middle" font-size="11" fill="#5f7a91">③はPOP3／IMAPで取りに行く（IMAPはサーバーに置いたまま閲覧）</text>
+      </svg>
+      </div>
+      <p class="cap">図5-3b　メール1通が届くまで。SMTPがDNSで住所を調べてリレーし、受取人はPOP3／IMAPで取りに行く。</p>
+    </div>
+
     <div class="backtop"><a href="#toc">▲ もくじへ戻る</a></div>
   </section>
 
@@ -1454,6 +1512,10 @@ footer b{color:var(--sky-dark);background:none;padding:0}
 
 </main>
 
+<nav data-chapnav="1" aria-label="章の移動" style="max-width:940px;margin:0 auto;padding:28px 20px 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">
+  <a href="%E7%AC%AC4%E7%AB%A0%E3%80%8C%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%99%E3%82%8B%E5%BD%B9%E5%89%B2%20%EF%BD%9E%E9%85%8D%E4%B8%8B%E3%81%AE%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%82%BF%E3%81%AE%E8%A6%81%E6%B1%82%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%99%E3%82%8B%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">← 前の章（第4章）</a>
+  <a href="%E7%AC%AC6%E7%AB%A0%E3%80%8C%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%8B%E3%82%89%E3%81%AE%E5%87%A6%E7%90%86%E3%81%A8%E9%AB%98%E6%80%A7%E8%83%BD%E3%81%AA%E5%87%A6%E7%90%86%20%EF%BD%9E%E3%83%87%E3%82%B8%E3%82%BF%E3%83%AB%E6%8A%80%E8%A1%93%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">次の章（第6章） →</a>
+</nav>
 <footer>
   <p><b>第5章 メールとインターネット ～メールやインターネットで利用されるサーバー～</b></p>
   <p>メールもWebも、役割の違うサーバーたちのリレーで届いています。<br>

@@ -1240,15 +1240,8 @@ footer b{color:var(--sky-dark);background:none;padding:0}
     <div class="card">
       <h3>PCサーバー以外</h3>
       <p>x86以外の代表格として<strong>RISC</strong>というアーキテクチャのSPARC（Oracle、元サン・マイクロシステムズ）がある。同様なタイプにIBMのPowerなどがあり、UNIX系用で、処理性能はPCサーバーよりも上。</p>
+      <p class="desc">※<b class="em" style="background:none;padding:0;color:var(--sky-deep)">RISC</b>＝命令を単純にして高速に処理するCPUの設計思想。x86（複雑な命令を持つCISC系）とは命令セットの考え方が異なる系統で、SPARCやIBM Powerが代表例。</p>
       <p>なお、統計上、サーバーというときに、PCサーバー、UNIX系サーバーの他にメインフレームやスーパーコンピュータも含む。PCに対して、それ以外をサーバーとする考え方がもとになっている。</p>
-    </div>
-
-    <div class="chips sun">
-      <span class="chip">RISC</span>
-      <span class="chip">SPARC（Oracle）</span>
-      <span class="chip">IBM Power</span>
-      <span class="chip">UNIX系用</span>
-      <span class="chip">処理性能はPCサーバーより上</span>
     </div>
 
     <div class="column">
@@ -1776,6 +1769,61 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <p class="cap">図2-16　クラウドで唯一立ち止まる論点。データが事業者側に入ることをどう扱うか。</p>
     </div>
 
+    <div class="fig">
+      <div class="figbox">
+      <svg viewBox="0 0 760 324" role="img" aria-label="サーバーの置き方4パターン比較。オンプレミス・データセンター・レンタル・クラウドを、機器・管理・データの所在で比べる">
+        <defs>
+          <marker id="c2end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#0288d1"/>
+          </marker>
+        </defs>
+        <g>
+          <rect x="16" y="58" width="176" height="212" rx="16" fill="#fff" stroke="#d3ecfa" stroke-width="2"/>
+          <rect x="200" y="58" width="176" height="212" rx="16" fill="#fff" stroke="#d3ecfa" stroke-width="2"/>
+          <rect x="384" y="58" width="176" height="212" rx="16" fill="#fff" stroke="#d3ecfa" stroke-width="2"/>
+          <rect x="568" y="58" width="176" height="212" rx="16" fill="#fff" stroke="#d3ecfa" stroke-width="2"/>
+        </g>
+        <g>
+          <rect x="29" y="44" width="150" height="28" rx="14" fill="#4fc3f7"/>
+          <rect x="213" y="44" width="150" height="28" rx="14" fill="#4fc3f7"/>
+          <rect x="397" y="44" width="150" height="28" rx="14" fill="#4fc3f7"/>
+          <rect x="581" y="44" width="150" height="28" rx="14" fill="#0288d1"/>
+        </g>
+        <g text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">
+          <text x="104" y="63">オンプレミス</text>
+          <text x="288" y="63">データセンター</text>
+          <text x="472" y="63">レンタル</text>
+          <text x="656" y="63">クラウド</text>
+        </g>
+        <g font-size="12" fill="#23405c">
+          <text x="32" y="112"><tspan fill="#5f7a91">機器：</tspan>自社で保有</text>
+          <text x="32" y="150"><tspan fill="#5f7a91">管理：</tspan>自社</text>
+          <text x="32" y="188"><tspan fill="#5f7a91">データ：</tspan>社内のみ 🔒</text>
+
+          <text x="216" y="112"><tspan fill="#5f7a91">機器：</tspan>自社機器を預ける</text>
+          <text x="216" y="150"><tspan fill="#5f7a91">管理：</tspan>事業者</text>
+          <text x="216" y="188"><tspan fill="#5f7a91">データ：</tspan>社外へ</text>
+
+          <text x="400" y="112"><tspan fill="#5f7a91">機器：</tspan>事業者から借りる</text>
+          <text x="400" y="150"><tspan fill="#5f7a91">管理：</tspan>事業者</text>
+          <text x="400" y="188"><tspan fill="#5f7a91">データ：</tspan>社外へ</text>
+
+          <text x="584" y="112"><tspan fill="#5f7a91">機器：</tspan>持たない</text>
+          <text x="584" y="150"><tspan fill="#5f7a91">管理：</tspan>事業者</text>
+          <text x="584" y="188"><tspan fill="#5f7a91">データ：</tspan>社外へ</text>
+        </g>
+        <g font-size="11.5" fill="#0288d1">
+          <text x="32" y="230">増減：しにくい</text>
+          <text x="584" y="230">増減：柔軟</text>
+        </g>
+        <text x="44" y="294" font-size="12" font-weight="700" fill="#0288d1">自社で抱える</text>
+        <text x="716" y="294" text-anchor="end" font-size="12" font-weight="700" fill="#0288d1">借りて使う</text>
+        <path d="M40 312 L720 312" stroke="#0288d1" stroke-width="2.5" fill="none" marker-end="url(#c2end)"/>
+      </svg>
+      </div>
+      <p class="cap">図2-16b　置き方の早わかり。左ほど自社で抱え、右ほど借りて使う。データが社内にとどまるのはオンプレミスだけ。</p>
+    </div>
+
     <div class="backtop"><a href="#toc">▲ もくじへ戻る</a></div>
   </section>
 
@@ -1814,12 +1862,6 @@ footer b{color:var(--sky-dark);background:none;padding:0}
         <li>信頼性が極めて高い
           <span class="desc">一般のサーバーよりも信頼性が高い。全体としてコストが高いのも事実。</span></li>
       </ul>
-    </div>
-
-    <div class="chips sun">
-      <span class="chip">IBM z ／ MVS</span>
-      <span class="chip">富士通 MSP ／ XSP</span>
-      <span class="chip">NEC ACOS</span>
     </div>
 
     <div class="card">
@@ -1967,11 +2009,6 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <p class="cap">図2-18　ミドルウェアはOSとアプリの間の共通部品置き場。郵便局と郵便受けほど役割が違う。</p>
     </div>
 
-    <div class="chips mint">
-      <span class="chip">DBMS</span>
-      <span class="chip">Webサービス</span>
-    </div>
-
     <div class="card">
       <h3>ミドルウェアの代表選手DBMS</h3>
       <p>例えば、DBMS（DataBase Management System）はデータを保管する器として、<strong>データのやりとりから保管までを効率化</strong>する。大量のデータを扱うシステムであればバックヤードにはほぼ必ずDBMSが存在するといってもよい。</p>
@@ -2077,6 +2114,10 @@ footer b{color:var(--sky-dark);background:none;padding:0}
 
 </main>
 
+<nav data-chapnav="1" aria-label="章の移動" style="max-width:940px;margin:0 auto;padding:28px 20px 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">
+  <a href="%E7%AC%AC1%E7%AB%A0%E3%80%8C%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%AE%E5%9F%BA%E6%9C%AC%20%EF%BD%9E%E5%8F%B8%E4%BB%A4%E5%A1%94%E3%81%A8%E3%81%97%E3%81%A6%E3%81%AE3%E3%81%A4%E3%81%AE%E5%BD%A2%E6%85%8B%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">← 前の章（第1章）</a>
+  <a href="%E7%AC%AC3%E7%AB%A0%E3%80%8C%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%A7%E4%BD%95%E3%82%92%E3%81%99%E3%82%8B%E3%81%8B%EF%BC%9F%20%EF%BD%9E%E4%BB%AE%E6%83%B3%E5%8C%96%E3%81%A8%E5%91%A8%E8%BE%BA%E6%A9%9F%E5%99%A8%EF%BD%9E%E3%80%8D.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--sky);color:var(--sky-deep);border-radius:999px;padding:11px 22px;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 6px 20px rgba(2,136,209,.10)">次の章（第3章） →</a>
+</nav>
 <footer>
   <p><b>第2章 ハードウェアとしてのサーバー ～多様性とPCとの違い～</b></p>
   <p>PCとの違いは、結局「止めない」の一言に集約されます。<br>
