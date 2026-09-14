@@ -576,11 +576,6 @@ footer b{color:var(--sky-dark);background:none;padding:0}
         <circle cx="360" cy="164" r="62" fill="none" stroke="#a9dcf3" stroke-width="2"/>
         <rect x="30" y="104" width="52" height="120" fill="none" stroke="#a9dcf3" stroke-width="2"/>
         <rect x="638" y="104" width="52" height="120" fill="none" stroke="#a9dcf3" stroke-width="2"/>
-        <!-- 指示の矢印 -->
-        <path d="M392 150 L520 92" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
-        <path d="M394 172 L534 196" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
-        <path d="M328 178 L200 248" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
-        <path d="M330 148 L206 96" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
         <!-- 選手 -->
         <g fill="#ffffff" stroke="#4fc3f7" stroke-width="2.5">
           <circle cx="192" cy="88" r="21"/><circle cx="188" cy="256" r="21"/>
@@ -592,6 +587,11 @@ footer b{color:var(--sky-dark);background:none;padding:0}
           <text x="534" y="88">PC</text><text x="548" y="206">PC</text>
           <text x="150" y="174">PC</text><text x="596" y="144">PC</text>
         </g>
+        <!-- 指示の矢印（PC丸より前面に描画して矢じりを隠さない） -->
+        <path d="M394 148 L512 94" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
+        <path d="M397 172 L524 197" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
+        <path d="M326 182 L209 245" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
+        <path d="M325 148 L214 98" stroke="#0288d1" stroke-width="2.5" marker-end="url(#a2)" fill="none"/>
         <!-- 司令塔 -->
         <circle cx="360" cy="164" r="36" fill="#0288d1"/>
         <circle cx="360" cy="164" r="44" fill="none" stroke="#0288d1" stroke-width="2" stroke-dasharray="5 5" opacity=".55"/>
