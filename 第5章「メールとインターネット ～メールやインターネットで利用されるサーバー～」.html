@@ -529,7 +529,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <div class="ava ch-sora" role="img" aria-label="そら先生"></div>
       <div class="bubble">
         <span class="who">そら先生</span>
-        <p>まず<b class="em">SMTPサーバー</b>にメールが渡されます。SMTPは <i>Simple Mail Transfer Protocol</i>、メールを送るための決まりごとです。宛先の住所（IPアドレス）はDNSに聞いて調べてから、相手へ届けます。</p>
+        <p>まず<b class="em">SMTPサーバー</b>にメールが渡されます。SMTPは Simple Mail Transfer Protocol、メールを送るための決まりごとです。宛先の住所（IPアドレス）はDNSに聞いて調べてから、相手へ届けます。</p>
       </div>
     </div>
 
@@ -604,6 +604,14 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <h3>SMTPサーバーのメールソフトでの設定</h3>
       <p>SMTPサーバーはメールソフトの設定画面などで「<strong>smtp.ドメイン名</strong>」などで目にすることが多い。一方、メール受信のPOP3サーバーは「<strong>pop.ドメイン名</strong>」などで見ることがある。プロトコルとそれに準じた処理が異なることからメールソフトでも別に設定する。</p>
       <p>メールソフトの設定画面からは、送信はSMTP、受信はPOP3と設定画面なども分かれていることから、送る処理と受け取る処理でそれぞれがまったく別のサーバーの機能のように感じる。しかし、SMTPサーバーは<strong>送信に加えて受信の窓口にもなっている</strong>。メールの送受信サーバーと呼んでもよいかもしれない。</p>
+    </div>
+
+    <div class="column">
+      <div class="ava c ch-mizuki" role="img" aria-label="みずき先生"></div>
+      <div>
+        <h4>みずき先生の補足　― ドメイン名って？</h4>
+        <p><b class="em">ドメイン名</b>とは、インターネット上の<b class="em">「住所を表す名前」</b>のこと。「example.com」のように、メールアドレスの＠の後ろや、Webサイトのアドレス（URL）の中に出てきます。機械が使う数字の住所が<b>IPアドレス</b>、人間が覚えやすい名前が<b>ドメイン名</b>——この2つを結びつける対応表を引いてくれるのが<b>DNS</b>なんですね。</p>
+      </div>
     </div>
 
     <div class="column">
@@ -956,14 +964,6 @@ footer b{color:var(--sky-dark);background:none;padding:0}
       <p style="margin-top:14px">私たちはDNSの存在を意識することはないが、メールでもWebでも活躍している非常に重要な機能。また、大きく<strong>キャッシュサーバー</strong>と<strong>コンテンツサーバー</strong>の2つに分けられる。</p>
     </div>
 
-    <div class="column">
-      <div class="ava c ch-mizuki" role="img" aria-label="みずき先生"></div>
-      <div>
-        <h4>みずき先生の補足　― ドメイン名って？</h4>
-        <p><b class="em">ドメイン名</b>とは、インターネット上の<b class="em">「住所を表す名前」</b>のこと。「example.com」のように、メールアドレスの＠の後ろや、Webサイトのアドレス（URL）の中に出てきます。機械が使う数字の住所が<b>IPアドレス</b>、人間が覚えやすい名前が<b>ドメイン名</b>——この2つを結びつける対応表を引いてくれるのが<b>DNS</b>なんですね。</p>
-      </div>
-    </div>
-
     <div class="fig">
       <h3 class="fig-title">DNSサーバーは2種類</h3>
       <div class="figbox">
@@ -1225,6 +1225,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
         <rect x="12" y="24" width="300" height="252" rx="18" fill="#f0f9fe" stroke="#4fc3f7" stroke-width="2.5"/>
         <rect x="78" y="10" width="168" height="30" rx="15" fill="#4fc3f7"/>
         <text x="162" y="30" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">社内（ファイルサーバー）</text>
+        <g transform="translate(0,-28)">
         <rect x="40" y="130" width="90" height="66" rx="10" fill="#fff" stroke="#0288d1" stroke-width="2.5"/>
         <rect x="52" y="142" width="66" height="24" rx="4" fill="#e3f4fd"/>
         <text x="85" y="186" text-anchor="middle" font-size="11" font-weight="700" fill="#01579b">クライアント</text>
@@ -1233,11 +1234,13 @@ footer b{color:var(--sky-dark);background:none;padding:0}
         <text x="244" y="190" text-anchor="middle" font-size="11" font-weight="700" fill="#01579b">ファイルサーバー</text>
         <path d="M130 163 H 192" stroke="#0288d1" stroke-width="3" marker-end="url(#m57a)" fill="none"/>
         <text x="162" y="234" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0288d1">ディレクトリを指定して保存</text>
+        </g>
 
         <!-- 右：外部 -->
         <rect x="336" y="24" width="372" height="252" rx="18" fill="#fff8e6" stroke="#ffb74d" stroke-width="2.5"/>
         <rect x="426" y="10" width="192" height="30" rx="15" fill="#ffb74d"/>
         <text x="522" y="30" text-anchor="middle" font-size="12.5" font-weight="800" fill="#fff">外部（インターネット経由）</text>
+        <g transform="translate(0,-28)">
         <rect x="358" y="120" width="92" height="74" rx="10" fill="#fff" stroke="#c98a00" stroke-width="2.5"/>
         <rect x="370" y="132" width="68" height="24" rx="4" fill="#fff0cf"/>
         <text x="404" y="176" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8a6200">FTPソフト</text>
@@ -1250,6 +1253,7 @@ footer b{color:var(--sky-dark);background:none;padding:0}
         <text x="519" y="132" text-anchor="middle" font-size="14">🔑</text>
         <text x="519" y="234" text-anchor="middle" font-size="11" font-weight="700" fill="#c98a00">①IP／URLを指定 → ②認証 → ③転送開始</text>
         <text x="519" y="254" text-anchor="middle" font-size="10.5" fill="#8a6200">フォルダ作成やファイル共有ができる。両側にFTPソフトが必要</text>
+        </g>
       </svg>
       </div>
       <p class="cap">図5-8　社内はディレクトリ指定でOK。外部へはIP／URLを指定し、認証を受けてから転送を始める。</p>
