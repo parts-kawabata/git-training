@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gitが広がる世界</title>
+<style>
+  :root {
+    --bg: #fbf8f4;
+    --surface: #ffffff;
+    --surface-2: #f4efe8;
+    --text: #2b2622;
+    --muted: #6e655d;
+    --border: #e6ddd2;
+    --accent: #e8572a;
+    --accent-soft: #fde8df;
+    --good: #2f8f5b;
+    --good-soft: #e1f3e8;
+    --bad: #b8483b;
+    --bad-soft: #f8e3df;
+    --blue: #3a6fb0;
+    --blue-soft: #e2ecf8;
+    --shadow: 0 2px 10px rgba(60, 40, 20, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1a18;
+      --surface: #262320;
+      --surface-2: #2f2b27;
+      --text: #efe9e2;
+      --muted: #b0a79d;
+      --border: #3d3833;
+      --accent: #ff7a4d;
+      --accent-soft: #3d2a21;
+      --good: #5cc48b;
+      --good-soft: #1f3529;
+      --bad: #ec7b6d;
+      --bad-soft: #3b2522;
+      --blue: #7aa7e0;
+      --blue-soft: #1f2c3d;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1a18; --surface: #262320; --surface-2: #2f2b27; --text: #efe9e2; --muted: #b0a79d;
+    --border: #3d3833; --accent: #ff7a4d; --accent-soft: #3d2a21; --good: #5cc48b; --good-soft: #1f3529;
+    --bad: #ec7b6d; --bad-soft: #3b2522; --blue: #7aa7e0; --blue-soft: #1f2c3d; --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  svg { max-width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; }
+
+  /* ---------- hero ---------- */
+  header.hero { padding: 64px 0 40px; }
+  .chapter-tag {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .12em;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px;
+  }
+  h1 { font-size: clamp(34px, 7vw, 52px); line-height: 1.25; margin: 16px 0 12px; letter-spacing: .02em; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0; }
+  .lead strong { color: var(--text); }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; padding: 0; list-style: none; }
+  .toc a {
+    display: inline-block; font-size: 14px; color: var(--text); text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface); padding: 6px 14px; border-radius: 999px;
+  }
+  .toc a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- sections ---------- */
+  section { padding: 40px 0; border-top: 1px solid var(--border); }
+  .sec-label { font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--accent); }
+  h2 { font-size: clamp(24px, 4.6vw, 32px); line-height: 1.4; margin: 6px 0 20px; }
+  h3 { font-size: 21px; line-height: 1.5; margin: 0 0 12px; }
+  p { margin: 0 0 16px; }
+  .hl { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); font-weight: 700; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow); margin: 20px 0;
+  }
+  .term {
+    border-left: 5px solid var(--accent); background: var(--surface); border-radius: 0 14px 14px 0;
+    padding: 18px 22px; margin: 20px 0; box-shadow: var(--shadow);
+  }
+  .term .t-name { font-weight: 800; font-size: 19px; }
+  .term .t-read { font-size: 13px; color: var(--muted); margin-left: 6px; }
+  .term p:last-child { margin-bottom: 0; }
+
+  /* file chaos */
+  .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 20px 0; }
+  .file {
+    display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px; word-break: break-all; line-height: 1.4;
+  }
+  .file:nth-child(odd) { transform: rotate(-1.2deg); }
+  .file:nth-child(even) { transform: rotate(1deg); }
+  .file .ico { flex: none; width: 22px; height: 28px; border-radius: 3px; background: var(--blue); position: relative; }
+  .file .ico::after { content: ""; position: absolute; right: 0; top: 0; border: 5px solid; border-color: var(--surface) var(--surface) transparent transparent; }
+  .sigh { text-align: center; font-size: 15px; color: var(--muted); }
+
+  /* problem cards */
+  .problem { margin: 32px 0; }
+  .problem-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .num {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-weight: 800; font-size: 18px;
+  }
+  .problem-head h3 { margin: 0; }
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba > div { border-radius: 14px; padding: 16px 18px; font-size: 16px; }
+  .ba .before { background: var(--bad-soft); }
+  .ba .after { background: var(--good-soft); }
+  .ba .tag { display: inline-block; font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+  .ba .before .tag { color: var(--bad); }
+  .ba .after .tag { color: var(--good); }
+  .figure { margin: 16px 0 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .figcap { font-size: 14px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+  /* history log */
+  .log { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+  .log li { display: grid; grid-template-columns: 14px 1fr; gap: 12px; padding: 8px 0; position: relative; }
+  .log li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); margin-top: 7px; }
+  .log li:not(:last-child)::after { content: ""; position: absolute; left: 5px; top: 26px; bottom: -8px; width: 2px; background: var(--border); }
+  .log .who { font-weight: 700; }
+  .log .meta { color: var(--muted); font-size: 13px; }
+
+  /* git vs github */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .vs .card { margin: 0; }
+  .vs .card h3 { display: flex; align-items: center; gap: 8px; }
+  .pill { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .pill.git { background: var(--accent-soft); color: var(--accent); }
+  .pill.gh { background: var(--blue-soft); color: var(--blue); }
+  .vs ul { margin: 0; padding-left: 1.2em; font-size: 16px; }
+
+  .uses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  .use { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-align: center; font-size: 15px; line-height: 1.6; }
+  .use .emoji { font-size: 34px; line-height: 1; display: block; margin-bottom: 10px; }
+  .use b { display: block; font-size: 16px; margin-bottom: 4px; }
+
+  /* summary */
+  .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .summary .card { margin: 0; }
+  .check { list-style: none; padding: 0; margin: 0; }
+  .check li { position: relative; padding-left: 30px; margin: 8px 0; }
+  .check li::before {
+    content: "✓"; position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--good); color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; line-height: 1;
+  }
+
+  /* quiz */
+  .quiz { margin: 18px 0; }
+  .quiz .q { font-weight: 700; margin-bottom: 10px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opts button {
+    font: inherit; font-size: 15px; cursor: pointer; color: var(--text); background: var(--surface-2);
+    border: 2px solid transparent; border-radius: 10px; padding: 8px 14px; text-align: left;
+  }
+  .opts button:hover { border-color: var(--border); }
+  .opts button.correct { background: var(--good-soft); border-color: var(--good); }
+  .opts button.wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .explain { display: none; margin-top: 10px; font-size: 15px; color: var(--muted); }
+  .explain.show { display: block; }
+
+  /* glossary */
+  dl.gloss { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; }
+  dl.gloss dt { font-weight: 800; }
+  dl.gloss dd { margin: 0; color: var(--muted); }
+
+  footer { padding: 40px 0 60px; text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 0 28px; }
+    .ba, .vs, .summary, .uses { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+    dl.gloss { grid-template-columns: 1fr; gap: 2px; }
+    dl.gloss dd { margin-bottom: 10px; }
+  }
+
+  /* ---------- chapter 2 additions ---------- */
+  .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; padding: 0; list-style: none; counter-reset: rm; }
+  .roadmap li {
+    counter-increment: rm; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px; font-size: 15px; line-height: 1.5; text-align: center;
+  }
+  .roadmap li::before {
+    content: counter(rm); display: grid; place-items: center; width: 30px; height: 30px; margin: 0 auto 8px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .roadmap small { display: block; color: var(--muted); font-size: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; padding: 0; list-style: none; }
+  .chips li { background: var(--surface-2); border-radius: 999px; padding: 4px 14px; font-size: 15px; }
+
+  details.cmd { margin: 20px 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+  details.cmd summary { cursor: pointer; padding: 12px 18px; font-weight: 700; font-size: 15px; list-style: none; }
+  details.cmd summary::-webkit-details-marker { display: none; }
+  details.cmd summary::before { content: "▶"; display: inline-block; margin-right: 8px; font-size: 11px; color: var(--accent); transition: transform .2s; }
+  details.cmd[open] summary::before { transform: rotate(90deg); }
+  details.cmd summary .sub { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+  .code {
+    margin: 0; padding: 16px 18px; background: #22201e; color: #f1ece6; font-size: 14px; line-height: 1.9;
+    font-family: "Consolas", "Menlo", "Source Han Code JP", monospace; overflow-x: auto;
+  }
+  .code .p { color: #ff9a73; user-select: none; }
+  .code .c { color: #9fd6a8; }
+  .code .line { white-space: pre; }
+  .cmd-note { font-size: 14px; color: var(--muted); padding: 10px 18px 14px; margin: 0; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; position: relative; }
+  .step .emoji { font-size: 32px; line-height: 1; display: block; margin-bottom: 8px; }
+  .step b { display: block; font-size: 17px; }
+  .step span.sub { font-size: 14px; color: var(--muted); }
+  .step:not(:last-child)::after {
+    content: "→"; position: absolute; right: -12px; top: 50%; transform: translate(50%, -50%);
+    color: var(--accent); font-weight: 800; font-size: 20px;
+  }
+
+  .callout { background: var(--blue-soft); border-radius: 14px; padding: 16px 20px; margin: 20px 0; font-size: 16px; }
+  .callout b:first-child { color: var(--blue); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .vs .figure { margin: 0 0 12px; padding: 8px; }
+
+  @media (max-width: 640px) {
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .step:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -12px; transform: translate(50%, 50%); }
+  }
+
+  /* ---------- chapter 3 additions ---------- */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.6; }
+  th, td { padding: 12px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-2); font-size: 14px; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code, dd code {
+    font-family: "Consolas", "Menlo", monospace; font-size: .92em; background: var(--surface-2);
+    padding: 1px 6px; border-radius: 6px;
+  }
+  td:first-child, th:first-child { white-space: nowrap; }
+  .ignore-grid .code .line { white-space: pre-wrap; word-break: break-all; }
+
+  .flow { list-style: none; margin: 20px 0; padding: 0; counter-reset: fl; }
+  .flow li {
+    counter-increment: fl; position: relative; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; margin-bottom: 12px;
+  }
+  .flow li::before {
+    content: counter(fl); flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .flow li:not(:last-child)::after {
+    content: ""; position: absolute; left: 31px; bottom: -13px; width: 2px; height: 12px; background: var(--accent); opacity: .5;
+  }
+  .flow .where { margin-left: auto; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .flow .where.pc { background: var(--accent-soft); color: var(--accent); }
+  .flow .where.gh { background: var(--blue-soft); color: var(--blue); }
+
+  .ignore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .ignore-grid .item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .ignore-grid .item h4 { margin: 0; padding: 10px 16px; font-size: 15px; }
+  .ignore-grid .item { display: flex; flex-direction: column; }
+  .ignore-grid .code { font-size: 13px; padding: 12px 16px; flex: 1; }
+
+  .conflict { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin: 16px 0; }
+  .conflict .code { border-radius: 12px; }
+  .conflict .arrow { font-size: 24px; color: var(--accent); font-weight: 800; text-align: center; }
+  .conflict .label { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .code .m { color: #ffb86b; font-weight: 700; }
+  .code .del { opacity: .45; text-decoration: line-through; }
+
+  .note { font-size: 14px; color: var(--muted); }
+  .steps.two { grid-template-columns: 1fr 1fr; }
+
+  @media (max-width: 640px) {
+    .ignore-grid { grid-template-columns: 1fr; }
+    .conflict { grid-template-columns: 1fr; }
+    .steps.two { grid-template-columns: 1fr; }
+    .conflict .arrow { transform: rotate(90deg); }
+    .flow .where { margin-left: 46px; }
+  }
+
+  /* ---------- chapter 4 additions ---------- */
+  .callout.warn { background: var(--bad-soft); }
+  .callout.warn b:first-child { color: var(--bad); }
+  .callout.tip { background: var(--good-soft); }
+  .callout.tip b:first-child { color: var(--good); }
+  .scene { display: inline-block; font-size: 13px; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 2px 12px; border-radius: 999px; margin-bottom: 10px; }
+  .summary h3 { font-size: 18px; }
+  table.qi td:first-child { white-space: normal; }
+  .td-list { margin: 0; padding-left: 1.2em; }
+  .td-list li + li { margin-top: 2px; }
+  table.qi a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  table.qi a:hover { text-decoration: underline; }
+
+  /* ---------- chapter 5 additions ---------- */
+  .journey { list-style: none; margin: 20px 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .journey li { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 12px; text-align: center; font-size: 14px; line-height: 1.5; }
+  .journey li .ch { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--accent); margin-bottom: 4px; }
+  .journey li.now { border-color: var(--accent); background: var(--accent-soft); }
+  .big-msg { text-align: center; font-size: clamp(20px, 4vw, 26px); font-weight: 800; line-height: 1.6; margin: 28px 0 8px; }
+  @media (max-width: 640px) {
+    .journey { grid-template-columns: 1fr; }
+  }
+  /* ---------- chapter nav ---------- */
+  .chapter-nav { display: flex; gap: 14px; padding: 32px 0 8px; border-top: 1px solid var(--border); }
+  .chapter-nav a {
+    flex: 1 1 0; max-width: 50%; display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--text);
+    background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px 18px;
+    box-shadow: var(--shadow); transition: border-color .15s, transform .15s;
+  }
+  .chapter-nav a:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .chapter-nav .dir { font-size: 14px; font-weight: 800; color: var(--accent); }
+  .chapter-nav .ch { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+  .chapter-nav .ttl { font-size: 15px; font-weight: 700; line-height: 1.5; }
+  .chapter-nav .next { margin-left: auto; text-align: right; }
+  @media (max-width: 640px) {
+    .chapter-nav { flex-direction: column; }
+    .chapter-nav a { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="chapter-tag">CHAPTER 5</span>
+    <h1>Gitが広がる世界</h1>
+    <p class="lead">Gitは、ファイルを記録するだけの道具ではありません。<br><strong>Webページを公開</strong>したり、<strong>チームの働き方そのものを変えたり</strong>できます。最終章では、その広がりを見ていきましょう。</p>
+    <ul class="toc">
+      <li><a href="#s29">29 GitHub Pages</a></li>
+      <li><a href="#s30">30 Gitを使うとうれしいこと</a></li>
+      <li><a href="#summary">まとめ</a></li>
+      <li><a href="#quiz">理解チェック</a></li>
+      <li><a href="#journey">ふりかえり</a></li>
+    </ul>
+  </header>
+
+  <!-- ===== SECTION 29 ===== -->
+  <section id="s29">
+    <div class="sec-label">SECTION 29</div>
+    <h2>GitHub PagesでWebページを公開してみよう</h2>
+
+    <div class="term">
+      <div><span class="t-name">GitHub Pages</span><span class="t-read">（ギットハブ・ページズ）ってなに？</span></div>
+      <p>GitHubが提供する<b>Webページ公開サービス</b>。GitHubのアカウントがあれば、<b>無料で</b>Webページを公開できます。</p>
+      <p>リポジトリに置いたHTMLなどのファイルが、そのままインターネット上のWebページになるイメージです。</p>
+    </div>
+
+    <p>GitHub Pagesは、<b>静的なWebページ</b>（HTML・CSS・JavaScript）を公開するサービスです。<b>動的なWebページは公開できません</b>。</p>
+
+    <div class="vs">
+      <div class="card">
+        <h3><span class="pill git">OK</span>静的なWebページ</h3>
+        <ul>
+          <li>HTML・CSS・JavaScriptでできたページ</li>
+          <li>置いてあるファイルを、そのまま表示する</li>
+          <li>例：自己紹介ページ、作品紹介、資料ページ</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="pill gh">NG</span>動的なWebページ</h3>
+        <ul>
+          <li>サーバー側でプログラムを動かして、内容を作るページ</li>
+          <li>見る人や操作によって、表示が変わる</li>
+          <li>例：ログインが必要な会員サイト、掲示板</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <p><b>⚠ 注意</b></p>
+      <p><b>プライベートリポジトリであっても</b>、GitHub Pagesで公開設定をすると<b>インターネット上で公開</b>されます。見られて困る情報が入っていないか、公開前に必ず確認しましょう。</p>
+    </div>
+
+    <h3 style="margin-top:28px">Webページを更新したいときは</h3>
+    <p>ソースコードを編集後、masterブランチに<b>コミット → プッシュ</b>すれば、随時Webページが更新されます。これまで学んだ操作そのままです。</p>
+    <ol class="flow">
+      <li>ソースコードを編集する<span class="where pc">自分のPC</span></li>
+      <li>masterブランチにコミットする<span class="where pc">自分のPC</span></li>
+      <li>プッシュする<span class="where pc">自分のPC → GitHub</span></li>
+      <li>Webページが更新される 🎉<span class="where gh">GitHub Pages</span></li>
+    </ol>
+    <p class="note">※最近は本流のブランチ名が「main」の場合も多くあります。どのブランチを公開するかはGitHub Pagesの設定で選べます。<br>※サービスの内容は変更されることがあります。最新の情報はGitHubの公式サイトで確認しましょう。</p>
+  </section>
+
+  <!-- ===== SECTION 30 ===== -->
+  <section id="s30">
+    <div class="sec-label">SECTION 30</div>
+    <h2>Gitを使うとうれしいこと</h2>
+    <p>最後に、Gitを使うと<b>チームにとって</b>どんなうれしいことがあるのかを整理します。大きく2つあります。</p>
+
+    <!-- うれしいこと1 -->
+    <div class="problem">
+      <div class="problem-head"><span class="num">1</span><h3>効率的にコミュニケーションができる</h3></div>
+      <p>エンジニア・Webデザイナー・ディレクター、<span class="hl">全員が同じツールを使う</span>ことで、情報の行き違いや伝達漏れが減ります。</p>
+
+      <div class="figure">
+        <svg viewBox="0 0 640 235" role="img" aria-label="エンジニア、デザイナー、ディレクターが全員GitHubという同じ場所で情報を共有している図">
+          <line x1="160" y1="115" x2="212" y2="115" stroke="var(--border)" stroke-width="3"/>
+          <line x1="428" y1="115" x2="480" y2="115" stroke="var(--border)" stroke-width="3"/>
+          <line x1="320" y1="157" x2="320" y2="180" stroke="var(--border)" stroke-width="3"/>
+
+          <ellipse cx="320" cy="115" rx="108" ry="42" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2"/>
+          <text x="320" y="111" font-size="17" font-weight="700" text-anchor="middle" fill="var(--text)">GitHub</text>
+          <text x="320" y="133" font-size="12" text-anchor="middle" fill="var(--muted)">同じ場所・同じ情報</text>
+
+          <g font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">
+            <rect x="20" y="90" width="140" height="50" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="90" y="120">🛠 エンジニア</text>
+            <rect x="480" y="90" width="140" height="50" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="550" y="120">🎨 デザイナー</text>
+            <rect x="240" y="180" width="160" height="46" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="320" y="208">📋 ディレクター</text>
+          </g>
+          <text x="320" y="40" font-size="14" font-weight="700" text-anchor="middle" fill="var(--good)">伝言ゲームがなくなる！</text>
+        </svg>
+        <div class="figcap">職種が違っても、見ている場所はひとつ。</div>
+      </div>
+
+      <div class="uses">
+        <div class="use"><span class="emoji">👀</span><b>状況が見える</b>チームの誰もが、今のプロダクトの状態・今ディスカッションされていることを確認できる</div>
+        <div class="use"><span class="emoji">🙋</span><b>自分から提案できる</b>プルリクエストを送って自分から提案していくことができる</div>
+        <div class="use"><span class="emoji">🤝</span><b>みんなで決める</b>そのプルリクエストに対し、いろいろな人の手や意見が入り、チームの合意ができたところでマージされる</div>
+      </div>
+
+      <div class="term">
+        <div><span class="t-name">意思決定プロセスの民主化</span></div>
+        <p>3つ目のような流れのことを、こう呼びます。一部の人だけが決めて上から伝えるのではなく、<b>誰でも提案でき、みんなの意見が入り、チームが合意してから決まる</b>。Gitとプルリクエストが、そんなフラットなチームづくりを支えてくれます。</p>
+      </div>
+    </div>
+
+    <!-- うれしいこと2 -->
+    <div class="problem">
+      <div class="problem-head"><span class="num">2</span><h3>新しく参加した人でもすぐにプロジェクトに入っていける</h3></div>
+      <p>ソースコードの変更履歴と合わせて、<span class="hl">「なぜそうしたのか」という理由</span>がコードレビューやイシューに記録されているので、新しく参加した人でもすぐにプロジェクトに入っていけます。</p>
+
+      <div class="ba">
+        <div class="before"><span class="tag">😣 記録が残っていないと</span><br>「このボタン、なんでこの色なんですか？」と毎回だれかに聞くしかない。聞ける人がいなければ、分からないまま。</div>
+        <div class="after"><span class="tag">😊 Gitで記録が残っていると</span><br>履歴・レビュー・イシューをたどれば、「いつ・誰が・なぜ」変えたのかを自分で調べられる。</div>
+      </div>
+
+      <div class="term" style="margin-top:20px">
+        <div><span class="t-name">イシュー</span><span class="t-read">（issue）ってなに？</span></div>
+        <p>GitHub上で、<b>課題・バグ報告・やりたいこと・話し合い</b>を記録しておける掲示板のような機能です。「何が問題で、どう決まったか」が残ります。</p>
+      </div>
+      <p class="note">CHAPTER1で見た「修正した意図を伝えたい」という悩みが、チーム全体で解決されている状態です。</p>
+    </div>
+  </section>
+
+  <!-- ===== まとめ ===== -->
+  <section id="summary">
+    <div class="sec-label">SUMMARY</div>
+    <h2>まとめ</h2>
+    <div class="summary">
+      <div class="card">
+        <h3>GitHub Pages</h3>
+        <ul class="check">
+          <li>GitHubのアカウントがあれば、無料でWebページを公開できる</li>
+          <li>公開できるのは静的なWebページ（HTML・CSS・JavaScript）。動的なWebページは公開できない</li>
+          <li>プライベートリポジトリでも、公開設定をするとインターネット上で公開される</li>
+          <li>masterブランチにコミット → プッシュすれば、随時Webページが更新される</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Gitを使うとうれしいこと</h3>
+        <ul class="check">
+          <li>全員が同じツールを使うことで、情報の行き違いや伝達漏れが減る</li>
+          <li>誰もが提案でき、チームの合意でマージされる＝<b>意思決定プロセスの民主化</b></li>
+          <li>「なぜそうしたのか」が記録されているので、新しく参加した人でもすぐにプロジェクトに入っていける</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== クイズ ===== -->
+  <section id="quiz">
+    <div class="sec-label">CHECK</div>
+    <h2>ミニ理解チェック</h2>
+    <p>答えだと思うものをクリックしてみましょう。</p>
+
+    <div class="card quiz">
+      <div class="q">Q1. GitHub Pagesで公開できるのはどれ？</div>
+      <div class="opts">
+        <button data-ok="1">HTML・CSS・JavaScriptでできた静的なWebページ</button>
+        <button data-ok="0">ログイン機能のある会員サイト</button>
+        <button data-ok="0">書き込みができる掲示板</button>
+      </div>
+      <div class="explain" data-answer="「HTML・CSS・JavaScriptでできた静的なWebページ」" data-body="動的なWebページは公開できません。"></div>
+    </div>
+
+    <div class="card quiz">
+      <div class="q">Q2. プライベートリポジトリでGitHub Pagesの公開設定をすると？</div>
+      <div class="opts">
+        <button data-ok="0">チームメンバーだけが見られる</button>
+        <button data-ok="1">インターネット上で公開される</button>
+        <button data-ok="0">公開設定ができない</button>
+      </div>
+      <div class="explain" data-answer="「インターネット上で公開される」" data-body="見られて困る情報がないか、公開前に必ず確認しましょう。"></div>
+    </div>
+
+    <div class="card quiz">
+      <div class="q">Q3. 新しく参加した人でもすぐにプロジェクトに入っていけるのはなぜ？</div>
+      <div class="opts">
+        <button data-ok="0">ソースコードが短くなるから</button>
+        <button data-ok="1">「なぜそうしたのか」がレビューやイシューに記録されているから</button>
+        <button data-ok="0">前任者が必ず説明してくれるから</button>
+      </div>
+      <div class="explain" data-answer="「『なぜそうしたのか』がレビューやイシューに記録されているから」" data-body="変更履歴と合わせて理由が残っているので、自分で調べてキャッチアップできます。"></div>
+    </div>
+  </section>
+
+  <!-- ===== 用語 ===== -->
+  <section id="glossary">
+    <div class="sec-label">GLOSSARY</div>
+    <h2>この章の用語ミニ辞典</h2>
+    <div class="card">
+      <dl class="gloss">
+        <dt>GitHub Pages</dt><dd>GitHubが提供する、無料のWebページ公開サービス。</dd>
+        <dt>静的なWebページ</dt><dd>置いてあるファイル（HTML・CSS・JavaScript）をそのまま表示するページ。</dd>
+        <dt>動的なWebページ</dt><dd>サーバー側でプログラムを動かし、見る人や操作に応じて内容が変わるページ。</dd>
+        <dt>イシュー</dt><dd>GitHub上で課題や話し合いを記録しておける機能。</dd>
+        <dt>意思決定プロセスの民主化</dt><dd>誰でも提案でき、みんなの意見が入り、チームの合意で物事が決まること。</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ===== ふりかえり ===== -->
+  <section id="journey">
+    <div class="sec-label">JOURNEY</div>
+    <h2>ここまでのふりかえり</h2>
+    <p>Gitを何も知らないところから、ここまで来ました。</p>
+    <ol class="journey">
+      <li><span class="ch">CHAPTER 1</span>Gitって何？</li>
+      <li><span class="ch">CHAPTER 2</span>個人でGitを使ってみよう</li>
+      <li><span class="ch">CHAPTER 3</span>複数人でGitを使ってみよう</li>
+      <li><span class="ch">CHAPTER 4</span>実用Git〜こんなときは？</li>
+      <li class="now"><span class="ch">CHAPTER 5</span>Gitが広がる世界</li>
+    </ol>
+    <p class="big-msg">Gitは「ファイルのタイムマシン」から、<br>「チームで働くための土台」へ。</p>
+  </section>
+
+  <nav class="chapter-nav" aria-label="章の切り替え">
+    <a class="prev" href="CHAPTER4%E3%80%8C%E5%AE%9F%E7%94%A8Git%EF%BD%9E%E3%81%93%E3%82%93%E3%81%AA%E3%81%A8%E3%81%8D%E3%81%AF%E3%81%A9%E3%81%86%E3%81%99%E3%82%8C%E3%81%B0%E3%81%84%E3%81%84%EF%BC%9F%E3%80%8D.html"><span class="dir">← 前章</span><span class="ch">CHAPTER 4</span><span class="ttl">実用Git〜こんなときはどうすればいい？</span></a>
+  </nav>
+
+</div>
+
+<footer>
+  <div class="wrap">CHAPTER 5「Gitが広がる世界」 ── 全章おつかれさまでした！さっそくGitを使ってみましょう 🎉</div>
+</footer>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (q) {
+    q.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        q.querySelectorAll('button').forEach(function (x) {
+          x.classList.remove('correct', 'wrong');
+          if (x.dataset.ok === '1') x.classList.add('correct');
+        });
+        if (b.dataset.ok !== '1') b.classList.add('wrong');
+        var ex = q.querySelector('.explain');
+        ex.textContent = (b.dataset.ok === '1' ? '正解！' : '正解は' + ex.dataset.answer + '。') + ex.dataset.body;
+        ex.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>複数人でGitを使ってみよう</title>
+<style>
+  :root {
+    --bg: #fbf8f4;
+    --surface: #ffffff;
+    --surface-2: #f4efe8;
+    --text: #2b2622;
+    --muted: #6e655d;
+    --border: #e6ddd2;
+    --accent: #e8572a;
+    --accent-soft: #fde8df;
+    --good: #2f8f5b;
+    --good-soft: #e1f3e8;
+    --bad: #b8483b;
+    --bad-soft: #f8e3df;
+    --blue: #3a6fb0;
+    --blue-soft: #e2ecf8;
+    --shadow: 0 2px 10px rgba(60, 40, 20, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1a18;
+      --surface: #262320;
+      --surface-2: #2f2b27;
+      --text: #efe9e2;
+      --muted: #b0a79d;
+      --border: #3d3833;
+      --accent: #ff7a4d;
+      --accent-soft: #3d2a21;
+      --good: #5cc48b;
+      --good-soft: #1f3529;
+      --bad: #ec7b6d;
+      --bad-soft: #3b2522;
+      --blue: #7aa7e0;
+      --blue-soft: #1f2c3d;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1a18; --surface: #262320; --surface-2: #2f2b27; --text: #efe9e2; --muted: #b0a79d;
+    --border: #3d3833; --accent: #ff7a4d; --accent-soft: #3d2a21; --good: #5cc48b; --good-soft: #1f3529;
+    --bad: #ec7b6d; --bad-soft: #3b2522; --blue: #7aa7e0; --blue-soft: #1f2c3d; --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  svg { max-width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; }
+
+  /* ---------- hero ---------- */
+  header.hero { padding: 64px 0 40px; }
+  .chapter-tag {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .12em;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 12px; border-radius: 999px;
+  }
+  h1 { font-size: clamp(34px, 7vw, 52px); line-height: 1.25; margin: 16px 0 12px; letter-spacing: .02em; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0; }
+  .lead strong { color: var(--text); }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; padding: 0; list-style: none; }
+  .toc a {
+    display: inline-block; font-size: 14px; color: var(--text); text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface); padding: 6px 14px; border-radius: 999px;
+  }
+  .toc a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- sections ---------- */
+  section { padding: 40px 0; border-top: 1px solid var(--border); }
+  .sec-label { font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--accent); }
+  h2 { font-size: clamp(24px, 4.6vw, 32px); line-height: 1.4; margin: 6px 0 20px; }
+  h3 { font-size: 21px; line-height: 1.5; margin: 0 0 12px; }
+  p { margin: 0 0 16px; }
+  .hl { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); font-weight: 700; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow); margin: 20px 0;
+  }
+  .term {
+    border-left: 5px solid var(--accent); background: var(--surface); border-radius: 0 14px 14px 0;
+    padding: 18px 22px; margin: 20px 0; box-shadow: var(--shadow);
+  }
+  .term .t-name { font-weight: 800; font-size: 19px; }
+  .term .t-read { font-size: 13px; color: var(--muted); margin-left: 6px; }
+  .term p:last-child { margin-bottom: 0; }
+
+  /* file chaos */
+  .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 20px 0; }
+  .file {
+    display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px; word-break: break-all; line-height: 1.4;
+  }
+  .file:nth-child(odd) { transform: rotate(-1.2deg); }
+  .file:nth-child(even) { transform: rotate(1deg); }
+  .file .ico { flex: none; width: 22px; height: 28px; border-radius: 3px; background: var(--blue); position: relative; }
+  .file .ico::after { content: ""; position: absolute; right: 0; top: 0; border: 5px solid; border-color: var(--surface) var(--surface) transparent transparent; }
+  .sigh { text-align: center; font-size: 15px; color: var(--muted); }
+
+  /* problem cards */
+  .problem { margin: 32px 0; }
+  .problem-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .num {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-weight: 800; font-size: 18px;
+  }
+  .problem-head h3 { margin: 0; }
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .ba > div { border-radius: 14px; padding: 16px 18px; font-size: 16px; }
+  .ba .before { background: var(--bad-soft); }
+  .ba .after { background: var(--good-soft); }
+  .ba .tag { display: inline-block; font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+  .ba .before .tag { color: var(--bad); }
+  .ba .after .tag { color: var(--good); }
+  .figure { margin: 16px 0 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .figcap { font-size: 14px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+  /* history log */
+  .log { list-style: none; margin: 0; padding: 0; font-size: 15px; }
+  .log li { display: grid; grid-template-columns: 14px 1fr; gap: 12px; padding: 8px 0; position: relative; }
+  .log li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); margin-top: 7px; }
+  .log li:not(:last-child)::after { content: ""; position: absolute; left: 5px; top: 26px; bottom: -8px; width: 2px; background: var(--border); }
+  .log .who { font-weight: 700; }
+  .log .meta { color: var(--muted); font-size: 13px; }
+
+  /* git vs github */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .vs .card { margin: 0; }
+  .vs .card h3 { display: flex; align-items: center; gap: 8px; }
+  .pill { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .pill.git { background: var(--accent-soft); color: var(--accent); }
+  .pill.gh { background: var(--blue-soft); color: var(--blue); }
+  .vs ul { margin: 0; padding-left: 1.2em; font-size: 16px; }
+
+  .uses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  .use { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-align: center; font-size: 15px; line-height: 1.6; }
+  .use .emoji { font-size: 34px; line-height: 1; display: block; margin-bottom: 10px; }
+  .use b { display: block; font-size: 16px; margin-bottom: 4px; }
+
+  /* summary */
+  .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .summary .card { margin: 0; }
+  .check { list-style: none; padding: 0; margin: 0; }
+  .check li { position: relative; padding-left: 30px; margin: 8px 0; }
+  .check li::before {
+    content: "✓"; position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--good); color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; line-height: 1;
+  }
+
+  /* quiz */
+  .quiz { margin: 18px 0; }
+  .quiz .q { font-weight: 700; margin-bottom: 10px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opts button {
+    font: inherit; font-size: 15px; cursor: pointer; color: var(--text); background: var(--surface-2);
+    border: 2px solid transparent; border-radius: 10px; padding: 8px 14px; text-align: left;
+  }
+  .opts button:hover { border-color: var(--border); }
+  .opts button.correct { background: var(--good-soft); border-color: var(--good); }
+  .opts button.wrong { background: var(--bad-soft); border-color: var(--bad); }
+  .explain { display: none; margin-top: 10px; font-size: 15px; color: var(--muted); }
+  .explain.show { display: block; }
+
+  /* glossary */
+  dl.gloss { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 10px 20px; }
+  dl.gloss dt { font-weight: 800; }
+  dl.gloss dd { margin: 0; color: var(--muted); }
+
+  footer { padding: 40px 0 60px; text-align: center; color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 0 28px; }
+    .ba, .vs, .summary, .uses { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+    dl.gloss { grid-template-columns: 1fr; gap: 2px; }
+    dl.gloss dd { margin-bottom: 10px; }
+  }
+
+  /* ---------- chapter 2 additions ---------- */
+  .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; padding: 0; list-style: none; counter-reset: rm; }
+  .roadmap li {
+    counter-increment: rm; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px; font-size: 15px; line-height: 1.5; text-align: center;
+  }
+  .roadmap li::before {
+    content: counter(rm); display: grid; place-items: center; width: 30px; height: 30px; margin: 0 auto 8px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .roadmap small { display: block; color: var(--muted); font-size: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; padding: 0; list-style: none; }
+  .chips li { background: var(--surface-2); border-radius: 999px; padding: 4px 14px; font-size: 15px; }
+
+  details.cmd { margin: 20px 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+  details.cmd summary { cursor: pointer; padding: 12px 18px; font-weight: 700; font-size: 15px; list-style: none; }
+  details.cmd summary::-webkit-details-marker { display: none; }
+  details.cmd summary::before { content: "▶"; display: inline-block; margin-right: 8px; font-size: 11px; color: var(--accent); transition: transform .2s; }
+  details.cmd[open] summary::before { transform: rotate(90deg); }
+  details.cmd summary .sub { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+  .code {
+    margin: 0; padding: 16px 18px; background: #22201e; color: #f1ece6; font-size: 14px; line-height: 1.9;
+    font-family: "Consolas", "Menlo", "Source Han Code JP", monospace; overflow-x: auto;
+  }
+  .code .p { color: #ff9a73; user-select: none; }
+  .code .c { color: #9fd6a8; }
+  .code .line { white-space: pre; }
+  .cmd-note { font-size: 14px; color: var(--muted); padding: 10px 18px 14px; margin: 0; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; position: relative; }
+  .step .emoji { font-size: 32px; line-height: 1; display: block; margin-bottom: 8px; }
+  .step b { display: block; font-size: 17px; }
+  .step span.sub { font-size: 14px; color: var(--muted); }
+  .step:not(:last-child)::after {
+    content: "→"; position: absolute; right: -12px; top: 50%; transform: translate(50%, -50%);
+    color: var(--accent); font-weight: 800; font-size: 20px;
+  }
+
+  .callout { background: var(--blue-soft); border-radius: 14px; padding: 16px 20px; margin: 20px 0; font-size: 16px; }
+  .callout b:first-child { color: var(--blue); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .vs .figure { margin: 0 0 12px; padding: 8px; }
+
+  @media (max-width: 640px) {
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .step:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -12px; transform: translate(50%, 50%); }
+  }
+
+  /* ---------- chapter 3 additions ---------- */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.6; }
+  th, td { padding: 12px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-2); font-size: 14px; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code, dd code {
+    font-family: "Consolas", "Menlo", monospace; font-size: .92em; background: var(--surface-2);
+    padding: 1px 6px; border-radius: 6px;
+  }
+  td:first-child, th:first-child { white-space: nowrap; }
+  .ignore-grid .code .line { white-space: pre-wrap; word-break: break-all; }
+
+  .flow { list-style: none; margin: 20px 0; padding: 0; counter-reset: fl; }
+  .flow li {
+    counter-increment: fl; position: relative; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; margin-bottom: 12px;
+  }
+  .flow li::before {
+    content: counter(fl); flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .flow li:not(:last-child)::after {
+    content: ""; position: absolute; left: 31px; bottom: -13px; width: 2px; height: 12px; background: var(--accent); opacity: .5;
+  }
+  .flow .where { margin-left: auto; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .flow .where.pc { background: var(--accent-soft); color: var(--accent); }
+  .flow .where.gh { background: var(--blue-soft); color: var(--blue); }
+
+  .ignore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .ignore-grid .item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .ignore-grid .item h4 { margin: 0; padding: 10px 16px; font-size: 15px; }
+  .ignore-grid .item { display: flex; flex-direction: column; }
+  .ignore-grid .code { font-size: 13px; padding: 12px 16px; flex: 1; }
+
+  .conflict { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin: 16px 0; }
+  .conflict .code { border-radius: 12px; }
+  .conflict .arrow { font-size: 24px; color: var(--accent); font-weight: 800; text-align: center; }
+  .conflict .label { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .code .m { color: #ffb86b; font-weight: 700; }
+  .code .del { opacity: .45; text-decoration: line-through; }
+
+  .note { font-size: 14px; color: var(--muted); }
+  .steps.two { grid-template-columns: 1fr 1fr; }
+
+  @media (max-width: 640px) {
+    .ignore-grid { grid-template-columns: 1fr; }
+    .conflict { grid-template-columns: 1fr; }
+    .steps.two { grid-template-columns: 1fr; }
+    .conflict .arrow { transform: rotate(90deg); }
+    .flow .where { margin-left: 46px; }
+  }
+  /* ---------- chapter nav ---------- */
+  .chapter-nav { display: flex; gap: 14px; padding: 32px 0 8px; border-top: 1px solid var(--border); }
+  .chapter-nav a {
+    flex: 1 1 0; max-width: 50%; display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--text);
+    background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 14px 18px;
+    box-shadow: var(--shadow); transition: border-color .15s, transform .15s;
+  }
+  .chapter-nav a:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .chapter-nav .dir { font-size: 14px; font-weight: 800; color: var(--accent); }
+  .chapter-nav .ch { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+  .chapter-nav .ttl { font-size: 15px; font-weight: 700; line-height: 1.5; }
+  .chapter-nav .next { margin-left: auto; text-align: right; }
+  @media (max-width: 640px) {
+    .chapter-nav { flex-direction: column; }
+    .chapter-nav a { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="chapter-tag">CHAPTER 3</span>
+    <h1>複数人でGitを使ってみよう</h1>
+    <p class="lead">いよいよ<strong>チームでの使い方</strong>です。<br>GitHubを通じてファイルを受け渡し、みんなの修正をひとつにまとめる方法を学びます。</p>
+    <ul class="toc">
+      <li><a href="#s7">07 アカウント</a></li>
+      <li><a href="#s8">08 SSH</a></li>
+      <li><a href="#s9">09 フォーク・クローン</a></li>
+      <li><a href="#s10">10 ブランチ</a></li>
+      <li><a href="#s11">11 マージ</a></li>
+      <li><a href="#s12">12 プッシュ</a></li>
+      <li><a href="#s13">13 プル</a></li>
+      <li><a href="#s14">14 コンフリクト</a></li>
+      <li><a href="#s15">15 プルリクエスト</a></li>
+      <li><a href="#s16">16 .gitignore</a></li>
+      <li><a href="#summary">まとめ</a></li>
+      <li><a href="#quiz">理解チェック</a></li>
+    </ul>
+  </header>
+
+  <!-- ===== ロードマップ ===== -->
+  <section id="intro">
+    <div class="sec-label">ROADMAP</div>
+    <h2>この章でやること</h2>
+    <ol class="roadmap">
+      <li>GitHubの準備<small>アカウント・SSH</small></li>
+      <li>リポジトリを手元へ<small>フォーク・クローン</small></li>
+      <li>分けて作って合流<small>ブランチ・マージ</small></li>
+      <li>チームとやり取り<small>プッシュ・プル・プルリク</small></li>
+    </ol>
+    <p>CHAPTER2では「自分のパソコンの中」だけでGitを使いました。この章では、<span class="hl">インターネット上のGitHubを“みんなの集合場所”にして</span>、複数人で作業する方法を見ていきます。</p>
+    <div class="term">
+      <div><span class="t-name">リモートリポジトリ</span><span class="t-read">ってなに？</span></div>
+      <p>GitHubなど<b>インターネット上に置かれたリポジトリ</b>のこと。自分のパソコンの中にある「ローカルリポジトリ」と対になる言葉です。（リモート＝離れた場所）</p>
+    </div>
+  </section>
+
+  <!-- ===== SECTION 07 ===== -->
+  <section id="s7">
+    <div class="sec-label">SECTION 07</div>
+    <h2>GitHubのアカウントを作ろう</h2>
+    <p>GitHubは、<b>無料で</b>公開リポジトリ・非公開リポジトリを何個でも作ることができます。</p>
+    <div class="vs">
+      <div class="card">
+        <h3><span class="pill git">無料</span>フリープラン</h3>
+        <ul>
+          <li>公開・非公開リポジトリを何個でも作れる</li>
+          <li>ただし、非公開リポジトリ1つあたりの共同作業者は<b>3人まで</b>という制限付き</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="pill gh">有料</span>有料プラン</h3>
+        <ul>
+          <li>何人でも共同作業者を追加できるようになる</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">※「公開」は誰でも見られるリポジトリ、「非公開」は招待した人だけが見られるリポジトリです。<br>※料金プランの内容は変更されることがあります。最新の情報はGitHubの公式サイトで確認しましょう。</p>
+  </section>
+
+  <!-- ===== SECTION 08 ===== -->
+  <section id="s8">
+    <div class="sec-label">SECTION 08</div>
+    <h2>SSH接続の設定をしよう</h2>
+
+    <div class="term">
+      <div><span class="t-name">SSH</span><span class="t-read">（エスエスエイチ）ってなに？</span></div>
+      <p>安全性の高い通信方法のひとつで、<b>すべての通信が暗号化</b>されます。そのため、簡単には解読できず、なりすましも防止できます。</p>
+    </div>
+
+    <p>SSHでは、<b>公開鍵</b>と<b>秘密鍵</b>と呼ばれる特殊なファイルを2つ、ペアで使います。<br>イメージは<span class="hl">「GitHubに南京錠（公開鍵）を預けて、その鍵（秘密鍵）は自分だけが持っている」</span>状態。悪意のある第三者は秘密鍵を持っていないので通信できません。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 215" role="img" aria-label="自分のPCとGitHubが公開鍵と秘密鍵のペアで暗号化通信し、第三者は通信できない図">
+        <rect x="20" y="40" width="150" height="90" rx="12" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="95" y="72" font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">あなたのPC</text>
+        <rect x="40" y="90" width="110" height="26" rx="13" fill="var(--surface)"/>
+        <text x="95" y="108" font-size="13" text-anchor="middle" fill="var(--text)">🔑 秘密鍵</text>
+
+        <rect x="470" y="40" width="150" height="90" rx="12" fill="var(--blue-soft)" stroke="var(--blue)"/>
+        <text x="545" y="72" font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">GitHub</text>
+        <rect x="490" y="90" width="110" height="26" rx="13" fill="var(--surface)"/>
+        <text x="545" y="108" font-size="13" text-anchor="middle" fill="var(--text)">🔒 公開鍵</text>
+
+        <line x1="174" y1="85" x2="466" y2="85" stroke="var(--good)" stroke-width="6" stroke-linecap="round"/>
+        <text x="320" y="70" font-size="14" font-weight="700" text-anchor="middle" fill="var(--good)">暗号化された通信</text>
+        <text x="320" y="108" font-size="12" text-anchor="middle" fill="var(--muted)" font-family="Consolas, monospace">#@x%&amp;!q9…</text>
+
+        <line x1="320" y1="170" x2="320" y2="124" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 4"/>
+        <circle cx="320" cy="146" r="12" fill="var(--bad)"/>
+        <text x="320" y="151" font-size="14" font-weight="700" text-anchor="middle" fill="#fff">×</text>
+        <text x="320" y="195" font-size="13" text-anchor="middle" fill="var(--bad)">悪意のある第三者（秘密鍵を持っていない）</text>
+      </svg>
+      <div class="figcap">ペアの鍵を持っている者同士だけが通信できる。途中で盗み見ても中身は読めません。</div>
+    </div>
+    <p class="note">※秘密鍵はその名のとおり、<b>絶対に他人に渡してはいけない</b>ファイルです。</p>
+  </section>
+
+  <!-- ===== SECTION 09 ===== -->
+  <section id="s9">
+    <div class="sec-label">SECTION 09</div>
+    <h2>練習用のリポジトリをコピーしてこよう</h2>
+    <p>GitHub上で公開されているリポジトリをコピーする流れは、次の2ステップです。</p>
+    <div class="steps two">
+      <div class="step"><span class="emoji">🍴</span><b>1. フォークする</b><span class="sub">GitHub上で自分のアカウントにコピー</span></div>
+      <div class="step"><span class="emoji">💻</span><b>2. クローンする</b><span class="sub">自分のパソコンにダウンロード</span></div>
+    </div>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 255" role="img" aria-label="他の人のリポジトリをフォークで自分のアカウントにコピーし、クローンで自分のパソコンにダウンロードする図">
+        <rect x="10" y="10" width="620" height="122" rx="16" fill="var(--blue-soft)"/>
+        <text x="30" y="34" font-size="13" font-weight="700" fill="var(--blue)">GitHub（インターネット上）</text>
+
+        <rect x="40" y="50" width="200" height="60" rx="10" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="140" y="85" font-size="14" text-anchor="middle" fill="var(--text)">他の人のリポジトリ</text>
+        <rect x="400" y="50" width="200" height="60" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="500" y="85" font-size="14" text-anchor="middle" fill="var(--text)">自分のリポジトリ（コピー）</text>
+
+        <line x1="244" y1="92" x2="386" y2="92" stroke="var(--accent)" stroke-width="3"/>
+        <polygon points="396,92 384,85 384,99" fill="var(--accent)"/>
+        <text x="320" y="78" font-size="14" font-weight="700" text-anchor="middle" fill="var(--accent)">① フォーク</text>
+
+        <line x1="500" y1="114" x2="500" y2="166" stroke="var(--accent)" stroke-width="3"/>
+        <polygon points="500,176 493,164 507,164" fill="var(--accent)"/>
+        <text x="486" y="156" font-size="14" font-weight="700" text-anchor="end" fill="var(--accent)">② クローン（ダウンロード）</text>
+
+        <rect x="400" y="180" width="200" height="62" rx="10" fill="var(--surface-2)" stroke="var(--border)"/>
+        <text x="500" y="206" font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">自分のパソコン</text>
+        <text x="500" y="228" font-size="12" text-anchor="middle" fill="var(--muted)">ローカルリポジトリ</text>
+      </svg>
+      <div class="figcap">フォークはGitHub上でのコピー、クローンはGitHubから自分のパソコンへのダウンロード。</div>
+    </div>
+
+    <p><b>フォーク</b>すると、他の人が公開しているリモートリポジトリを、自分のアカウントに<b>コピー</b>できます。</p>
+    <p>フォークしただけではGitHub上でコピーしただけなので、<span class="hl">自分のパソコンにはリポジトリはありません</span>。このリモートリポジトリを、自分のパソコンにダウンロードする操作を<b>クローン</b>と呼びます。</p>
+
+    <details class="cmd">
+      <summary>コマンドで操作する場合<span class="sub">（読み飛ばしてもOK）</span></summary>
+      <div class="code"><div class="line"><span class="p">$ </span>git clone 自分のリモートリポジトリのURL  <span class="c">← リモートリポジトリをクローンする</span></div></div>
+    </details>
+  </section>
+
+  <!-- ===== SECTION 10 ===== -->
+  <section id="s10">
+    <div class="sec-label">SECTION 10</div>
+    <h2>並行世界を作ろう（ブランチ）</h2>
+
+    <div class="term">
+      <div><span class="t-name">ブランチ</span><span class="t-read">（branch＝木の枝）ってなに？</span></div>
+      <p>同時並行で作業するときに便利な機能。別のブランチで変更があったとしても、その影響を受けずに開発を続けられます。つまり、<b>並行世界を作れる</b>ということです。</p>
+    </div>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 185" role="img" aria-label="masterブランチから新機能ブランチが枝分かれしている図">
+        <line x1="40" y1="130" x2="600" y2="130" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+        <path d="M180 130 C 220 130, 220 64, 262 64 L 420 64" fill="none" stroke="var(--blue)" stroke-width="4" stroke-linecap="round"/>
+        <g fill="var(--accent)">
+          <circle cx="80" cy="130" r="11"/><circle cx="180" cy="130" r="11"/><circle cx="320" cy="130" r="11"/><circle cx="460" cy="130" r="11"/>
+        </g>
+        <g fill="var(--blue)">
+          <circle cx="300" cy="64" r="11"/><circle cx="400" cy="64" r="11"/>
+        </g>
+        <text x="40" y="165" font-size="13" font-weight="700" fill="var(--accent)">masterブランチ（本流）</text>
+        <text x="434" y="69" font-size="13" font-weight="700" fill="var(--blue)">新機能ブランチ</text>
+        <rect x="365" y="6" width="70" height="26" rx="8" fill="var(--text)"/>
+        <text x="400" y="24" font-size="13" font-weight="700" text-anchor="middle" fill="var(--bg)">今ココ！</text>
+        <polygon points="392,34 408,34 400,46" fill="var(--text)"/>
+      </svg>
+      <div class="figcap">本流とは別の「枝」で作業すれば、お互いの変更に影響されずに進められます。</div>
+    </div>
+
+    <p>ブランチの移動には<b>チェックアウト</b>（CHAPTER2で学んだ機能）を使い、今いるブランチから別のブランチへ移動することができます。</p>
+    <p class="note">※ブランチの正体は「今ココ！」を指す目印（ポインタ）です。枝をまるごと複製しているわけではないので、気軽に作れます。</p>
+
+    <details class="cmd">
+      <summary>コマンドで操作する場合<span class="sub">（読み飛ばしてもOK）</span></summary>
+      <div class="code"><div class="line"><span class="p">$ </span>git branch               <span class="c">← 存在するブランチを一覧表示する</span></div><div class="line"><span class="p">$ </span>git branch ブランチ名     <span class="c">← 現在のブランチを元に新規ブランチを作成する</span></div><div class="line"><span class="p">$ </span>git checkout ブランチ名   <span class="c">← 指定したブランチに移動する</span></div></div>
+    </details>
+  </section>
+
+  <!-- ===== SECTION 11 ===== -->
+  <section id="s11">
+    <div class="sec-label">SECTION 11</div>
+    <h2>ブランチを統合してみよう（マージ）</h2>
+    <p>変更した内容を元のブランチに合流させたいときは<b>マージ</b>をします。並行世界を、ひとつの世界に戻すイメージです。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 185" role="img" aria-label="新機能ブランチがmasterブランチに合流（マージ）する図">
+        <line x1="40" y1="130" x2="600" y2="130" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+        <path d="M150 130 C 190 130, 190 64, 232 64 L 400 64 C 460 64, 470 130, 520 130" fill="none" stroke="var(--blue)" stroke-width="4" stroke-linecap="round"/>
+        <g fill="var(--accent)">
+          <circle cx="70" cy="130" r="11"/><circle cx="150" cy="130" r="11"/><circle cx="300" cy="130" r="11"/>
+        </g>
+        <g fill="var(--blue)">
+          <circle cx="270" cy="64" r="11"/><circle cx="370" cy="64" r="11"/>
+        </g>
+        <circle cx="520" cy="130" r="15" fill="var(--good)"/>
+        <text x="520" y="135" font-size="13" font-weight="700" text-anchor="middle" fill="#fff">✓</text>
+        <text x="40" y="165" font-size="13" font-weight="700" fill="var(--accent)">masterブランチ</text>
+        <text x="232" y="44" font-size="13" font-weight="700" fill="var(--blue)">新機能ブランチ</text>
+        <text x="520" y="168" font-size="13" font-weight="700" text-anchor="middle" fill="var(--good)">マージ！</text>
+      </svg>
+      <div class="figcap">枝分かれして作った変更が、本流に合流します。</div>
+    </div>
+
+    <p>実際の開発では、<b>「バグ修正が完了したのでmasterブランチに取り込む」「その間に新機能が完成したため、masterブランチに取り込む」</b>というように役立ちます。</p>
+    <p class="note">※「master」は本流となるブランチによく付けられる名前です。最近は「main」という名前もよく使われます。</p>
+
+    <details class="cmd">
+      <summary>コマンドで操作する場合<span class="sub">（読み飛ばしてもOK）</span></summary>
+      <div class="code"><div class="line"><span class="p">$ </span>git checkout ブランチA  <span class="c">← まずはマージコミットを作りたいブランチAに移動する</span></div><div class="line"><span class="p">$ </span>git merge ブランチB     <span class="c">← マージしたいブランチBを指定してマージする</span></div></div>
+    </details>
+  </section>
+
+  <!-- ===== SECTION 12 ===== -->
+  <section id="s12">
+    <div class="sec-label">SECTION 12</div>
+    <h2>プッシュしよう</h2>
+    <p>ローカルリポジトリ（自分のPC）で起きた変更を、リモートリポジトリ（GitHub）に反映させたいときは<b>プッシュ</b>をします。<span class="hl">アップロードに近いイメージ</span>です。</p>
+    <details class="cmd">
+      <summary>コマンドで操作する場合<span class="sub">（読み飛ばしてもOK）</span></summary>
+      <div class="code"><div class="line"><span class="p">$ </span>git push リモートリポジトリ名 ブランチ名  <span class="c">← ローカルリポジトリで行った変更を、リモートリポジトリにプッシュする</span></div></div>
+    </details>
+  </section>
+
+  <!-- ===== SECTION 13 ===== -->
+  <section id="s13">
+    <div class="sec-label">SECTION 13</div>
+    <h2>プルしよう</h2>
+    <p>リモートリポジトリ（GitHub）で起きた変更を、ローカルリポジトリ（自分のPC）に反映したいときは<b>プル</b>をします。<span class="hl">ダウンロードに近いイメージ</span>です。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 195" role="img" aria-label="ローカルからリモートへはプッシュ、リモートからローカルへはプル">
+        <rect x="20" y="40" width="180" height="120" rx="12" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="110" y="96" font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">ローカルリポジトリ</text>
+        <text x="110" y="118" font-size="12" text-anchor="middle" fill="var(--muted)">（自分のPC）</text>
+        <rect x="440" y="40" width="180" height="120" rx="12" fill="var(--blue-soft)" stroke="var(--blue)"/>
+        <text x="530" y="96" font-size="14" font-weight="700" text-anchor="middle" fill="var(--text)">リモートリポジトリ</text>
+        <text x="530" y="118" font-size="12" text-anchor="middle" fill="var(--muted)">（GitHub）</text>
+
+        <line x1="206" y1="76" x2="422" y2="76" stroke="var(--accent)" stroke-width="4"/>
+        <polygon points="434,76 420,68 420,84" fill="var(--accent)"/>
+        <text x="320" y="62" font-size="14" font-weight="700" text-anchor="middle" fill="var(--accent)">プッシュ（アップロード）</text>
+
+        <line x1="434" y1="126" x2="218" y2="126" stroke="var(--blue)" stroke-width="4"/>
+        <polygon points="206,126 220,118 220,134" fill="var(--blue)"/>
+        <text x="320" y="154" font-size="14" font-weight="700" text-anchor="middle" fill="var(--blue)">プル（ダウンロード）</text>
+      </svg>
+      <div class="figcap">プッシュとプルは、向きが逆なだけ。自分の変更を届けるのがプッシュ、みんなの変更を受け取るのがプル。</div>
+    </div>
+
+    <details class="cmd">
+      <summary>コマンドで操作する場合<span class="sub">（読み飛ばしてもOK）</span></summary>
+      <div class="code"><div class="line"><span class="p">$ </span>git pull リモートリポジトリ名 ブランチ名  <span class="c">← リモートリポジトリ上のコミットを、ローカルリポジトリの現在のブランチに取り込む</span></div></div>
+    </details>
+  </section>
+
+  <!-- ===== SECTION 14 ===== -->
+  <section id="s14">
+    <div class="sec-label">SECTION 14</div>
+    <h2>コンフリクトが起きたら？</h2>
+    <p><b>コンフリクト</b>（conflict＝衝突）は、<span class="hl">同じ行に、同時に別々の修正がなされたとき</span>に発生します。</p>
+
+    <div class="ba">
+      <div class="after"><span class="tag">😊 違う行を修正した場合</span><br>同じファイルでも、行が違えばコンフリクトは起きずにそのままマージされる。</div>
+      <div class="before"><span class="tag">😣 同じ行を修正した場合</span><br>Gitは「どちらを採用すればいいの？」と判断できず、コンフリクトになる。</div>
+    </div>
+
+    <p style="margin-top:20px">コンフリクトが起きたファイルをエディタで開くと、<b>記号を目印として2つの修正</b>がテキストに入っています。正しいソースコードだけ残して、不要な記号を消すことで、コンフリクトは解決され、マージコミットが作られます。</p>
+
+    <div class="conflict">
+      <div>
+        <div class="label">コンフリクトが起きたファイル</div>
+        <div class="code"><div class="line"><span class="m">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span></div><div class="line">&lt;h1&gt;ようこそ&lt;/h1&gt;</div><div class="line"><span class="m">=======</span></div><div class="line">&lt;h1&gt;いらっしゃいませ&lt;/h1&gt;</div><div class="line"><span class="m">&gt;&gt;&gt;&gt;&gt;&gt;&gt; ブランチB</span></div></div>
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <div class="label">正しい方だけ残して、記号を消す</div>
+        <div class="code"><div class="line">&lt;h1&gt;ようこそ&lt;/h1&gt;</div></div>
+      </div>
+    </div>
+    <p class="note">※上側（<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> と <code>=======</code> の間）が今いるブランチの内容、下側（<code>=======</code> と <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> の間）がマージしようとしたブランチの内容です。</p>
+  </section>
+
+  <!-- ===== SECTION 15 ===== -->
+  <section id="s15">
+    <div class="sec-label">SECTION 15</div>
+    <h2>プルリクエストからマージまで</h2>
+
+    <div class="term">
+      <div><span class="t-name">プルリクエスト</span><span class="t-read">（略して「プルリク」）ってなに？</span></div>
+      <p>自分がした変更を取り込んでもらうよう、<b>提案すること</b>。プルリクエストのゴールは、本流のブランチにマージされることです。</p>
+    </div>
+
+    <div class="ba">
+      <div class="before"><span class="tag">😣 コードレビューがない場合</span><br>個人が書いたコードが、他のメンバーにチェックされることなく、そのまま本流のブランチに適用されてしまっている状態。この状態だと、バグや目的からずれた実装を生みがち。</div>
+      <div class="after"><span class="tag">😊 プルリクエストを使ったコードレビューがある場合</span><br>レビュー担当者が、提案されたコードをチェックし、OKが出たコードだけがマージされる。こうすることで、品質の高いコードを保つことができる。</div>
+    </div>
+
+    <h3 style="margin-top:28px">プルリクエストからマージまでの流れ</h3>
+    <ol class="flow">
+      <li>フォークする<span class="where gh">GitHub</span></li>
+      <li>クローンする<span class="where pc">GitHub → 自分のPC</span></li>
+      <li>作業用のブランチを作ってコミットする<span class="where pc">自分のPC</span></li>
+      <li>プッシュする<span class="where pc">自分のPC → GitHub</span></li>
+      <li>GitHub上でプルリクエストを作成する<span class="where gh">GitHub</span></li>
+      <li>コードがレビューされる<span class="where gh">GitHub</span></li>
+    </ol>
+    <p>これまでに学んだ操作が、すべてこの流れの中でつながっています。レビューでOKが出れば、本流のブランチにマージされてゴールです 🎉</p>
+  </section>
+
+  <!-- ===== SECTION 16 ===== -->
+  <section id="s16">
+    <div class="sec-label">SECTION 16</div>
+    <h2>バージョン管理しなくてもいいファイルを無視しよう</h2>
+    <p>フォルダの中には、記録しておく必要のないファイルもあります。</p>
+    <h3>バージョン管理が必要ないファイル</h3>
+    <ul class="chips">
+      <li>🖥️ OSが自動生成するファイル</li>
+      <li>🗃️ キャッシュ（一時保存データ）</li>
+      <li>🐘 容量が大きすぎるもの など</li>
+    </ul>
+
+    <h3 style="margin-top:24px">除外するファイルの例</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ファイル・ディレクトリ名</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td><code>.DS_Store</code></td><td>macOSが自動で生成</td></tr>
+          <tr><td><code>Thumbs.db</code></td><td>Windows OSが自動で生成</td></tr>
+          <tr><td><code>.sass-cache/</code></td><td>Sassのキャッシュ。管理が必要ないため、除外する</td></tr>
+          <tr><td><code>*.css.map</code></td><td>Sassのソースマップ。Sassの適用箇所をたどるために出力するもの。管理が必要ないため、除外する</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>このような場合、<b>「.gitignore」</b>（ギット・イグノア：ignore＝無視する）というテキストファイルを使うと、Gitで管理しないファイルを指定することができます。</p>
+
+    <h3 style="margin-top:24px">「.gitignore」の書き方</h3>
+    <div class="ignore-grid">
+      <div class="item"><h4>特定のファイルを無視したい</h4><div class="code"><div class="line"><span class="c"># 自分用のメモファイルを無視する</span></div><div class="line">memo.txt</div></div></div>
+      <div class="item"><h4>特定の拡張子を無視したい</h4><div class="code"><div class="line"><span class="c"># .rbcという拡張子がついているファイルが無視される</span></div><div class="line">*.rbc</div></div></div>
+      <div class="item"><h4>特定のファイルを無視しない（例外設定）</h4><div class="code"><div class="line"><span class="c"># 例外として、test.rbcは無視されない</span></div><div class="line">!test.rbc</div></div></div>
+      <div class="item"><h4>特定のディレクトリ以下を無視したい</h4><div class="code"><div class="line"><span class="c"># templates_cというディレクトリ以下が無視される</span></div><div class="line">templates_c/</div></div></div>
+      <div class="item"><h4>ルートディレクトリ直下にあるものを指定したい</h4><div class="code"><div class="line"><span class="c"># ルートディレクトリにあるlogというディレクトリ以下が無視される</span></div><div class="line">/log/</div></div></div>
+      <div class="item"><h4>コメント</h4><div class="code"><div class="line"><span class="c"># 行頭に#を入力するとコメントが書ける</span></div></div></div>
+    </div>
+    <p class="note">※「<code>*</code>」は「なんでもOK」という意味の記号です。「ルートディレクトリ」はリポジトリのいちばん上のフォルダのことです。</p>
+
+    <div class="callout">
+      <p><b>すでにコミットしてしまったファイルを無視する方法</b></p>
+      <ol style="margin:0;padding-left:1.4em">
+        <li>追跡をやめる</li>
+        <li>「.gitignore」に追加する</li>
+      </ol>
+      <p class="note" style="margin-top:8px">※一度記録したファイルは、.gitignoreに書くだけでは無視されません。先にGitの「追跡」から外す必要があります（コマンドでは <code>git rm --cached ファイル名</code>）。</p>
+    </div>
+  </section>
+
+  <!-- ===== まとめ ===== -->
+  <section id="summary">
+    <div class="sec-label">SUMMARY</div>
+    <h2>まとめ</h2>
+    <div class="summary">
+      <div class="card">
+        <h3>コピーとブランチ</h3>
+        <ul class="check">
+          <li><b>フォーク</b>とは、他人が公開しているリモートリポジトリを、自分のアカウントに、クラウド上でコピーする機能</li>
+          <li><b>クローン</b>とは、クラウド上のリモートリポジトリを自分のパソコンの中にダウンロードする機能</li>
+          <li><b>ブランチ</b>とは、ポインタである</li>
+          <li>ポインタとは、簡単に言うと「<b>今ココ！</b>」である</li>
+          <li>ブランチを移動するときは、<b>チェックアウト</b>を使う</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>統合とやり取り</h3>
+        <ul class="check">
+          <li><b>マージ</b>は、ブランチを統合することができる</li>
+          <li>アップロードしたいとき → <b>プッシュ</b></li>
+          <li>ダウンロードしてローカルリポジトリに反映したいとき → <b>プル</b></li>
+          <li><b>コンフリクト</b>した箇所を、Gitが印をつけて教えてくれる</li>
+          <li>エディタで修正してコミットし直す</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== クイズ ===== -->
+  <section id="quiz">
+    <div class="sec-label">CHECK</div>
+    <h2>ミニ理解チェック</h2>
+    <p>答えだと思うものをクリックしてみましょう。</p>
+
+    <div class="card quiz">
+      <div class="q">Q1. GitHub上のリポジトリを、自分のパソコンにダウンロードする操作は？</div>
+      <div class="opts">
+        <button data-ok="0">フォーク</button>
+        <button data-ok="1">クローン</button>
+        <button data-ok="0">マージ</button>
+      </div>
+      <div class="explain" data-answer="「クローン」" data-body="フォークはGitHub上で自分のアカウントにコピーするだけなので、パソコンにはまだありません。"></div>
+    </div>
+
+    <div class="card quiz">
+      <div class="q">Q2. 自分のPCで行った変更を、GitHubに反映したいときは？</div>
+      <div class="opts">
+        <button data-ok="1">プッシュ</button>
+        <button data-ok="0">プル</button>
+        <button data-ok="0">チェックアウト</button>
+      </div>
+      <div class="explain" data-answer="「プッシュ」" data-body="アップロードに近いイメージです。逆にGitHubの変更を受け取るのが「プル」です。"></div>
+    </div>
+
+    <div class="card quiz">
+      <div class="q">Q3. コンフリクトが起きるのはどんなとき？</div>
+      <div class="opts">
+        <button data-ok="0">同じファイルの、違う行を2人が修正したとき</button>
+        <button data-ok="1">同じ行に、同時に別々の修正がなされたとき</button>
+        <button data-ok="0">ブランチを新しく作ったとき</button>
+      </div>
+      <div class="explain" data-answer="「同じ行に、同時に別々の修正がなされたとき」" data-body="同じファイルでも行が違えば、コンフリクトは起きずにそのままマージされます。"></div>
+    </div>
+  </section>
+
+  <!-- ===== 用語 ===== -->
+  <section id="glossary">
+    <div class="sec-label">GLOSSARY</div>
+    <h2>この章の用語ミニ辞典</h2>
+    <div class="card">
+      <dl class="gloss">
+        <dt>リモートリポジトリ</dt><dd>GitHubなど、インターネット上にあるリポジトリ。</dd>
+        <dt>SSH</dt><dd>通信をすべて暗号化する、安全性の高い通信方法。</dd>
+        <dt>公開鍵 / 秘密鍵</dt><dd>SSHで使うペアのファイル。秘密鍵は自分だけが持つ。</dd>
+        <dt>フォーク</dt><dd>他人のリモートリポジトリを、GitHub上で自分のアカウントにコピーすること。</dd>
+        <dt>クローン</dt><dd>リモートリポジトリを自分のパソコンにダウンロードすること。</dd>
+        <dt>ブランチ</dt><dd>作業の流れを枝分かれさせる機能。正体は「今ココ！」を指すポインタ。</dd>
+        <dt>マージ</dt><dd>ブランチを統合（合流）すること。</dd>
+        <dt>プッシュ / プル</dt><dd>プッシュはGitHubへ送る（アップロード）、プルはGitHubから受け取る（ダウンロード）。</dd>
+        <dt>コンフリクト</dt><dd>同じ行が別々に修正され、自動でマージできない状態。</dd>
+        <dt>プルリクエスト</dt><dd>自分の変更を取り込んでもらうよう提案すること。レビューの場にもなる。</dd>
+        <dt>.gitignore</dt><dd>Gitで管理しないファイルを指定するテキストファイル。</dd>
+      </dl>
+    </div>
+  </section>
+
+  <nav class="chapter-nav" aria-label="章の切り替え">
+    <a class="prev" href="CHAPTER2%E3%80%8C%E5%80%8B%E4%BA%BA%E3%81%A7Git%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%88%E3%81%86%E3%80%8D.html"><span class="dir">← 前章</span><span class="ch">CHAPTER 2</span><span class="ttl">個人でGitを使ってみよう</span></a>
+    <a class="next" href="CHAPTER4%E3%80%8C%E5%AE%9F%E7%94%A8Git%EF%BD%9E%E3%81%93%E3%82%93%E3%81%AA%E3%81%A8%E3%81%8D%E3%81%AF%E3%81%A9%E3%81%86%E3%81%99%E3%82%8C%E3%81%B0%E3%81%84%E3%81%84%EF%BC%9F%E3%80%8D.html"><span class="dir">次章 →</span><span class="ch">CHAPTER 4</span><span class="ttl">実用Git〜こんなときはどうすればいい？</span></a>
+  </nav>
+
+</div>
+
+<footer>
+  <div class="wrap">CHAPTER 3「複数人でGitを使ってみよう」 ── 次の章では、実用的な「こんなときはどうすればいい？」を学びます。</div>
+</footer>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function (q) {
+    q.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        q.querySelectorAll('button').forEach(function (x) {
+          x.classList.remove('correct', 'wrong');
+          if (x.dataset.ok === '1') x.classList.add('correct');
+        });
+        if (b.dataset.ok !== '1') b.classList.add('wrong');
+        var ex = q.querySelector('.explain');
+        ex.textContent = (b.dataset.ok === '1' ? '正解！' : '正解は' + ex.dataset.answer + '。') + ex.dataset.body;
+        ex.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>
