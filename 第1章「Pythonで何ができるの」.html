@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pythonで何ができるの？</title>
+<style>
+  :root{
+    --ink:#243b53; --sub:#5b6b7d; --sky:#2b8aef; --sky-bg:#e7f1ff;
+    --grn:#1f9d55; --grn-bg:#e3f7ec;
+    --org:#f5821f; --org-bg:#fff1e0;
+    --pur:#8b5cf6; --pur-bg:#f0eaff;
+    --pink:#e84393; --pink-bg:#fde8f2;
+    --yel:#f2b705; --yel-bg:#fff8db;
+    --line:#d7e0ea; --card:#fff; --page:#f4f8fc; --soft:#fafcff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0 0 60px;
+    font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,sans-serif;
+    color:var(--ink); background:var(--page); line-height:1.9; font-size:17px;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:0 16px;}
+  ruby rt{font-size:.55em; color:#6b7b8d;}
+  b.mark{background:linear-gradient(transparent 60%, #ffe58a 60%);}
+
+  /* ヘッダー */
+  header{
+    background:linear-gradient(135deg,#2b8aef,#8b5cf6);
+    color:#fff; text-align:center; padding:46px 18px 40px; margin-bottom:30px;
+    border-radius:0 0 30px 30px; box-shadow:0 8px 24px rgba(43,138,239,.25);
+  }
+  header .chap{display:inline-block; background:rgba(255,255,255,.2); border-radius:999px; padding:2px 16px; font-size:.9em; margin-bottom:8px;}
+  header h1{font-size:2.1em; margin:0 0 10px; letter-spacing:1px; line-height:1.4;}
+  header p{font-size:1.05em; margin:0; opacity:.95;}
+
+  /* 目次 */
+  nav.toc{background:var(--card); border-radius:20px; padding:18px 22px; box-shadow:0 4px 14px rgba(36,59,83,.07);}
+  nav.toc h2{border:none; padding:0; font-size:1.15em; margin:0 0 8px;}
+  nav.toc ol{margin:0; padding-left:1.4em;}
+  nav.toc a{color:var(--sky); text-decoration:none; font-weight:bold;}
+  nav.toc a:hover{text-decoration:underline;}
+
+  /* セクション */
+  section{background:var(--card); border-radius:20px; padding:26px 24px; margin:22px 0; box-shadow:0 4px 14px rgba(36,59,83,.07);}
+  h2{font-size:1.5em; margin:0 0 16px; padding-left:14px; border-left:8px solid var(--sky); line-height:1.4;}
+  h3{font-size:1.15em; margin:18px 0 8px;}
+  .lead{font-size:1.05em; background:var(--soft); border-radius:12px; padding:12px 16px;}
+
+  /* 吹き出し */
+  .talk{display:flex; gap:12px; align-items:flex-start; margin:14px 0;}
+  .talk .who{flex:0 0 56px; text-align:center; font-size:.75em; color:var(--sub); line-height:1.3;}
+  .talk .who .face{font-size:2.3em; line-height:1.1;}
+  .talk .bubble{position:relative; background:var(--sky-bg); border-radius:16px; padding:10px 16px; flex:1;}
+  .talk.q .bubble{background:var(--org-bg);}
+  .talk .bubble::before{content:""; position:absolute; left:-8px; top:18px; border:8px solid transparent; border-left:0; border-right-color:var(--sky-bg);}
+  .talk.q .bubble::before{border-right-color:var(--org-bg);}
+
+  /* 事実カード */
+  .facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-top:12px;}
+  .fact{border-radius:16px; padding:16px; text-align:center; border:2px solid var(--line); background:var(--soft);}
+  .fact .ico{font-size:2.2em; line-height:1.2;}
+  .fact .k{font-weight:bold; font-size:1.05em; margin:6px 0 4px;}
+  .fact .v{font-size:.95em; color:var(--sub);}
+
+  /* 企業タグ */
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;}
+  .tag{background:var(--pur-bg); color:var(--pur); border-radius:999px; padding:4px 14px; font-weight:bold; font-size:.92em;}
+  .tag.svc{background:var(--grn-bg); color:var(--grn);}
+  .tag.robo{background:var(--org-bg); color:var(--org);}
+
+  /* 特長 */
+  .feature{border-radius:18px; padding:20px 20px 14px; margin:18px 0; border:2px solid;}
+  .feature.f1{background:var(--sky-bg); border-color:var(--sky);}
+  .feature.f2{background:var(--grn-bg); border-color:var(--grn);}
+  .feature.f3{background:var(--pur-bg); border-color:var(--pur);}
+  .feature .num{display:inline-flex; width:38px; height:38px; border-radius:50%; color:#fff; font-weight:bold; align-items:center; justify-content:center; font-size:1.2em; margin-right:8px; vertical-align:middle;}
+  .f1 .num{background:var(--sky);} .f2 .num{background:var(--grn);} .f3 .num{background:var(--pur);}
+  .feature h3{margin:0 0 10px; font-size:1.3em;}
+  .orig{background:#fff; border-radius:12px; padding:10px 14px; margin:10px 0; border-left:5px solid var(--line);}
+  .orig ul{margin:0; padding-left:1.2em;}
+  .figure{background:#fff; border-radius:14px; padding:14px; margin:12px 0; text-align:center;}
+  .figure svg{max-width:100%; height:auto;}
+  .figure .cap{font-size:.9em; color:var(--sub); margin-top:6px;}
+
+  /* コード */
+  pre.code{background:#1e293b; color:#e2e8f0; border-radius:12px; padding:14px 16px; overflow-x:auto; font-family:Consolas,"Courier New",monospace; font-size:.95em; line-height:1.7; text-align:left; margin:8px 0;}
+  pre.code .c{color:#94a3b8;} pre.code .ind{background:#ffd43b; border-radius:3px;}
+
+  /* 比較表 */
+  .vs{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px;}
+  .vs .col{flex:1 1 260px; background:#fff; border-radius:16px; padding:16px; border:2px dashed var(--line);}
+  .vs .col h4{margin:0 0 6px; font-size:1.1em;}
+  .vs .good{color:var(--grn); font-weight:bold;} .vs .bad{color:var(--pink); font-weight:bold;}
+
+  /* ポイント・コラム */
+  .point{background:var(--yel-bg); border-radius:14px; padding:12px 16px; margin:12px 0; border:2px solid #f6d860;}
+  .point::before{content:"💡 ポイント"; display:block; font-weight:bold; color:#b38600; margin-bottom:2px;}
+
+  /* 用語 */
+  dl.words{margin:0;}
+  dl.words dt{font-weight:bold; color:var(--sky); margin-top:12px;}
+  dl.words dd{margin:2px 0 0 0; padding-left:14px; border-left:3px solid var(--sky-bg);}
+
+  /* クイズ */
+  .quiz{border:2px solid var(--line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--soft);}
+  .quiz .qq{font-weight:bold;}
+  .quiz .opts{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+  .quiz button{font:inherit; font-size:.95em; cursor:pointer; border:2px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:6px 16px;}
+  .quiz button:hover{border-color:var(--sky);}
+  .quiz button.ok{background:var(--grn-bg); border-color:var(--grn); color:var(--grn); font-weight:bold;}
+  .quiz button.ng{background:var(--pink-bg); border-color:var(--pink); color:var(--pink);}
+  .quiz .ans{margin-top:8px; min-height:1.5em; font-size:.95em;}
+
+  .summary li{margin:6px 0;}
+  footer{text-align:center; color:var(--sub); font-size:.9em; margin-top:30px;}
+
+  @media (max-width:600px){
+    body{font-size:16px;}
+    header h1{font-size:1.6em;}
+    section{padding:20px 16px;}
+    .talk .who{flex-basis:46px;}
+  }
+
+  /* ダークモード */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e3ebf5; --sub:#9fb0c2; --sky-bg:#1c2c44; --grn-bg:#173326; --org-bg:#3a2a17;
+      --pur-bg:#2a2147; --pink-bg:#3d1c2c; --yel-bg:#3a3214; --line:#33465c;
+      --card:#18222f; --page:#0f1722; --soft:#1d2938;
+    }
+    :root:not([data-theme="light"]) .orig,
+    :root:not([data-theme="light"]) .figure,
+    :root:not([data-theme="light"]) .vs .col,
+    :root:not([data-theme="light"]) .quiz button{background:var(--soft);}
+    :root:not([data-theme="light"]) b.mark{background:linear-gradient(transparent 60%, #7a5d00 60%);}
+    :root:not([data-theme="light"]) .point{border-color:#7a6510;}
+    :root:not([data-theme="light"]) .figure svg .bg{fill:#1d2938;}
+    :root:not([data-theme="light"]) .figure svg text{fill:#e3ebf5;}
+  }
+
+  /* コメント位置そろえ */
+  pre.code .rows{display:table;}
+  pre.code .row{display:table-row;}
+  pre.code .cd, pre.code .cm{display:table-cell; white-space:pre;}
+  pre.code .cm{padding-left:2.5em;}
+
+  /* 前章・次章ボタン */
+  nav.chapnav{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:28px 0 8px;}
+  nav.chapnav a{flex:1 1 260px; max-width:420px; display:block; background:var(--card); border:2px solid var(--sky); border-radius:16px; padding:12px 18px; color:var(--ink); text-decoration:none; box-shadow:0 4px 14px rgba(36,59,83,.07); transition:background .15s, transform .15s; line-height:1.5;}
+  nav.chapnav a:hover{background:var(--sky-bg); transform:translateY(-2px);}
+  nav.chapnav a small{display:block; color:var(--sky); font-weight:bold; font-size:.85em;}
+  nav.chapnav a b{font-size:.98em;}
+  nav.chapnav a.next{margin-left:auto; text-align:right;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="chap">第1章</div>
+  <h1>🐍 Pythonで何ができるの？</h1>
+  <p>プログラミングをまったく知らなくても大丈夫。<br>まずは「Pythonってどんなもの？」をのぞいてみよう！</p>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>📖 この章でわかること</h2>
+  <ol>
+    <li><a href="#before">そもそも「プログラミング言語」って？</a></li>
+    <li><a href="#what">Pythonとは</a></li>
+    <li><a href="#features">Pythonの3つの特長</a></li>
+    <li><a href="#name">名前の由来</a></li>
+    <li><a href="#words">ことばのミニ辞典</a>／<a href="#quiz">かくにんクイズ</a></li>
+  </ol>
+</nav>
+
+<!-- 0. 前提 -->
+<section id="before">
+  <h2><span>🧭</span> そもそも「プログラミング言語」って？</h2>
+  <div class="talk q">
+    <div class="who"><div class="face">🙋</div>はじめて<br>さん</div>
+    <div class="bubble">「Python」って聞いたことはあるけど、そもそもプログラミング言語って何ですか？</div>
+  </div>
+  <div class="talk">
+    <div class="who"><div class="face">👩‍🏫</div>先生</div>
+    <div class="bubble">コンピューターは、人間の言葉（日本語や英語）をそのままでは理解できません。そこで、<b class="mark">コンピューターに「これをやってね」とお願いするための専用の言葉</b>が作られました。それが<b>プログラミング言語</b>です。そして、その言葉で書いた「お願いの手順書」を<b>プログラム</b>と呼びます。</div>
+  </div>
+  <div class="figure">
+    <svg viewBox="0 0 640 150" width="640" role="img" aria-label="人がプログラミング言語でコンピューターにお願いする図">
+      <rect class="bg" x="0" y="0" width="640" height="150" rx="14" fill="#fafcff"/>
+      <text x="80" y="70" font-size="48" text-anchor="middle">🧑</text>
+      <text x="80" y="115" font-size="15" text-anchor="middle" fill="#243b53">あなた</text>
+      <rect x="190" y="40" width="260" height="60" rx="14" fill="#e7f1ff" stroke="#2b8aef" stroke-width="2"/>
+      <text x="320" y="68" font-size="16" text-anchor="middle" fill="#243b53" font-weight="bold">プログラミング言語</text>
+      <text x="320" y="90" font-size="14" text-anchor="middle" fill="#2b8aef">（例：Python）で書いたお願い</text>
+      <line x1="125" y1="70" x2="185" y2="70" stroke="#9fb0c2" stroke-width="3" marker-end="url(#ar)"/>
+      <line x1="455" y1="70" x2="515" y2="70" stroke="#9fb0c2" stroke-width="3" marker-end="url(#ar)"/>
+      <text x="565" y="70" font-size="48" text-anchor="middle">💻</text>
+      <text x="565" y="115" font-size="15" text-anchor="middle" fill="#243b53">コンピューター</text>
+      <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9fb0c2"/></marker></defs>
+    </svg>
+    <div class="cap">人間 → プログラミング言語 → コンピューター。言語は「通訳さん」のような役目です。</div>
+  </div>
+  <p class="lead">プログラミング言語には、Python・C・Java などたくさんの種類があります。日本語・英語・フランス語…と人間の言葉がたくさんあるのと同じですね。この章では、その中の<b>Python</b>を紹介します。</p>
+</section>
+
+<!-- 1. Pythonとは -->
+<section id="what">
+  <h2><span>🐍</span> Pythonとは</h2>
+  <div class="facts">
+    <div class="fact"><div class="ico">🗓️</div><div class="k">誕生</div><div class="v">今から20年以上前に生まれたプログラミング言語</div></div>
+    <div class="fact"><div class="ico">🇳🇱</div><div class="k">作った人</div><div class="v">オランダの<br>グイド・ヴァンロッサムさん</div></div>
+    <div class="fact"><div class="ico">🤖</div><div class="k">人気の理由</div><div class="v">人工知能（機械学習）やビッグデータの解析などの研究によく使われている</div></div>
+  </div>
+
+  <h3>🔍 むずかしい言葉をかみくだくと…</h3>
+  <ul>
+    <li><b>人工知能（AI）</b>：人間のように「考える・判断する」ことをコンピューターにやらせる技術。</li>
+    <li><b>機械学習</b>：たくさんの例をコンピューターに見せて、自分でルールを覚えさせる方法。人工知能を作るための代表的なやり方です。</li>
+    <li><b>ビッグデータの解析</b>：人間では数えきれないほど大量のデータ（例：何百万人分の買い物記録）から、役に立つ傾向を見つけ出すこと。</li>
+  </ul>
+
+  <h3>🏢 実はこんなところで使われています</h3>
+  <p>大企業での利用</p>
+  <div class="tags"><span class="tag">Google</span><span class="tag">YouTube</span><span class="tag">ピクサー</span></div>
+  <p>Pythonで作られたWebサービス</p>
+  <div class="tags"><span class="tag svc">Instagram</span><span class="tag svc">Pinterest</span><span class="tag svc">Dropbox</span></div>
+  <p>ロボット</p>
+  <div class="tags"><span class="tag robo">Pepper の人工知能部分</span></div>
+
+  <div class="point">ふだん何気なく使っているアプリやサービスの「裏側」で、Pythonはこっそり活躍しています。</div>
+</section>
+
+<!-- 2. 特長 -->
+<section id="features">
+  <h2><span>✨</span> Pythonの3つの特長</h2>
+  <p class="lead">Pythonが人気なのには理由があります。大きく分けると次の3つです。</p>
+
+  <!-- 特長1 -->
+  <div class="feature f1">
+    <h3><span class="num">1</span>シンプルなプログラム</h3>
+    <div class="orig"><ul>
+      <li>プログラムの「処理のまとまり」を「インデント（字下げ）」を使って書く決まりのおかげで、誰が書いても読みやすいプログラムになる</li>
+    </ul></div>
+    <p><b>インデント（字下げ）</b>とは、行のはじめに空白を入れて文字を右にずらすこと。箇条書きのノートで、小見出しの中身を少し右にずらして書くのと同じです。</p>
+    <div class="figure">
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="c"># もし雨が降っていたら…</span></span></span><span class="row"><span class="cd">if 雨が降っている:</span></span><span class="row"><span class="cd"><span class="ind">    </span>傘を持つ</span><span class="cm"><span class="c"># ← 右にずらした行は「もし〜なら」の中身</span></span></span><span class="row"><span class="cd"><span class="ind">    </span>長ぐつをはく</span></span><span class="row"><span class="cd">出かける</span><span class="cm"><span class="c"># ← ずらしていない行は、雨でも晴れでも実行</span></span></span></span></pre>
+      <div class="cap">黄色い部分がインデント。<b>「どこからどこまでが1つのまとまりか」が見た目でひと目でわかります。</b><br>（説明のため日本語で書いた「イメージ」です。実際のPythonは英語の単語を使います）</div>
+    </div>
+    <p>Pythonでは、このずらし方が<b>ルールとして決まっている</b>ので、Aさんが書いても、Bさんが書いても、同じような整った形になります。だから<b class="mark">他の人が書いたプログラムでも読みやすい</b>のです。</p>
+  </div>
+
+  <!-- 特長2 -->
+  <div class="feature f2">
+    <h3><span class="num">2</span>ライブラリが豊富</h3>
+    <div class="orig"><ul>
+      <li>Pythonには強力な標準ライブラリが付属しているため、Pythonだけで様々なことができることから、「Pythonには、バッテリーが付属している（batteries included）」ともいわれる</li>
+      <li>外部のライブラリも充実しており、高速な数値計算や画像処理、機械学習のライブラリなどが様々あるため、人工知能などによく使われている</li>
+    </ul></div>
+    <p><b>ライブラリ</b>とは、<b class="mark">よく使う便利な機能を、誰かがあらかじめ作ってまとめておいてくれた「道具箱」</b>のことです。自分でゼロから作らなくても、道具箱から取り出すだけで使えます。</p>
+
+    <div class="vs">
+      <div class="col">
+        <h4>🔋 標準ライブラリ</h4>
+        <p>Pythonを入れると<b>最初から付いてくる</b>道具箱。<br>「電池付きのおもちゃ」のように、買ってすぐ遊べる！ これが <i>batteries included</i>（バッテリー付属）と呼ばれる理由です。</p>
+      </div>
+      <div class="col">
+        <h4>🧰 外部ライブラリ</h4>
+        <p>世界中の人が作って公開している、<b>あとから追加できる</b>道具箱。<br>例：高速な数値計算／画像処理／機械学習　など</p>
+      </div>
+    </div>
+    <div class="point">機械学習用の道具箱がそろっているから、人工知能を作るときにPythonがよく選ばれるんですね。</div>
+  </div>
+
+  <!-- 特長3 -->
+  <div class="feature f3">
+    <h3><span class="num">3</span>試行錯誤がやりやすい</h3>
+    <div class="orig"><ul>
+      <li>Pythonはプログラムを書いたらすぐに実行できる「インタープリタ言語」</li>
+      <li>試行錯誤がやりやすい言語なため、初心者にも、新しいものを生み出す開発者にも向いている</li>
+      <li>これに対して、CやJavaなどは「コンパイラ言語」といい、プログラムを実行ファイルに変更するため手間がかかるが、その分実行時の速度が速いという利点がある</li>
+    </ul></div>
+    <p><b>試行錯誤</b>とは「ちょっと試す → 結果を見る → 直す」をくり返すこと。これがすぐにできるかどうかは、プログラムの<b>動かし方の違い</b>で決まります。</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 260" width="640" role="img" aria-label="インタープリタ言語とコンパイラ言語の比較図">
+        <rect class="bg" x="0" y="0" width="640" height="260" rx="14" fill="#fafcff"/>
+        <defs><marker id="ar2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9fb0c2"/></marker></defs>
+        <!-- インタープリタ -->
+        <text x="20" y="34" font-size="16" font-weight="bold" fill="#8b5cf6">インタープリタ言語（Python）</text>
+        <rect x="20" y="50" width="150" height="56" rx="12" fill="#f0eaff" stroke="#8b5cf6" stroke-width="2"/>
+        <text x="95" y="84" font-size="15" text-anchor="middle" fill="#243b53">📝 書く</text>
+        <line x1="175" y1="78" x2="245" y2="78" stroke="#9fb0c2" stroke-width="3" marker-end="url(#ar2)"/>
+        <text x="210" y="54" font-size="12" text-anchor="middle" fill="#1f9d55">すぐ！</text>
+        <rect x="250" y="50" width="150" height="56" rx="12" fill="#e3f7ec" stroke="#1f9d55" stroke-width="2"/>
+        <text x="325" y="84" font-size="15" text-anchor="middle" fill="#243b53">▶️ 実行</text>
+        <text x="420" y="84" font-size="14" fill="#243b53">→ 結果を見てすぐ直せる</text>
+        <!-- コンパイラ -->
+        <text x="20" y="160" font-size="16" font-weight="bold" fill="#f5821f">コンパイラ言語（C・Java など）</text>
+        <rect x="20" y="176" width="130" height="56" rx="12" fill="#f0eaff" stroke="#8b5cf6" stroke-width="2"/>
+        <text x="85" y="210" font-size="15" text-anchor="middle" fill="#243b53">📝 書く</text>
+        <line x1="155" y1="204" x2="195" y2="204" stroke="#9fb0c2" stroke-width="3" marker-end="url(#ar2)"/>
+        <rect x="200" y="176" width="200" height="56" rx="12" fill="#fff1e0" stroke="#f5821f" stroke-width="2"/>
+        <text x="300" y="200" font-size="14" text-anchor="middle" fill="#243b53">🔧 実行ファイルに</text>
+        <text x="300" y="220" font-size="14" text-anchor="middle" fill="#243b53">変換（ひと手間）</text>
+        <line x1="405" y1="204" x2="445" y2="204" stroke="#9fb0c2" stroke-width="3" marker-end="url(#ar2)"/>
+        <rect x="450" y="176" width="170" height="56" rx="12" fill="#e3f7ec" stroke="#1f9d55" stroke-width="2"/>
+        <text x="535" y="200" font-size="15" text-anchor="middle" fill="#243b53">🚀 実行</text>
+        <text x="535" y="220" font-size="12" text-anchor="middle" fill="#1f9d55">動きはとても速い</text>
+      </svg>
+      <div class="cap">Pythonは「書いたらすぐ実行」。C や Java は「変換してから実行」。</div>
+    </div>
+
+    <div class="vs">
+      <div class="col">
+        <h4>🗣️ インタープリタ言語（Python）</h4>
+        <p>たとえるなら<b>同時通訳</b>。話したそばから訳してくれるので、すぐ伝わる。</p>
+        <p><span class="good">◎</span> 書いたらすぐ動かせる → 試行錯誤がしやすい</p>
+      </div>
+      <div class="col">
+        <h4>📚 コンパイラ言語（C・Java など）</h4>
+        <p>たとえるなら<b>翻訳本</b>。先に全部を訳して本にするので手間はかかるけど、できあがった本はスラスラ読める。</p>
+        <p><span class="bad">△</span> 実行前に変換の手間がかかる<br><span class="good">◎</span> その分、実行時の速度が速い</p>
+      </div>
+    </div>
+    <div class="point">すぐ試せるPythonは、<b>はじめてプログラミングを学ぶ人</b>にも、<b>新しいものを生み出す開発者</b>にも向いています。</div>
+  </div>
+</section>
+
+<!-- 3. 名前の由来 -->
+<section id="name">
+  <h2><span>🎬</span> 名前の由来</h2>
+  <div class="talk q">
+    <div class="who"><div class="face">🙋</div>はじめて<br>さん</div>
+    <div class="bubble">「パイソン」って、なんだか強そうな名前ですね。どうしてこの名前なんですか？</div>
+  </div>
+  <div class="talk">
+    <div class="who"><div class="face">👩‍🏫</div>先生</div>
+    <div class="bubble">Pythonの作者が<b>「空飛ぶモンティ・パイソン」</b>という、イギリスのコメディ番組のファンだったため、Pythonと名づけられました。</div>
+  </div>
+  <div class="talk">
+    <div class="who"><div class="face">👩‍🏫</div>先生</div>
+    <div class="bubble">そして「パイソン（python）」には英語で<b>ニシキヘビ</b>という意味があるので、Pythonのアイコンやマスコットには<b>ニシキヘビ 🐍</b> の絵が使われているんですよ。</div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="ico">📺</div><div class="k">由来</div><div class="v">コメディ番組<br>「空飛ぶモンティ・パイソン」</div></div>
+    <div class="fact"><div class="ico">🐍</div><div class="k">マーク</div><div class="v">python ＝ ニシキヘビ<br>だからヘビの絵</div></div>
+  </div>
+</section>
+
+<!-- 4. 用語 -->
+<section id="words">
+  <h2><span>📘</span> ことばのミニ辞典</h2>
+  <dl class="words">
+    <dt>プログラミング言語</dt><dd>コンピューターにお願いをするための専用の言葉。</dd>
+    <dt>プログラム</dt><dd>プログラミング言語で書いた「お願いの手順書」。</dd>
+    <dt>インデント（字下げ）</dt><dd>行のはじめに空白を入れて右にずらすこと。Pythonでは「処理のまとまり」を表す大切なルール。</dd>
+    <dt>ライブラリ</dt><dd>便利な機能をまとめた道具箱。最初から付いてくる「標準ライブラリ」と、あとから追加する「外部ライブラリ」がある。</dd>
+    <dt>インタープリタ言語</dt><dd>書いたプログラムをすぐに実行できる言語。例：Python。</dd>
+    <dt>コンパイラ言語</dt><dd>プログラムを一度「実行ファイル」に変換してから動かす言語。手間はかかるが実行は速い。例：C、Java。</dd>
+  </dl>
+</section>
+
+<!-- 5. クイズ -->
+<section id="quiz">
+  <h2><span>✅</span> かくにんクイズ</h2>
+  <p class="lead">ボタンを押して答えてみよう！</p>
+
+  <div class="quiz" data-ok="1">
+    <div class="qq">Q1. Pythonを作ったのはどこの国の人？</div>
+    <div class="opts"><button>アメリカ</button><button>オランダ</button><button>イギリス</button></div>
+    <div class="ans" data-exp="グイド・ヴァンロッサムさんはオランダの人です。"></div>
+  </div>
+  <div class="quiz" data-ok="0">
+    <div class="qq">Q2. Pythonで「処理のまとまり」を表すのに使うものは？</div>
+    <div class="opts"><button>インデント（字下げ）</button><button>色</button><button>文字の大きさ</button></div>
+    <div class="ans" data-exp="インデントのルールのおかげで、誰が書いても読みやすくなります。"></div>
+  </div>
+  <div class="quiz" data-ok="2">
+    <div class="qq">Q3.「batteries included（バッテリーが付属している）」とは、何が付いていることをたとえた言葉？</div>
+    <div class="opts"><button>充電器</button><button>コンパイラ</button><button>強力な標準ライブラリ</button></div>
+    <div class="ans" data-exp="最初から便利な道具箱が付いているので、Pythonだけで様々なことができます。"></div>
+  </div>
+  <div class="quiz" data-ok="1">
+    <div class="qq">Q4. Pythonは次のうちどちら？</div>
+    <div class="opts"><button>コンパイラ言語</button><button>インタープリタ言語</button></div>
+    <div class="ans" data-exp="書いたらすぐに実行できるので、試行錯誤がしやすいです。"></div>
+  </div>
+  <div class="quiz" data-ok="0">
+    <div class="qq">Q5. 「Python」という名前の由来は？</div>
+    <div class="opts"><button>イギリスのコメディ番組</button><button>作者のペットのヘビ</button><button>有名な数学者の名前</button></div>
+    <div class="ans" data-exp="作者が「空飛ぶモンティ・パイソン」のファンだったからです。"></div>
+  </div>
+</section>
+
+<!-- まとめ -->
+<section>
+  <h2><span>🎯</span> この章のまとめ</h2>
+  <ul class="summary">
+    <li>🐍 Pythonは、オランダのグイド・ヴァンロッサムさんが作った、20年以上の歴史があるプログラミング言語。</li>
+    <li>🤖 人工知能（機械学習）やビッグデータ解析で大人気。Google・YouTube・Instagram なども使っている。</li>
+    <li>✨ 特長は <b>①シンプルで読みやすい</b>／<b>②ライブラリ（道具箱）が豊富</b>／<b>③すぐ試せる</b> の3つ。</li>
+    <li>🎬 名前はコメディ番組「空飛ぶモンティ・パイソン」から。マークはニシキヘビ。</li>
+  </ul>
+  <div class="point">次の章では、実際にPythonを触ってみます。お楽しみに！</div>
+</section>
+
+<nav class="chapnav" aria-label="章の切り替え">
+  <a class="next" href="第2章「Pythonを触ってみよう」.html"><small>次の章 ▶</small><b>第2章「Pythonを触ってみよう」</b></a>
+</nav>
+
+<footer>第1章「Pythonで何ができるの？」</footer>
+</div>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function(q){
+    var ok = Number(q.dataset.ok);
+    var btns = q.querySelectorAll('button');
+    var ans = q.querySelector('.ans');
+    btns.forEach(function(b, i){
+      b.addEventListener('click', function(){
+        btns.forEach(function(x){ x.classList.remove('ok','ng'); });
+        if(i === ok){
+          b.classList.add('ok');
+          ans.textContent = '⭕ 正解！ ' + ans.dataset.exp;
+        }else{
+          b.classList.add('ng');
+          ans.textContent = '❌ ざんねん、もう一度考えてみよう。';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

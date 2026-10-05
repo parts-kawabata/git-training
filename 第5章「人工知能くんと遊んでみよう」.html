@@ -260,6 +260,14 @@
   .results.result{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px; background:var(--soft); border:2px solid var(--line); border-radius:0 14px 14px 14px; padding:10px; margin-bottom:12px;}
   .results.result figure.shot{margin:0; border:none; padding:6px;}
   .results.result figure.shot img{width:100%;}
+
+  /* 前章・次章ボタン */
+  nav.chapnav{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:28px 0 8px;}
+  nav.chapnav a{flex:1 1 260px; max-width:420px; display:block; background:var(--card); border:2px solid var(--sky); border-radius:16px; padding:12px 18px; color:var(--ink); text-decoration:none; box-shadow:0 4px 14px rgba(36,59,83,.07); transition:background .15s, transform .15s; line-height:1.5;}
+  nav.chapnav a:hover{background:var(--sky-bg); transform:translateY(-2px);}
+  nav.chapnav a small{display:block; color:var(--sky); font-weight:bold; font-size:.85em;}
+  nav.chapnav a b{font-size:.98em;}
+  nav.chapnav a.next{margin-left:auto; text-align:right;}
 </style>
 </head>
 <body>
@@ -636,6 +644,10 @@
   </ul>
   <div class="point">第1章から第5章まで、おつかれさまでした！ Pythonで「何ができるのか」を、実際に手を動かして体験できましたね。</div>
 </section>
+
+<nav class="chapnav" aria-label="章の切り替え">
+  <a class="prev" href="第4章「アプリを作ってみよう」.html"><small>◀ 前の章</small><b>第4章「アプリを作ってみよう」</b></a>
+</nav>
 
 <footer>第5章「人工知能くんと遊んでみよう」</footer>
 </div>

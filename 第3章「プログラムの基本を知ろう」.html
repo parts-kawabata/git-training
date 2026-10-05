@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プログラムの基本を知ろう</title>
+<style>
+  :root{
+    --ink:#243b53; --sub:#5b6b7d; --sky:#2b8aef; --sky-bg:#e7f1ff;
+    --grn:#1f9d55; --grn-bg:#e3f7ec;
+    --org:#f5821f; --org-bg:#fff1e0;
+    --pur:#8b5cf6; --pur-bg:#f0eaff;
+    --pink:#e84393; --pink-bg:#fde8f2;
+    --yel:#f2b705; --yel-bg:#fff8db;
+    --line:#d7e0ea; --card:#fff; --page:#f4f8fc; --soft:#fafcff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0 0 60px;
+    font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,sans-serif;
+    color:var(--ink); background:var(--page); line-height:1.9; font-size:17px;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:0 16px;}
+  b.mark{background:linear-gradient(transparent 60%, #ffe58a 60%);}
+  code.in{font-family:Consolas,"Courier New",monospace; background:var(--sky-bg); color:var(--sky); border-radius:6px; padding:1px 6px; font-size:.92em; white-space:nowrap;}
+
+  /* ヘッダー */
+  header{
+    background:linear-gradient(135deg,#2b8aef,#8b5cf6);
+    color:#fff; text-align:center; padding:46px 18px 40px; margin-bottom:30px;
+    border-radius:0 0 30px 30px; box-shadow:0 8px 24px rgba(43,138,239,.25);
+  }
+  header .chap{display:inline-block; background:rgba(255,255,255,.2); border-radius:999px; padding:2px 16px; font-size:.9em; margin-bottom:8px;}
+  header h1{font-size:2.1em; margin:0 0 10px; letter-spacing:1px; line-height:1.4;}
+  header p{font-size:1.05em; margin:0; opacity:.95;}
+
+  /* 目次 */
+  nav.toc{background:var(--card); border-radius:20px; padding:18px 22px; box-shadow:0 4px 14px rgba(36,59,83,.07);}
+  nav.toc h2{border:none; padding:0; font-size:1.15em; margin:0 0 8px;}
+  nav.toc ol{margin:0; padding-left:1.4em;}
+  nav.toc a{color:var(--sky); text-decoration:none; font-weight:bold;}
+  nav.toc a:hover{text-decoration:underline;}
+
+  /* セクション */
+  section{background:var(--card); border-radius:20px; padding:26px 24px; margin:22px 0; box-shadow:0 4px 14px rgba(36,59,83,.07);}
+  h2{font-size:1.5em; margin:0 0 16px; padding-left:14px; border-left:8px solid var(--sky); line-height:1.4;}
+  h2 .ls{display:inline-block; font-size:.6em; background:var(--sky); color:#fff; border-radius:999px; padding:0 12px; vertical-align:middle; margin-right:8px; letter-spacing:1px;}
+  h3{font-size:1.2em; margin:26px 0 10px; padding-bottom:4px; border-bottom:2px dashed var(--line);}
+  .lead{font-size:1.05em; background:var(--soft); border-radius:12px; padding:12px 16px;}
+
+  /* 吹き出し */
+  .talk{display:flex; gap:12px; align-items:flex-start; margin:14px 0;}
+  .talk .who{flex:0 0 56px; text-align:center; font-size:.75em; color:var(--sub); line-height:1.3;}
+  .talk .who .face{font-size:2.3em; line-height:1.1;}
+  .talk .bubble{position:relative; background:var(--sky-bg); border-radius:16px; padding:10px 16px; flex:1;}
+  .talk.q .bubble{background:var(--org-bg);}
+  .talk .bubble::before{content:""; position:absolute; left:-8px; top:18px; border:8px solid transparent; border-left:0; border-right-color:var(--sky-bg);}
+  .talk.q .bubble::before{border-right-color:var(--org-bg);}
+
+  /* 原文ボックス */
+  .orig{background:var(--soft); border-radius:12px; padding:10px 14px; margin:10px 0; border-left:5px solid var(--line);}
+  .orig ul{margin:0; padding-left:1.2em;}
+
+  /* コード */
+  .label{display:inline-block; font-size:.8em; font-weight:bold; border-radius:8px 8px 0 0; padding:2px 12px; margin-top:8px;}
+  .label.prog{background:#1e293b; color:#cbd5e1;}
+  .label.out{background:#dfe7f0; color:#41556b;}
+  pre.code{background:#1e293b; color:#e2e8f0; border-radius:0 12px 12px 12px; padding:14px 16px; overflow-x:auto; font-family:Consolas,"Courier New",monospace; font-size:.95em; line-height:1.7; margin:0 0 10px;}
+  pre.code .c{color:#94a3b8;} pre.code .ind{background:#ffd43b; border-radius:3px;}
+  pre.code .s{color:#86efac;} pre.code .k{color:#c4b5fd;}
+  pre.out{background:#fff; color:#1d4ed8; border:2px solid #dfe7f0; border-radius:0 12px 12px 12px; padding:12px 16px; overflow-x:auto; font-family:Consolas,"Courier New",monospace; font-size:.95em; line-height:1.7; margin:0 0 10px;}
+  pre.out .err{color:#dc2626;}
+
+  /* 1行ずつの実行表 */
+  table{border-collapse:collapse; width:100%; margin:10px 0; font-size:.97em;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--sky-bg);}
+  td code{font-family:Consolas,"Courier New",monospace; white-space:nowrap;}
+  td.res{font-family:Consolas,"Courier New",monospace; color:#1d4ed8; font-weight:bold;}
+  td.res.err{color:#dc2626;}
+  .tbl{overflow-x:auto;}
+  .sym{font-family:Consolas,"Courier New",monospace; font-weight:bold; font-size:1.2em; text-align:center; color:var(--pur);}
+
+  /* 手順 */
+  ol.steps{list-style:none; padding:0; margin:10px 0; counter-reset:st;}
+  ol.steps > li{counter-increment:st; position:relative; padding:8px 0 8px 46px; border-bottom:1px dashed var(--line);}
+  ol.steps > li:last-child{border-bottom:none;}
+  ol.steps > li::before{content:counter(st); position:absolute; left:0; top:8px; width:32px; height:32px; border-radius:50%; background:var(--grn); color:#fff; font-weight:bold; display:flex; align-items:center; justify-content:center;}
+  .menu{display:inline-block; background:var(--soft); border:1px solid var(--line); border-radius:6px; padding:0 8px; font-size:.92em; font-weight:bold;}
+
+  /* スクリーンショット */
+  figure.shot{margin:12px 0; background:var(--soft); border:2px solid var(--line); border-radius:14px; padding:12px; text-align:center;}
+  figure.shot img{max-width:100%; height:auto; border-radius:6px; background:#fff;}
+  figure.shot figcaption{font-size:.88em; color:var(--sub); margin-top:6px;}
+
+  /* 説明カード */
+  .explain{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:12px 0;}
+  .explain .ex{border-radius:14px; padding:12px 14px; background:var(--pur-bg);}
+  .explain .ex .t{font-family:Consolas,"Courier New",monospace; font-weight:bold; color:var(--pur);}
+
+  /* 図 */
+  .figure{background:var(--soft); border-radius:14px; padding:14px; margin:12px 0; text-align:center;}
+  .figure svg{max-width:100%; height:auto;}
+  .figure .cap{font-size:.9em; color:var(--sub); margin-top:6px;}
+
+  /* 角度カード */
+  .angles{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:12px 0;}
+  .angle{border:2px solid var(--line); border-radius:16px; padding:12px; text-align:center; background:var(--soft);}
+  .angle svg{width:120px; height:120px;}
+  .angle .k{font-weight:bold; font-size:1.05em;}
+  .angle .v{font-size:.92em; color:var(--sub);}
+
+  /* ポイント・注意 */
+  .point{background:var(--yel-bg); border-radius:14px; padding:12px 16px; margin:12px 0; border:2px solid #f6d860;}
+  .point::before{content:"💡 ポイント"; display:block; font-weight:bold; color:#b38600; margin-bottom:2px;}
+  .warn{background:var(--pink-bg); border-radius:14px; padding:12px 16px; margin:12px 0; border:2px solid #f5a3c7;}
+  .warn::before{content:"⚠️ 注意"; display:block; font-weight:bold; color:var(--pink); margin-bottom:2px;}
+
+  /* 用語 */
+  dl.words{margin:0;}
+  dl.words dt{font-weight:bold; color:var(--sky); margin-top:12px; font-family:Consolas,"Segoe UI",Meiryo,sans-serif;}
+  dl.words dd{margin:2px 0 0 0; padding-left:14px; border-left:3px solid var(--sky-bg);}
+
+  /* クイズ */
+  .quiz{border:2px solid var(--line); border-radius:14px; padding:14px 16px; margin:12px 0; background:var(--soft);}
+  .quiz .qq{font-weight:bold;}
+  .quiz .opts{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+  .quiz button{font:inherit; font-size:.95em; cursor:pointer; border:2px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:6px 16px;}
+  .quiz button:hover{border-color:var(--sky);}
+  .quiz button.ok{background:var(--grn-bg); border-color:var(--grn); color:var(--grn); font-weight:bold;}
+  .quiz button.ng{background:var(--pink-bg); border-color:var(--pink); color:var(--pink);}
+  .quiz .ans{margin-top:8px; min-height:1.5em; font-size:.95em;}
+
+  .summary li{margin:6px 0;}
+  footer{text-align:center; color:var(--sub); font-size:.9em; margin-top:30px;}
+
+  @media (max-width:600px){
+    body{font-size:16px;}
+    header h1{font-size:1.6em;}
+    section{padding:20px 16px;}
+    .talk .who{flex-basis:46px;}
+  }
+
+  /* ダークモード */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#e3ebf5; --sub:#9fb0c2; --sky-bg:#1c2c44; --grn-bg:#173326; --org-bg:#3a2a17;
+      --pur-bg:#2a2147; --pink-bg:#3d1c2c; --yel-bg:#3a3214; --line:#33465c;
+      --card:#18222f; --page:#0f1722; --soft:#1d2938;
+    }
+    :root:not([data-theme="light"]) .quiz button{background:var(--soft);}
+    :root:not([data-theme="light"]) b.mark{background:linear-gradient(transparent 60%, #7a5d00 60%);}
+    :root:not([data-theme="light"]) .point{border-color:#7a6510;}
+    :root:not([data-theme="light"]) .warn{border-color:#7a2f52;}
+    :root:not([data-theme="light"]) .figure svg .bg{fill:#1d2938;}
+    :root:not([data-theme="light"]) .figure svg text.t{fill:#e3ebf5;}
+    :root:not([data-theme="light"]) .angle svg .t{fill:#e3ebf5;}
+  }
+
+  /* ===== 第3章で追加した部品 ===== */
+  .cards3{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:12px 0;}
+  .card3{border-radius:16px; padding:14px; text-align:center; border:2px solid var(--line); background:var(--soft);}
+  .card3 .ico{font-size:2.3em; line-height:1.2;}
+  .card3 .k{font-weight:bold; margin:4px 0;}
+  .card3 .v{font-size:.93em; color:var(--sub);}
+  .card3.hl{border-color:var(--sky); background:var(--sky-bg);}
+
+  .strip{display:flex; flex-wrap:wrap; gap:3px; justify-content:center; margin:8px 0 4px;}
+  .cell{width:44px; text-align:center; border-radius:8px; border:2px solid var(--line); background:#fff; padding:2px 0 0;}
+  .cell .ch{font-size:1.25em; font-weight:bold; line-height:1.5;}
+  .cell .p{font-family:Consolas,monospace; font-size:.78em; color:var(--sky); font-weight:bold; border-top:1px dashed var(--line);}
+  .cell .m{font-family:Consolas,monospace; font-size:.78em; color:var(--pink); font-weight:bold;}
+  .cell.a{border-color:var(--org); background:var(--org-bg);}
+  .cell.b{border-color:var(--grn); background:var(--grn-bg);}
+  .cell.c{border-color:var(--pur); background:var(--pur-bg);}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 18px; justify-content:center; font-size:.9em; margin-top:6px;}
+  .legend span::before{content:""; display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; border:2px solid;}
+  .legend .a::before{background:var(--org-bg); border-color:var(--org);}
+  .legend .b::before{background:var(--grn-bg); border-color:var(--grn);}
+  .legend .c::before{background:var(--pur-bg); border-color:var(--pur);}
+
+  .lockers{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:10px 0;}
+  .locker{min-width:96px; border:2px solid var(--line); border-radius:12px; background:#fff; text-align:center; overflow:hidden;}
+  .locker .no{background:var(--sky); color:#fff; font-family:Consolas,monospace; font-weight:bold; font-size:.9em;}
+  .locker .val{padding:8px 6px; font-weight:bold;}
+  .locker.pick{border-color:var(--org); box-shadow:0 0 0 3px var(--org-bg);}
+  .locker.pick .no{background:var(--org);}
+
+  .flow3{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:12px 0;}
+  .flow3 .fl{border-radius:16px; padding:12px; text-align:center; border:2px solid;}
+  .flow3 .fl svg{width:100%; max-width:200px; height:auto;}
+  .flow3 .f1{background:var(--sky-bg); border-color:var(--sky);}
+  .flow3 .f2{background:var(--org-bg); border-color:var(--org);}
+  .flow3 .f3{background:var(--grn-bg); border-color:var(--grn);}
+  .flow3 .k{font-weight:bold; font-size:1.1em;}
+  .flow3 .v{font-size:.92em;}
+
+  .shots-row{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; align-items:flex-start;}
+  .shots-row figure.shot{flex:0 1 auto;}
+  figure.shot.tall img{max-height:420px; width:auto;}
+
+  .syntax{background:var(--sky-bg); border:2px dashed var(--sky); border-radius:12px; padding:10px 14px; margin:10px 0; font-family:Consolas,"Courier New","Yu Gothic UI",monospace; font-size:.95em; line-height:1.8; white-space:pre-wrap; overflow-x:auto;}
+  .syntax::before{content:"📐 書式"; display:block; font-family:"Segoe UI","Yu Gothic UI",Meiryo,sans-serif; font-weight:bold; color:var(--sky); font-size:.9em;}
+  .syntax .note{color:var(--sub);}
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .cell,
+    :root:not([data-theme="light"]) .locker{background:var(--soft);}
+    :root:not([data-theme="light"]) .flow3 svg text{fill:#e3ebf5;}
+    :root:not([data-theme="light"]) .flow3 svg .box{fill:#18222f;}
+    :root:not([data-theme="light"]) pre.out{background:#18222f; color:#93c5fd;}
+  }
+
+  /* コメント位置そろえ */
+  pre.code .rows{display:table;}
+  pre.code .row{display:table-row;}
+  pre.code .cd, pre.code .cm{display:table-cell; white-space:pre;}
+  pre.code .cm{padding-left:2.5em;}
+
+  /* 出力結果ラベル＋画像 */
+  figure.shot.result{margin-top:0; border-top-left-radius:0;}
+  .shots-row.result{background:var(--soft); border:2px solid var(--line); border-radius:0 14px 14px 14px; padding:10px; margin-bottom:12px;}
+  .shots-row.result figure.shot{margin:0; border:none; padding:6px;}
+  .shots-row.result{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px;}
+  .shots-row.result figure.shot img{width:100%; max-width:168px;}
+
+  /* 前章・次章ボタン */
+  nav.chapnav{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:28px 0 8px;}
+  nav.chapnav a{flex:1 1 260px; max-width:420px; display:block; background:var(--card); border:2px solid var(--sky); border-radius:16px; padding:12px 18px; color:var(--ink); text-decoration:none; box-shadow:0 4px 14px rgba(36,59,83,.07); transition:background .15s, transform .15s; line-height:1.5;}
+  nav.chapnav a:hover{background:var(--sky-bg); transform:translateY(-2px);}
+  nav.chapnav a small{display:block; color:var(--sky); font-weight:bold; font-size:.85em;}
+  nav.chapnav a b{font-size:.98em;}
+  nav.chapnav a.next{margin-left:auto; text-align:right;}
+</style>
+</head>
+<body>
+<header>
+  <div class="chap">第3章</div>
+  <h1>🧩 プログラムの基本を知ろう</h1>
+  <p>変数・リスト・if文・for文・関数。<br>どんなプログラムにも出てくる「基本の部品」をひとつずつ覚えよう！</p>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>📖 この章でやること</h2>
+  <ol>
+    <li><a href="#l7">LESSON 7　プログラムってなに？</a></li>
+    <li><a href="#l8">LESSON 8　変数とデータの種類</a></li>
+    <li><a href="#l9">LESSON 9　文字列を使いこなそう</a></li>
+    <li><a href="#l10">LESSON 10　データ型を変換しよう</a></li>
+    <li><a href="#l11">LESSON 11　リストでたくさんのデータを扱おう</a></li>
+    <li><a href="#l12">LESSON 12　プログラムの3つの基本の形</a></li>
+    <li><a href="#l13">LESSON 13　if文（もしも〜なら）</a></li>
+    <li><a href="#l14">LESSON 14　for文（くり返し）</a></li>
+    <li><a href="#l15">LESSON 15　関数とモジュール</a></li>
+    <li><a href="#words">ことばのミニ辞典</a>／<a href="#quiz">かくにんクイズ</a></li>
+  </ol>
+</nav>
+
+<!-- LESSON 7 -->
+<section id="l7">
+  <h2><span class="ls">LESSON 7</span>プログラムってなに？</h2>
+  <p class="lead">プログラムとは、「<b>pro（あらかじめ）</b>」「<b>gram（書かれたもの）</b>」という意味があり、これから行うことをあらかじめ書いた「<b class="mark">program（予定表）</b>」のこと</p>
+  <div class="cards3">
+    <div class="card3"><div class="ico">🎻</div><div class="k">演奏会のプログラム</div><div class="v">これから演奏する曲の予定表</div></div>
+    <div class="card3"><div class="ico">🏃</div><div class="k">ダイエットのプログラム</div><div class="v">これから行うダイエットの予定表</div></div>
+    <div class="card3 hl"><div class="ico">💻</div><div class="k">コンピュータのプログラム</div><div class="v">コンピュータが行うことの予定表</div></div>
+  </div>
+  <div class="point">コンピュータは、プログラム（予定表）に書かれたとおりに、上から順番に仕事をこなしていきます。</div>
+</section>
+
+<!-- LESSON 8 -->
+<section id="l8">
+  <h2><span class="ls">LESSON 8</span>変数とデータの種類</h2>
+  <p class="lead">Pythonでは、「<b>変数名 = 値</b>」と書くだけで変数を作ることができる（例：変数aに10を入れるなら「a = 10」とだけ書く）</p>
+
+  <div class="talk q">
+    <div class="who"><div class="face">🙋</div>はじめて<br>さん</div>
+    <div class="bubble">「変数」って何ですか？</div>
+  </div>
+  <div class="talk">
+    <div class="who"><div class="face">👩‍🏫</div>先生</div>
+    <div class="bubble"><b>名前シールを貼った箱</b>だと思ってください。箱に値を入れておけば、あとから名前を呼ぶだけで中身を取り出せます。なお、<b>「=」は「等しい」ではなく「右の値を左の箱に入れる」</b>という意味です。</div>
+  </div>
+
+  <div class="figure">
+    <svg viewBox="0 0 640 160" width="640" role="img" aria-label="変数aという箱に10を入れる図">
+      <rect class="bg" x="0" y="0" width="640" height="160" rx="14" fill="#fafcff"/>
+      <defs><marker id="v1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5821f"/></marker></defs>
+      <circle cx="110" cy="70" r="34" fill="#fff1e0" stroke="#f5821f" stroke-width="3"/>
+      <text x="110" y="80" font-size="28" text-anchor="middle" font-weight="bold" fill="#f5821f">10</text>
+      <text class="t" x="110" y="130" font-size="14" text-anchor="middle" fill="#243b53">値</text>
+      <path d="M150,70 C210,70 230,70 280,85" fill="none" stroke="#f5821f" stroke-width="3" marker-end="url(#v1)"/>
+      <text x="215" y="46" font-size="14" text-anchor="middle" fill="#f5821f" font-weight="bold">入れる</text>
+      <path d="M290,60 L320,40 L440,40 L410,60 Z" fill="#cfe3ff" stroke="#2b8aef" stroke-width="2"/>
+      <rect x="290" y="60" width="120" height="70" fill="#e7f1ff" stroke="#2b8aef" stroke-width="2"/>
+      <path d="M410,60 L440,40 L440,110 L410,130 Z" fill="#b9d6fb" stroke="#2b8aef" stroke-width="2"/>
+      <rect x="318" y="80" width="64" height="30" rx="6" fill="#fff" stroke="#2b8aef"/>
+      <text x="350" y="102" font-size="20" text-anchor="middle" font-weight="bold" fill="#2b8aef" font-family="Consolas,monospace">a</text>
+      <text class="t" x="530" y="72" font-size="18" text-anchor="middle" fill="#243b53" font-family="Consolas,monospace" font-weight="bold">a = 10</text>
+      <text class="t" x="530" y="100" font-size="13" text-anchor="middle" fill="#5b6b7d">「aという箱に10を入れる」</text>
+    </svg>
+  </div>
+
+  <div class="syntax">変数名 = 値
+print(変数名)</div>
+
+  <span class="label prog">プログラム</span>
+<pre class="code">a = 10
+print(a)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPIAAAAwCAYAAAArSCcbAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKGSURBVHhe7dtReqsgEIZh6GKzhi6hW8nysgLOTbHjCKMOYgjne5+HizJoMOXXWNOYUkqhs9frFUII4fl8hsfjocsAGn3pDgCfhyADF4sx6q7uCDIWMcZVs2pWvdZfqucxmrWNrul6iyv3p/ejf74SQcZKSmlpeuHJmvzTSoyxup0cq7fb02OfFnkc+tiPyvu4G0HGW+WF7w1Ozdkrqw5gaU5n93mnIYKc3yDZqPWp3eEdV6QRxJNXY+v3s1eTY8IoQZYfofRHJd1Pra3Wora40u/VS/e/0xXHrbe/Yp9ZDn1u8r2zaqUxYZQgYxwyrHrRysWlWYvOy5rLaFrneHZbPZ4gY6UWVIsM75kwy8Vf2s4zlyvp+VwpH29umlUrGSLIctJ68rqfWlttNL3meOc+o/NqnE9U1kns6MlsiCDrScuJ635qbbWjUmFx9XBkjnfMRb+GN5xHnTmeI2OHCDI+g7x6ysWVQ5BbzwActXdyKJHHUdq2tM/a2LDzvnhrNQQZC71g9OLSTY8t9Welft2nX69Ws/paWcfgYb0vLTWNIAMNSqF6B4IMTGCoINfu6WP8awC2hglyLaQxhpDSX6uNA/5nwwR5kFsN4CMNE2QAfgQZmABBBiZAkIEJEGRgAgQZmMDwQc7PjnPjMRWwNVSQayGVXwgBsDVUkAH4EGRgAgQZmMAS5G/jvxG8NQD3WIL8k1I1lN4agHusPlpbofTWAPS3uUe2QumtAehrE+SwE0pvDUA/xSB/xxh+Kt++8NYA9LMJshVGbw1AX6sgW2H01gD0t3qOXAujtwbgHqvnyDXeGoB7bO6RAXweggxMgCADEyDIwAQIMjABggxMgCADEyDIwAT+AXizXYkzb1nIAAAAAElFTkSuQmCC" alt="変数aを表示した結果"><figcaption>IDLEで実行した画面</figcaption></figure>
+  <div class="orig"><ul><li>変数とは「変更できる数」という意味で、同じプログラムでも変数の中身を変えるだけで結果が変わる</li></ul></div>
+
+  <p>同様に計算もすることができる</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd">h = 1.71</span><span class="cm"><span class="c"># 身長（m）</span></span></span><span class="row"><span class="cd">w = 64</span><span class="cm"><span class="c"># 体重（kg）</span></span></span><span class="row"><span class="cd">bmi = w / (h * h)</span><span class="cm"><span class="c"># 箱の中身を使って計算し、bmiの箱に入れる</span></span></span><span class="row"><span class="cd">print(bmi)</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASoAAAAuCAYAAACf3FSNAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAQCSURBVHhe7drhbeMwDIZh6YbtDB3hVul4ncD3Sy3DipRNSS5zeR/AKKLPlJXEZpyg9TiOo2z2+flZSinl4+OjvL296RgAXH/0AABkQ6MCFqu16qGUnmWdhUYFqdb6sHmZl1vjvbzto3k1OtP5jJXz6Xn042d35/OhUeHBcRxfmz4RZSZ/2qy1mnVyX103smNOj3we+rmf1ebI7lnW2dCo8KvaBRNtDJard0b6wu2t6eqcWCdFo2ongNzI9mR3eKZP6pXqxbsU7/0ZZXIfnfXGpd46vTnP0nXWWuSx5F+Z67oUjardbsuNbE82o3cCFXH3ocd/04rnretXzNlU5+uyl/X26Y1ZdZ7enGe1Wv346lqsuhSNCnm0hqNPvKIaoKZPrBW8tWQzu8artWf27+3jrdMaH+nNqR+fZdXRqPDAakQe2ZyuNCt5gvfqImtZSa9npfZ826Z5mWU05w69JtVE19KrS9Go5ML0AvU42VyWza413jlndS5WT2vEXpO+2qy9OaPr9PSOU8SxeutvNfLvqC5Fo5IL0wvU42Rz2VmHcQKudmaNd6xFH0NfQKtdeT5n9z2732r6tdshRaPCc6jGXVo7Udu28wI/a9T8euTz6NX25rT2LYPXJZp5vDr9eLV2bP1YrkXmFquORoUv+kTWF4/e9L698aY3rsf08azMG5vlPYcI73WZySxenefq/qVT03ss1yLz3pjMdB2NCpjQu9Ayiq5T3t3o7U40KgAmeXejtzulaVS1fm891rjHm9PK5Pgot8ZHuRbJ9LG83BrXuR73arVoBpyRolHVWspxfG/6hNaPz/Dm9DI5rj80dtRFs+Ic06uzakaZN2c0A85K0ahG9EUD4LU8RaP6Le1u4KpRncy8/TS9bzW+Uun9LN46dWbtB9whRaOSF4G+QKLa14y26YvOynbqNRU5bq3Fqjucr1SjOSOsOb3Xc8d7i9eTolHt0C6K3oXsZbvIY+rjeWux6kYXvDdnlDXnb7yeeC2pGlWmT9zoWqy63tgZ0boRa51lkEXtmBOvI02jmjmRq/HV6BlE1+3VeVnUzJwz7y1QsjQqTuT/F+8tVkjRqIq4K4rcHbXfRvSYnE/mXubZUXd3FuXN6WVl8r0FSpZGdYgfYtum9cZGRvNZWXGOt6Pu7qw46yxO5s1pZXK8lwNnpGhUAOChUQFIj0YFIL2vRvXu/MoZzQBgha9G9fc4zKYTzQBghYevfl7TiWYAMOvHb1Re04lmADDjR6Mqg6YTzQAgqtuo3mstf43/zItmABD1o1F5zSaaAcCMh0blNZtoBgCzHv6Pymo20QwAVnj4PypLNAOAFX78RgUA2dCoAKRHowKQHo0KQHo0KgDp0agApPcP316CoyJpWGMAAAAASUVORK5CYII=" alt="BMIを計算した結果"><figcaption>第2章のBMI計算と同じ答えになった</figcaption></figure>
+  <div class="orig"><ul><li>計算式に数字を当てはめているだけ</li></ul></div>
+
+  <h3>📦 データの種類</h3>
+  <p>箱に入れるデータには種類があります。これを<b>データ型</b>といいます。</p>
+  <div class="tbl"><table>
+    <tr><th>分類</th><th>データ型</th><th>説明</th><th>例</th></tr>
+    <tr><td>数値（整数型）</td><td class="sym">int</td><td>個数や順番に使う</td><td><code>100</code></td></tr>
+    <tr><td>数値（浮動小数点数型）</td><td class="sym">float</td><td>一般的な計算に使う</td><td><code>12.3</code></td></tr>
+    <tr><td>文字列型</td><td class="sym">str</td><td>文字（列）を扱うときに使う</td><td><code>"hello"</code></td></tr>
+    <tr><td>ブール型</td><td class="sym">bool</td><td>True（真）か、False（偽）かの二択のときに使う</td><td><code>True</code></td></tr>
+  </table></div>
+  <div class="point"><b>整数</b>は 1, 2, 100 のような小数点のない数、<b>浮動小数点数</b>は 1.71 や 12.3 のような小数点のある数のことです。<b>ブール型</b>は「はい／いいえ」のような2択だけを表します。</div>
+  <p>Pythonでは、データ型をあまり意識することなく扱うことができるため、どのデータ型も「変数名 = 値」だけで作ることができる</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">i = 100
+f = 12.3
+w = <span class="s">"hello"</span>
+b = True
+print(i, f, w, b)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQcAAAAsCAYAAABot33mAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAOGSURBVHhe7drtcSMhDIBhuGJTg0twKykvFXA/YhytLMTHfhg87zPDnI2ABR9o157ElFIKIYRbjOH++/LFaCz7+fkJIYTw/f0dvr6+dBjAhP7lF94BH40BWNczOQCARHIADhZj1FVTqs2T5ICnGOOmeDEvXqq34rmN5vXRMR3f48jx9Dj6/exIDthIKT2L3swy9vgdO4THpi/1k211v5ozxvTIdei1t8pjzK5lniQHvFXepKOHsaT3CUAfFmtOvWOuborkkD90WYidE7tC7Y70qWLD3Vjy/n9qMdlGx6x6yZqnNeYUySE/yslC7JzYHqWNlx53WV3/TkesW/c/YswsH9Bc5Gfnxaw2Vl2pn0ePOUVywDxkAtAHQW48bXRDery5zGbvHHv7trS32njz1PUkB2yUDr9HJoSeBCE3qtVvZC5H0vM5Ul5vLpoXK6mN2WuK5CAXpBem64nti83mrDleOWZ07saenPy8xNibIL0xe+c5RXLQH4RcgK4nti/WKhmb6wwtc7xiLvoavQepV896Wtu2tms1RXLAGvKdU99B88HK5cxD1aqWcCxyHVZfa8xS21D5XEZjHq+fft+C5IAnvXn0htVFt7XqM6te1+nrlWJe3V7eGkZ4n8ueWInXz2O1JzkAO1iHakYj8yQ5ADBNlRxKv6fE+Fc0L1ZT6jM65ki/nrYWr78X6yXX1rtGrGma5FDabDGGkNJfke28WE2p7eiYo/1WkdelX+NzTZMcrt5sV18PWM00yWF1e5NN6VH9jMf4s8bM/8px9TWs97oP5kByUOQhj4+vCq3kRu/tZ30dkfU6NuqMMTM5dosz54L9SA4HGt3orYdpdp+yDvwiORT03v3PIp9GPtGnr29lJAdDLTFYm1m/P4p8GvHmtKpPX9/KSA5KLTG801kJ6Cq1+dfiuNb0ySF/f89FHlwvtocc09qw1l3ujLmsMqZHXk9f6+q5oM9UyaG0OfJhtOJerMbqI8frHXe0T+29N2apPjix2pieUp9SfRDXy6+tmK7H+02VHADMg+QAwERyAGB6Joeb9cvbw2gMwLqeyeGeUvGgj8YArGvztcI76KMxAGt6+c3BO+ijMQDreUkOoXLQR2MA1mImh1uM4V74q5TRGIC1vCQH74CPxgCsZ5McvAM+GgOwps3fOZQO+GgMwLo2f+dQMhoDsK6X3xwAIJAcAJSQHACY/gPCjmkiChMCLQAAAABJRU5ErkJggg==" alt="4種類のデータを表示した結果"><figcaption>4種類のデータがまとめて表示された</figcaption></figure>
+</section>
+
+<!-- LESSON 9 -->
+<section id="l9">
+  <h2><span class="ls">LESSON 9</span>文字列を使いこなそう</h2>
+
+  <h3>🔗 文字列をつなぐ</h3>
+  <span class="label prog">プログラム</span>
+<pre class="code">w = <span class="s">"こんにちは。"</span> + <span class="s">"私はパイソンです。"</span>
+print(w)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAAA1CAYAAACwewV/AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAULSURBVHhe7Zrrcdw6DIWpNOAuXUNKSCvuzq5A+REjgz0LggRISVz5fDOcuSIeBF9Ha91sn5+f+9vbWzmar6+vUkopHx8f5f39Hc1kMtu2PTzv+161Fcde6xe0vXz7WH2aaM4sknskn8wH54XPVzNaTzT+F3aQ+7Dv+/+GF1TbrAthxWlfjGtxRE4PPQ+cey/Ry3QVV9RJ4SDT0G/nmWzbFsqJF8mqKZqTPLKMcMhG6kabbzuDs99kq7AF3+Le/rRs2gdtVr/GqtPL2QvGYS3LCIf8rNSNNt82Ah4EYf9+O2P/lcyYN8bPyCnI5ZWm186zWT5WXy3Ow8rZi8Tis65lGeEg89HigAdIHwQke1g9vFpWY7TGaGyPv+Xj1Vnrb2HlxOey0i8OMp+aMHhosYiIhz5wVlymlplgPTOR+UpDPFuNVs4jsERDwFqWEQ5dGC4W9tO2JkfVeGbOzbk8HiKMnmhGxdPLma3TwxqnqLF0/csIBy6uXhTspy3GXjkQs+mp8YxacIwjLpkmMp9e316/2eDa1VhGOMi5yBtXmiAHR9qRF66XlhhZ6HlYsVbOmm9prEvW5uHF4fNsZGx81rVQOG4KHiw8zNjQ1+oXrH7sw/FqNq9vFG8OGbx1GbHV8OI8ov7FiLGedS0UDkK+wcuyKtk69a8GbFEoHIT8EPSvBmxRKByEkDAUDkJIGAoHISTMMsKBH2v0Bxvsz3zMIYTMYxnhwI81+oMN9mc+5hBC5rGMcBBCXgcKByEkzDLCgd8w+I2DkHVZRjjwGwa/cRCyLssIByHkdaBwEELCUDgIIWFuKRxnfjs9c6wRtu2x1ivqvmLMlXnl9bilcPRy9sZ543m2LCIW21bKvv9rPXi1eDYPqWEkfjX0+ur2E1hSOHAjIhsiBzQDjlcbF20t/6uIiMXRiGhk6vHiWutds2f2CvdZr6/8N9aJMbqh/ZVYUjj0JtQ25AhwvNq4aGv5W3iHaAazcmfqrNl610azOaJRlCBFkb2KxFr7bNWnc2IMxuPzq7CkcGSxNvFIRsbzDtEMvNyRumfVGbmgQqTOLF7+Vs1YX8u/GIL+qtxKOK5i5cMgNV1d2x58u0d8vct/FCgamlq/xGSEdzVuIxz6gkQOXRY9nj4MZ4ydYeXaNLJ/My7WrDy9nDnW1dxGOAr8rM5ckmiM9ebIjn0EeHGw1pKY8wje2mjBsOo8G1y72dTW4VVYTjgyC9qzyZm8Hq3xepDL0lNbr1+LnrVConVG85eKCI+QraMMxnqIcEby96772SwnHD8FOTz6wtQOiPat+SA9h1NyeTkjda5Cz9xrjMT2oNexRWbfz+LlhaNno3t8CrwRdOtF/HvGsph5QKwaJLeu0/JrUatzZO4zGFn/aGxtDXqJjLUiywlH7fJK60XniWyQXCbdPHRtPf4CzlPirPjsXJDIvIRonS16fKJk1r8M7J2Aa9MDrqOHzt/jfybLCUcxDrhuiNUn1GIEz9aLVxuCPtHYHj+LVhzareeR8bP0jpetbca8ojkiviXhfxZLCgchZG0oHISQMA/C8dv5Qy1rI4Tcjwfh+LPvVRHI2ggh9+PpTxVPBLI2Qsi9eBKO0hCBrI0Qch9M4SgNEcjaCCH3oCocv7et/Kn8D+SsjRByD0zh8C5/1kYIuQ9PwuFd/qyNEHIvnv4dR+3yZ22EkPvx9O84amRthJD78fSnCiGEtKBwEELCUDgIIWH+AhCrrktnwj5yAAAAAElFTkSuQmCC" alt="文字列をつないだ結果"></figure>
+  <div class="orig"><ul><li>「+」演算子を使うと、文字列と文字列を連結することができる</li></ul></div>
+  <div class="point">数どうしの「+」は足し算、文字列どうしの「+」は<b>くっつける</b>。同じ記号でも中身によって働きが変わります。</div>
+
+  <h3>📏 文字数を調べる</h3>
+  <p>文字列の文字数を調べるには、「len()」を使う</p>
+  <div class="syntax">len(文字列)</div>
+  <span class="label prog">プログラム</span>
+<pre class="code">w = <span class="s">"こんにちは。"</span> + <span class="s">"私はパイソンです。"</span>
+print(len(w))</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMEAAAA2CAYAAAB+1f09AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJiSURBVHhe7dndlcIgEIZh2Abs0hosYVuxO62AvVk84wQmipBM5H3O4WIZE8nZ+fJnvN1uKYQQTqdTGO1+v4cQQrher+F8PusysIsfPQHMhhBgeoTgi8UYn4ZVs+q1+VI9f0azttE1Xf/EK/sjBF8upfQYuhlkLaX0mI8xVreTn9XbrRmxT4s8Dn3sEiFAV7nxrKZr8coZXcrryEpryvt0FYK8KDmo2bUt9Doze+UqBPJyqS+Lep7a52qhSv9nTT2/px7HrbfP+3QVAvQnG73WBHpe1noGwVrLngjBl6s1uUU2/jtBkM1d2q5lLT3p9WSuQiDPFHlQs2vejFrjyH26CoG8POuzhp6n9p5UODOP8Moat1iL/o5o3IK5CgG2Vbu65AbKo9Y8W1oLVok8jtK2eZ+E4Ivpf7z8W56xSw1Wm89K83pOf1+tZs19yjqGjBBgeoQA0yMEmB4hwPQIAabnKgT6lZ1+z6sH0IOrEOhXdvoVmx5AD65CAOyBEGB6rkKg7/l5JsAWXIVA3/PzTIAtuAoBsAdCgOkRAkyPEGB6LkNQevET43IAPbgLgdXcKT0PoAd3IaC5sTV3IbBwK4QRDhUCeStEENDLYULAbRJGOUwIgFEOEwJufzDKYUIAjHKYEOSH4Tx4RkAvLkNQa3B+KMMILkMAbIkQYHqEANNbhOBivItsrQGeLULwm1K1oVtrgGeLEISVhm6tAV4VQxBWGrq1BnhUDUFYaejWGuCNGYJLjOG38stUaw3wphoCq5Fba4BHxRBYjdxaA7xahMBq5NYa4NkiBFYjt9YAzxYhAGbzBzgk74Y2PQaRAAAAAElFTkSuQmCC" alt="文字数を表示した結果"></figure>
+  <div class="orig"><ul>
+    <li>lenは「length（長さ）」の略</li>
+    <li>文字列だけではなく、リストの長さなども調べられる</li>
+  </ul></div>
+
+  <h3>✂️ 文字列の一部分を取り出す</h3>
+  <p>文字列の中から一部分の文字を取り出すときは、[ ]（ブラケット）を使う</p>
+  <div class="syntax">文字列[位置A]        <span class="note">… 位置Aの1文字</span>
+文字列[位置A:位置B]  <span class="note">… 位置Aから位置Bの直前までの範囲の文字列</span>
+文字列[:位置B]       <span class="note">… 先頭から位置Bの直前までの範囲の文字列</span>
+文字列[位置A:]       <span class="note">… 位置Aから末尾までの範囲の文字列</span></div>
+  <div class="orig"><ul>
+    <li>指定する位置は「0から始まる番号」で指定</li>
+    <li>先頭から「0」「1」「2」と割り当てられている</li>
+    <li>「こんにちは。私はパイソンです。」という文字列は15文字なので「0～14」で指定</li>
+    <li>Pythonの特殊機能として、マイナスの値を使うと「末尾からの位置になる」という機能がある（末尾から3番目の文字を「-3」と指定することもできる）</li>
+  </ul></div>
+
+  <p>先頭の「こ」と、途中にある「私はパイソン」と、末尾の「です。」を取り出す場合</p>
+  <div class="figure">
+    <div class="strip" id="strip"></div>
+    <div class="legend"><span class="a">w[0] → こ</span><span class="b">w[6:12] → 私はパイソン</span><span class="c">w[-3:] → です。</span></div>
+    <div class="cap">青い数字が前からの位置（0から）、赤い数字が後ろからの位置（-1から）。<br><b>w[6:12] は「6番から、12番の直前（11番）まで」</b>なので、12番の「で」は入りません。</div>
+  </div>
+  <span class="label prog">プログラム</span>
+<pre class="code">w = <span class="s">"こんにちは。"</span> + <span class="s">"私はパイソンです。"</span>
+print(w[0])
+print(w[6:12])
+print(w[-3:])</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMMAAABSCAYAAADpRWBMAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAQQSURBVHhe7dpvcuMgDIZx2MP2DD1Cr9Lj9QTsF+goCigg/5PT5zfjmY0xDl7rtXHcXEop6WA/Pz8ppZS+v7/Tx8eHbgZC+KdX4P5yzg+L1Wa1j9b32ts2mtVHt+n2LTz7IwxvqpTyu+iikG1yYpBzHvaT2+p+rxyxT4s8Dn3sFsKAXbQCXCm+GatX+DaOpjem0T5DhKENTi602W1n2OtKfRchwiBvo/p2qdfTtt0oXKVeRfX6K+1x3Lr/aJ8hwoD9yYLXJ94KV1u/ZyCssURCGN7UqNgtMgArgZBF3uvnGcue9HhGQoRBXjnaQpvdFs1RYzxznyHCIG/b+iqi19O2pnSu1EeYGeMZY9HfkRemZiHCgHON7jatkNoyW0RHehWwHnkcvb69feacCcM70idafpZX8F5RjNY3vfV6nf6+UZu1bivrGEYIA1DDQxiAijAAFWEAKsIAVCHCoH/q078T6wU4Qogw6J/69E9zegGOECIMQASEAahChEE/E/DMgCuECIN+JuCZAVcIEQYgAsIAVIQBqAgDUBEGoAoXhpz7C3C0cGEopb8ARwsXBuAqhAGoCANQEQagChUGfjXClUKFAbgSYQCqUGEo5fllGy/ecJZQYUjGSzdevOFo4cKQxJ9kyM9nu+I7ca0wYZDToZU7gVW0VpuljWFLf9xPmDCsBOBoLQie8Vj9XoVk1K7vlDhGiDDIu4L8vEruZ3Zfo7ZRQVuyEYQkQraqXSg8fTEvRBj0Q7L896sCk+R+evua5Sm6lXF6Wfv3jBmPQoShkVfzK61ehVe2tQoa1woVhma1GK/SpmB7FPhe+4FfmDDoYugVxpkBsQIpQ9Ab59n0/x18woShx3OSW6GOClny7D85n0Ms3nGkjX3xKEQYZk5oK26ryOXVuu3P2j6CmWMf2dIXz0KEoXdCZfHLIl9VBtOdqwtJHteqLX0xFiIMPfIKP3vSW+HrYun1763TZrZZ5Q23Pq6VvpgTLgyvTrJu732+olhmv887tquO6y8JF4a99KZGgCVsGOS0QC7AUcKEQRe9nBKMpgi6jw6N/gxYwoRBFnwr+hYKSRa27qP768+AJUwYNB2Emas7dwJsETIMOgjSaH3rw50AXiHD0EOB42i3CcMKpknweJswFPH2efYuwvMFpLcJQ1p8uyufMQgEUtQwbC3QlbsD0IQMQ1LTntlgrEyTPNMqvLewYUiOl2Yr2ybH9nhvocMAnIkwANVvGD6Nibm3DbiT3zB8lTIsbG8bcCcP0ySrsL1twF08PTNYhe1tA+7gKQzpRWF724DoumH4zDl9DX6A97YB0T2FwSpobxtwBw9hsAra2wbcxcN7hlFBe9uAO3l4zzDibQPu5OmZAfirCANQEQagIgxARRiA6j/N5vDNOpy5kQAAAABJRU5ErkJggg==" alt="文字列の一部を取り出した結果"></figure>
+
+  <h3>↩️ 文字列の途中で改行する</h3>
+  <p>改行コードは「\（バックスラッシュ）」に「n」と続けて「<b>\n</b>」と書く</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">w = <span class="s">"こんにちは。"</span> + <span class="s">"\n"</span> + <span class="s">"私はパイソンです。"</span>
+print(w)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMwAAABECAYAAADNwdpHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAASgSURBVHhe7Zlbduw4CEVRBpsx3CHcqWR4GYH7o5tqQgAL/JCsOnstf5QAPTmS7Grbtm10Id/f30RE9PX1RZ+fn9oMTqa19uO3XF5to8DulTM6bVprZpkkW2cVrvtIfTwePa6PH15gCbZtez06MaVNJ7AXJ3113B5X1Bkhx6HH3osWiQSCAYeRu/GZtNZSdepEt/qUrVMzXDA8APnAFtvuwNthV6cFpwvNIBh5ZOujWZfDdhxPgNt/u7EuH8kZ49bxR+scLhhwPlIUOjkiAXL5maKJ+jIbPX2EYBbEE0SEFElGNDLJrLhKX85E9+cowwUjdyB+YItts3FVH++ss3WcLjSDYOQVQe9Guhy2HJux419BTx/v6Ituo1cEGYYLBtyLd2pxsvFzdqJV2BOhhRyHFWvV6fmSMS8QzGLohZe/OVnko32tcsYq12W6Pc8WlR0lGkMFOS8QDHh7MuKCYABIAMEAkACCASABBANAguGC0Z855adOXS5tAIxguGDkJzv9OVCXZ75mAHAFwwUDwJOAYABIMFww+h0F7zBgZoYLRr+j4B0GzMxwwQDwJCAYABJAMAAkWEowd34TuLMtMA9LCaaXu5M9ai+ygfmYSjCt2U8PrRFVP6Lp9rx2tW3PH6zHVILZNvu5Gt2e16627flbWCKD4J7DVIKp0g6cLhWOtGeJLCM4MJYlBDMKfVKA9Xm8YO6+1sj25ElxR9tgPI8XDKlrTiVxszHWFaraNngW0wimkmw97xKVeiP22ushc5Xr9QP3MI1g3gV9leMyC+nr+YB7eaxgek+XPR8S1yn99ML+PW1ZQBDPYRrBeEmbTV5ZTyaB5a4vd38P2bcef0aPk+Os+OpYwHVMIxhyktZLRquM8WKYyNZL1DeN9snG9viBe5hKMGS85GZOl7MY0ebMYD7+ZwrB6CtK744aLWRki+A+HImfDTm/8gF5phBMRiRXw2Kp9CeK20tQz15Jbi0MOb/edVDHyEfb35nhgtELUV2UaJE9PJtOph5aIBYSQszCyZ2JlaLgPln9k3XqGB2vf78rwwWjF2JvkT2iRc6QSUwm088qUf17fdb92/MnYyMD/zJcMAwvzOgF2pK7ecY3Svqr0GKReOUcU9lwVmcawTDZhB0F775nJNRZ9fRyZ1urMYVgdMJYC3qniCLRSqFY/bwbPXdn483DuzKFYCwqicDJ3LPIlfqp+F4UUe0HHYyN4A0jU3/vvD+d4YLpWRReiGhBuB6Z0JH/DPSM3eNIbA+ZjUHO/exzfpThgrEWRQpELkYWbwGvTrY95LiyZGO9Oegl09Y7MFwwFiyQjFA4MXRCWfFWmabHJ0t1A9DjysSSMTc96HmMkPX3+D+ZqQSzN9nabv2uJNRRetur9u2McWXryPhSwf+pTCUYAGYHggEgwQcR0Z/gYlu1AbAiH0REf7fNTf6qDYAVeV3JouSv2gBYjR/vMFHyV20ArMSvl/4o+as2AFbhl2D+tEZ/nQ/qVRsAq/BDMFHSV20ArMRLMFHSV20ArMbrfxgv6as2AFbk9T+MR9UGwIr8eukHAPhAMAAkgGAASADBAJAAggEgwT8eQrVj4dnYpQAAAABJRU5ErkJggg==" alt="改行して表示した結果"></figure>
+  <div class="orig"><ul>
+    <li>長い文章のときなど、改行するたびにprint()が必要で、文字列を入れる変数もその分必要になるが、改行コードを使えば、1つの変数に改行も含めた複数行の文字列を入れて、1つのprint()だけで表示できる</li>
+    <li>「\（バックスラッシュ）」記号は、IDLEやエディタの画面には「￥」と表示されるが、効果は同じ</li>
+  </ul></div>
+</section>
+
+<!-- LESSON 10 -->
+<section id="l10">
+  <h2><span class="ls">LESSON 10</span>データ型を変換しよう</h2>
+  <p class="lead">「ユーザーの入力した文字列で計算したい場合」や「ネットからダウンロードした文字列で計算したい場合」などでは、データ型を意識する必要がある</p>
+  <div class="syntax">int(文字列)    <span class="note">… 文字列型を、整数型に変換する</span>
+float(文字列)  <span class="note">… 文字列型を、浮動小数点数型に変換する</span>
+str(数値)      <span class="note">… 整数型や浮動小数点数型を、文字列型に変換する</span></div>
+
+  <h3>❌ 文字列と数はそのまま足せない</h3>
+  <p>「文字列"100"と、整数23の足し算」をそのまま実行すると、エラーが表示される</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">a = <span class="s">"100"</span>
+print(a+23)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlcAAABoCAYAAADciNXVAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAABGXSURBVHhe7dxbkus2DoBhaRabNWQJ2UpWluesQPMwQQaNA4AXkTJp/V+Vq48IgTfLMrrt5Lyu6zom+/vvv4/jOI4///zz+O2332wYAADgK/z111/Hf2wjsKPzPG3TknaZ50rYM9837IteQ7SeqL1Hb1+9eXgviqsPO8/zxyOLZfGo3YvLOVaWY2M2fsfI/mw/9nh3T6/nznh3cj0zrr1PGD3/O6/L6PyofbZoLVG7jVlentf2aavNB/dRXC3guq5/H/bFpWP6E9zzPMM8fa7NK5nRZ0avw669lvSxul3muRK7Z3evlW8R7ctOe6PXoO8Dh3mevXbbR7R2L9cel9i9Hq20BuyJ4uqF5MU8+kV8Nv7mZW9a3pxa+8Q7eNcK9hXdB6L2GnLvkJzSMTDSEsWVvsjtxW7bd4w9YeZvVis7G3+rzJ6fUkyfY2Neu+bNM+uzls2L5qLH0j913MsTUSzKi8YRUZ52OnuWyfqMYtmxPt+ep+M2pnOymCfqUzsb9sX2o49LczmCNeh2G9N92pjmrcH2qY+j/mwfmsQu9Vch+9Dneew87Ry842iudl21evssxbx2ielzamQ5peOInqPt17Z/MhZZoriyF7y+mG37jrE7oifz+ue3ONv+SSPWbfNH9CnO5M/vWcw7x2uL8jJen7Uk1x63zqWUp+O1eybz8taV5fXK+sxiJXK+zSv1Ge3Z9fC+ZLK5HMkaSvOM8kp0n/Kw7Z5T3SO9c3TcPkYq7Ys9R8i53hp6+8xid/uM6Byvz1Z6jnYutv2TscgSxdXbRS+so3BjkfYRF7LI5rKau3Nsza053zsnm2fUXuL1aY9rlfKieNReUpPnrW+UWf1qI8bw+oj2JXrdXur+YGMlLedqpbxoHnoN8rDtnkvdI71zdNw+Mt48s/2053q8c6SfbA0Zr0+RxTI9eVFOtmffjOJqATUvdEu/AFtekPri9vJ65jKSnc9Ist7oRp3FIqU+Z8huUL1z2SVvJaPXcOdaktdtdF3sQq9D36dsWwu9p/Yx2oy+Z/SJ+ZYoruwFry8i275jbDWz5vhkn2dSYGT0Tdr223sTz/rsnWfGG+dQY3nzlxz9syYvMyvPzm9Veg2j5qv7s89x775IXz25o5XmcTr3UNum98XukeU9R16bVZqnR3KyfnvUzPdJ9jnQ7ZGr4xq0z7l93u3jU7HIEsWVvXj0E2Dbd4zVupwb6gw1c3xiLnaMs/HF16plPbXn1p43mt27mZ4ap8WdayVaT9Re406uGNHHzux9Sf+0sRryJqgfWXstee21zGWU1rk+SfZl1N7Y5133ads/GYssUVwhFt0ELvMRQs2TPVvtRafpdXi5Xp/RuUdhX3pjmSzPHo8mY9tjPRcdj5TydLy0Z1GeluXZMSxvHkfQZ2vM9pnJ+ixp2Rdhj1tkudFcMtk8MzXntvaZzeUK3hBtmx3L9lPLm0vNvnp5NbFed/v09kxEsZ5xdkdx9WH2grMvLPuw53rtwmu3bXa8KJa13ZWtoUe2L3dikSwv03r+4eR4x3ouOu616ZiXp3+25Nm4Vcrz2Bwri9fE5N+63fup416fpWNpy9q9WCQ7t+ZNzRuv5rgnL6Lf6KOcqBiI5jJTNJadiz4vyjmcvJZYpBTr6bOH95y9AcUVtrPLC7V3nvq3Svv4dr179u1696U3b4ZsLjVv9NE5LWrya87BT9meZbFvRnEFLEbeRLwHAGB9FFcAAAADUVwBAAAMRHEFAAAw0BLFlf3Srv7irm1/w5d6AQDAvpYoruyXdvUXd207X+oFAAArW6K4AgAA+BYUVwAAAAMtUVzZ71TxnSsAALCrJYor+50qvnMFAAB2tURxBQAA8C0orgAAAAaiuAIAABiI4monfJkfs3BtAcAwaxRX5/nr41NmjD2iz/M8jie+zD9irp/2iTVkY2axTG9eJOvvuvI4AKDaGsXVdf2/cND/BgAA2MwaxRVyT/3VCu+W/fXq039RBoCN7FFcyU3du8FLm22/EzuCsXR7a0wrxWvocbz+srlEsay/Ep1r86PxemOlsfTPFtF4pdjTsrlEsTv7AgBoskdxdfzzpmA/MtRt9rfu3piN1+ZlMU3OG0HGseNlc8liMq/e+em+vTY7Xm/MxkesIRsviz0tm0sW690XIX0CAIr2Ka68G7vXFhlxbtTu8c6VN7+VjJzP3b5a8lvO7aH7nz1Wi5a5tJwLABhmn+IqcgYfg5R8Im+FN7vrn79o9KyhV+94vXkz7DCXTzy3AIBf7F1cneZjkBY6rzb37nirvOHpNTwxp569Pm7kjXbneR+tNBcdG/ncUrABQLW9i6sW2RuDjdnjHl4fvW94vXmeUf30ysbvjc3w9Hgj3J2zFG4AgFv2Lq6k6JCHLkK8WJan6Xgpr2Y8bWShFMnmksVsfIRsvN5YSc8asvG8WEvfI2Vz8WJRbqsr+EsZAOAXaxVX0c07aj/UTV/OsW+K0ZtCFNP92JhubxmvdFzjMm/odnzbZzSXUuxI1p7Jzs/G64mVjqXNa89E43kxe4491rJYJsrL5mJjVhTzijEAQJe1iivkePPDLFxbADAMxdVI+iOX3o9fSmb0OcMu81wJe+b7hn3Ra4jWE7X36O2rNw9lT7w/YBl7F1dygeqH5bWJLNbLfkSjRXPsYfuxx7t7ej13xruT68mu552Mnr/el9a+o/Oj9tmitUTtNmZ5eV7bp602n6dl7w+9sr3MYqPNem5H9/eQvYurw3zHZNTF2uNU31nR/7bx68aXob1+V7TLPFdi9+zutfIton3ZaW+8e4Mc67V47baPaO1erj0usXs9WmkN38y7Br7Jrs/txHnuX1yVPHUR63HsmPbF5F1854SKH/vzrhXsK7oPRO015N4hOaVjPM8+v095cqxZZq3Bvi8P9v3FVc8NZcWbUeuFkK2hFJOfNp7lCW+eWZ+1bF40Fz2W/imiPBHForxoHBHlaaezZ5mszyiWHevz7XnSlvVZinmiPrWzYV9sP/q4NJcjWINutzHdp41p3hpsn/o46s/2oUnsUn85sA99nsfO087BO47matdVq7fPUsxrl5j89OKeLKd0/AneHLI16HYv9gnePEprKDmT16X822rcl/2Lq8YFF8mmy2NUv5Z9YvVN8K5sDVnMO8dri/IyXp+1JNcet86llKfjtXsm8/LWleX1yvrMYiVyvs0r9Rnt2fXwvmSyuRzJGkrzjPJKdJ/ysO2eU93rvHN03D5GKu2LPUfIud4aevvMYnf7jOgcr88dRGuo2TOPt++zRWsoyeYnfdk+O/Zl/+JKL/hbZRdDjdbcmvO9c7J5Ru0lXp/2uFYpL4pH7SU1ed76RpnVrzZiDK+PaF/O4M35Ujc8GytpOVcr5UXz0GuQh233XIWbu47bR8abZ7af9lyPd470k60h4/UpslimJy/KyfZsNSvPrVbPGh58XvYvrmYo3eRGmNm3vMijNWSxSKnPGbIXQu9cdslbyeg13LmW9JvzzvQ6ZC1eWwu9p/Yx2oy+Z/SJdneehzO5Z69A7j0PoLjy3L3J9Ygu5t6LVc/f9tu7vqzP3nlmvHEONZY3f8nRP0WWl5mVZ+e3Kr2GUfPV/dnnuHdfpK+e3NFK8zid4se26X2xe2R5z5HXZpXm6ZGcrN8eNfN9kn0OdHvkunENRuM9rfd5KK17pfU9MA+Kq5IRT4J9MksX4V0tc649t/a80ezezfTUOC3uXCvReqL2GndyxYg+dmbfuPRPG6shb1r6kbXXktdey1xGaZ3rk2RfPrU3T6p9HnbbiwfeVyiuLP3CGXnBlF6Q3g01OvcozLM3lsny7PFoMrY91nPR8UgpT8dLexblaVmeHcPy5nEEfbbGbJ+ZrM+Sln0R9rhFlhvNJZPNM1Nzbmuf2VwuU5RJzLbZsWw/tby51Oyrl1cT63W3T2/PRBTrGUf05o10Z8903ulcDy19PaH2uj369mXv4qpigek5UUxeOFG81+g+s3neiUWyvEzr+YeT4x3ruei41yaiPP2zJc/GrVKex+ZYWbwmJv/W7d5PEfVZOpa2rN2LRbJza2543ng1xz15EX1zjnKiG3g0l5misexc9HlRzuHktcQipVhPnz2856xFb36W48Vsm3cc7VlE50S5I9dn2+xxLZ0n/7Y/RbY2x97F1berfBI/rnee9jcd/fh2vXv27Xr3pTdvhmwu0c3Z3uS9c1rU5Necg5+yPctiNe7mr+7b12dQXOFz5E3EewAAsKk1i6vWv1y0ng8AADDJmsXVbBRjAABgkncWV1fDfyUAAADQYJ3iKvois22zx5nsC9IUWAAAYII1iqtT/afJowoe3WfUb9QOAADQaY3iSnv6vxSjwAIAAAOtV1yNlH0sKOQvXAAAAAN8d3FV+n8nUVgBAIDB1iuuSn9l6mVzKawAAMAEaxRX8r0nr+DJYhmdZ3PtMQAAwCBrFFeH+ghP/l0bi9oO87GgbQcAAJhgneIKAADgC1BcrcZ+N+xpnx4fAIDNUVz16ClAanJGfhdMf9/MymLyXTUAANCF4uobSZEmD10sZTEAAHAbxVWPUX9d0nr/ajWjOKLoAgCg2zuLKykcoo/GauNem5ejY62kv55cT08BBwAAqr2zuDrMx2Ne4aLjtaI+pY+Wvo4bH+HpcaQPTRdsNgYAAG55b3FVKipKcU9PTibrT/81q/UvWz0FGwAAqPLe4moX+q9MmhRH9t8af5kCAOBx7y2ubLGyIvuxYIuosNph3QAAbOy9xZV8JBYVIU8b+RHd3TXdzQcA4MXeW1wdycdpM+hirpbOkYLH5kfz13k6x+sTAAAM8+7iKlIqOLy4bbPH0ua1i6h40nlZvtA53phR+8FfrQAAuOudxdXKxcOn5/bp8QEA2Nw7iysA67B/rX2a/ujcfow+Qzbe7LEBPGKN4kp/B8jebGawY80eD9+9x0+v7ZvGOwd+DH1nnnoOdj49/ZZyovEu56sBNXpy7nh6PGAzaxRX+vs/0XeBRpNxnhoPwHp0cTey0Is8PR6Aj1ijuML/brT8Nog3WaG4sH818kTtPWrH414AbG394sreZPSx/DsqTKTdi2Wyfksxr11i8tOL9yiN58XuzGN0n/Zce5yJ5pLFSvOM8rKY7tNTk2djut3GescrifJqxpOf0TktSv31zvMOr89snjPn4imNF+1ZSZRXM578jM4Bvtz6xVXJqf4v5vqFrNttTOLZi1/nW16sNJ49x4raI9l4WczGbSwyo89e2VyymI3X5mWx65/nTH5qWZ6NPzFeJMvLxhM6f4TR+zJLNM+n55KNl+1ZJsvLxhOjrwlgM+sXV/qFLS9YG++hbxyeqP0oxDK9eTV036VxSvEePX2WnttaLXm157bsZ6+o36j9Ka3jt55fMrq/WXaZ5wita209H/gy6xdXd5yFv059szevfYbe/dwhT4rc1jx8L64J4JY9iit5oXu/DWUv/Ev9dcrLXcnIm5js1Q7rzp7bVdzZz55r8OnxDpM36jrE3rgmgG57FFcZeeGX3qC//ebw7evLzFj7Ln1maserPW803rR9pXvZE3hegFv2KK5KNxvvt3RddHn5OjbiRlIar8RbQyYbz4vdXaPX5wg9fWVzyWKZLM+LnWo/dVzz8mp4eU+PF8U/aZd5Hh+YSzReac8ipbxoPADHsVxxZV/AR+ebr7iCj0d0exSPlGJefxIbrTSejtmfwh5nbJ+6PTuO2mY8t1ms5tjL82L2nNo83V46HjleSSkvinltLS6ncNS842guRzLPO7z+bJs9ljavPTPiNWGV9ixSyotiXhvwMmsVV57shZrFsD6ePxxcBz+wF8BXWL+4AgAA2AjFFQAAwED/Fle/J19M7I0BAAC8zb/F1R/XFRZKvTEAAIC3+fGxYFYo9cYAAADe5JfvXGWFUm8MAADgLX4pro5CodQbAwAAeAO3uPr9PI8/gv/fSm8MAADgDX4prrICqTcGAADwFj+Kq6xA6o0BAAC8yY//z1VUIPXGAAAA3ubH/+cq0hsDAAB4m/8CUsRZj+GamYsAAAAASUVORK5CYII=" alt="文字列と数を足してエラーになった画面"></figure>
+  <div class="point">" " で囲んだ <b>"100"</b> は、見た目は数でも中身は<b>文字</b>。Pythonは「文字と数をくっつけることはできません」と困ってしまいます。</div>
+
+  <p>これをint()を使って文字列を整数に変換してから計算すると正しく計算できる</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">a = <span class="s">"100"</span>
+print(int(a)+23)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL0AAAA1CAYAAAAUNOqFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJrSURBVHhe7dnRlcIgEIVh2Abs0hoswVbsTitgXxYdJwwxmLCT8H/n8LCMieR4Qwgb7/d7Op1OYWuPxyOEEMLtdgvn81mXgW5+dAdwdIT+oGKMb61Wq9Wt/lI9f0arHaNruv4N63yE/sBSSs+mf3xZSyk9+2OM5nHys/q4OVucs0Zeh752Qo/V5KDpkH3LmrEteRyZHpOb0OcLk41avdbDWjOvJ25CLx9/+jGn+6l9z7qJ0t+sqPv/0xrXLY93E3qsTwZbh6Z2E+X+NYNfG0tvhP7ArFDXyKAvCb4Mc+m4lrGsSY7HTejlTJAbtXrNm63GuPY53YRePm71rKD7qS2TCjPvFj4ZY4+x6O+IaknlJvToy3p65MDkVgtwL3M3Uom8Dn0soT8o/UPLv+WMXAqU1Z+V+nWf/j6rVuv7lnUNhB7DIfQYDqHHcAg9hkPoMRw3oddbaHqfVTeglZvQ6y00veWlG9DKTeiBXgg9huMm9HrNzpoeW3ETer1mZ02PrbgJPdALocdwCD2GQ+gxHHehtzZmYnw1rVYDNFeht0IbYwgpvZr8XK0GlLgKPTuR6MFV6Ftwo2CpXYReBjsvZyS5ptc1QNtF6OewpscSuwo9MznWsJvQW4FnZsdSuwi9FXigxS5CH9TLqpzd8zqeF1l8yl3oS6GVL6q5WXVgjrvQA1sj9BgOocdw3kJ/qez/tdYAb95Cf03JDHBrDfBmsrypBbi1BngyCX2YCXBrDfCiGPowE+DWGuCBGfpLjOFq/LentQZ4UAx9LbitNcCLSehrwW2tAZ5M9umt4LbWAG8m+/SW1hrgzWR5AxzdL4HF/YS3HXqJAAAAAElFTkSuQmCC" alt="正しく計算できた結果"></figure>
+
+  <h3>⚠️ 変換できないときはエラーになる</h3>
+  <p>数値に変換するとき、変換できない文字列で行うとエラーになる</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">b = <span class="s">"こんにちは"</span>
+print(int(b)+23)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,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" alt="変換できずエラーになった画面"></figure>
+
+  <p>このようなエラーが起こりそうなときは、あらかじめチェックしておくことで防ぐことができる。<b>isdigit()</b>という命令を使えば、「その変数は正しく数値に変換できるのか」をチェックすることができ、変換できるときは<b>True</b>、できないときは<b>False</b>が返ってくる。調べてTrueが返ってきたときだけ変換すればエラーにならない</p>
+  <div class="syntax">チェックしたい変数.isdigit()</div>
+  <span class="label prog">プログラム</span>
+<pre class="code">a = <span class="s">"100"</span>
+b = <span class="s">"こんにちは"</span>
+print(a.isdigit())
+print(b.isdigit())</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAABACAYAAABImajiAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAMRSURBVHhe7drRcaswEIVh6RbrGlJCWkl5rkD3wZZHPpYWJGNYmf+bYSZmEYHJHhA4MaWUwoddr9cQQgh/f3/hcrloGThMjDGklMI/LWAOMcanxapZ9db6Wj1vo6wxWtP6O7bcH0GYWErpsWhDlLXyph/vV8DauHJbHbfkE/u0lOeh575W3kcgCOiRG2e08Vp6r+xlA4d7wHR87z5dBCEfdLlQ28dWV+jZRAmTiyCUt1W9fer6M9Xe0QpWul89df2RtjhvHd+7TxdBwJiy2fWPbgUrr98yDNaxeFM7RoIwsVajW8rm7wlD2Ty1cSPHsiU9nl4uglBeTfJCzZ9PHeOe+4yVu0HwEoTyNq5XFl1/ptpaqXKF/oQ1x7jHsejvaDV3DxdBwPZad5ncRHl5t4G2sBSumvI8amNr+2xtGwjCvPQPWn7OTVAuum1tfVZbr+v097Vq1rp3WefQiyDgNKzQEASAIAA3BAEgCMCNiyDoqz59R6wLsDUXQdBXffpqThdgay6CAByNIABegqDPADwjYG8ugqDPADwjYG8uggAcjSAABAG4IQiAlyDE+LoAe3IRhJRui/4M7MVFEICjTRGEPFXSaZNOoWqfdQxQM0UQwr2pe6ZN5fYpEQbYpgnC2gAAI6YJwgimRljrq4NQTo24o8DyNUFYuuov1XFuUwchPwTnB+NWrVYHSq6C0GrW1vpQ+TKuVtP1gHIVBOAoBAHwEoRyLj/yurN3e0C5CELgVScO5iYIwJGmCMI7U6bWOKuG83EThFZjxsF/nrPGWTWck5sgtJ4P9POorfaD7+QmCJbW3cKSr/StcVYN5+M+CDqN6WFNf8pa737xfdwHYZQ2vqVnW3wn90HQKU7t6l5TG7emhnNyEYSlRtQpjG6vnzMdt7aG83ERBOBoBAEgCMDNIwg/xhPoaA2YxSMIvyk1m3q0BsziaWpkNfVoDZjByzOC1dSjNcC7lyCEhaYerQGeVYPwE2P4bXzTNFoDPHsJgtXMozXAu6cgWM08WgNm8PQ9QquZR2vALJ6+R2gZrQGz+A8csVqmeH1GXQAAAABJRU5ErkJggg==" alt="isdigitの結果"></figure>
+  <div class="orig"><ul><li>"100"は整数に変換できる（True）が、"こんにちは"は整数に変換できない（False）ことがわかる</li></ul></div>
+
+  <p>「"こんにちは"と、整数23の足し算をする」というプログラムを実行</p>
+  <p>（数値に変換できないときは「数値じゃないよ」と表示される　※エラーで終了しないように工夫することが大事）</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd">b = <span class="s">"こんにちは"</span></span></span><span class="row"><span class="cd"><span class="k">if</span> b.isdigit():</span><span class="cm"><span class="c"># 数に変換できるなら…</span></span></span><span class="row"><span class="cd">    print(int(b)+23)</span></span><span class="row"><span class="cd"><span class="k">else</span>:</span><span class="cm"><span class="c"># そうでなければ…</span></span></span><span class="row"><span class="cd">    print(<span class="s">"数値じゃないよ"</span>)</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMcAAAA3CAYAAAC4l17fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAOjSURBVHhe7dlNcuowEARg6V2AW3KGHCFX4XawYau3CJMMzYwsyX9j6K/KlSDZshxPy0Dy9Xotp9Mpre12u6WUUrpcLul8PmM3UTj/sIGIfjAcbyrn/LTV+mr9XrvVL/ug2jHYh/1zzB2P4XhjpZTfDYtE95VSfttzzu5xel88bsoaY9bo68Brb8Vw0GKkIEeL0dP7BJB5CGtOLWOGCYdMVm/sq/dtYamV/GhyznHCoR+7+HjFdvbN54WtPFZZbN/TEteNx7eMGSYctDwdACyEWtikfcmA1OYSjcyR4XhjXvHX6ED0BEQXvXXcyFyWhPNpESYcemWRjX31vmjWmuOWY2YV8jDh0I95XGWwnX19irGSr6FljlvMBc+hC75HmHDQtrynkRSWbCNFtbSpwFn0dVjHWmPivgzHm8Ibr19LYegN97XahdWObXg+r6/WNlftGlowHEQPGCSGg8jBcBA5GA4iB8NB5AgTDvxqEb+nxo1obWHCgV8t4leBuBGtLUw4iKJhOIgcYcKBnyn4mYP2FiYc+JmCnzlob2HCQRQNw0HkYDiIHGHCIZ+x8Sf+7vH28dr3FnVe9CdMOPAzNr5ulfPzhm0I26xw7m2puSw1zqcIEw6rmK1+r0/CVMrzhm17wvnr67Cui/YVJhxYuPJaCh+L3WMFrKfwWs4xCq9Bn0Ne98w1DTwNdEB7j/00YcIhIUiPQmm9cbX9MFRrq82lVe98e/5WyXmyki1MOPBGyU2fuvl4nLb2Cjkyrl4EsJ1iCROOZBSOVUQ9tlwhpbj3KPKpBYTGhAmHLi5vxcfwTPHGaVU7Duerg+gd1zt/2leYcEjR6JVe//QKrmbNJ4c1zxFzwtti7gLxycKEYw1zCmNklddPEQu26yeOvLboxcHbx6LH1+foGeOThQqHFAEWmL7JrTdWF4UuDmSNieev0cfXztPCmkur1vP2/h0/WZhw6FDom4eF2nJjZSxrs8iYeg5b0OeVc3rnln29fkvtulr+jp8uTDgkFPq1/qlhGx5X2zwt+3hGjhE952zdT6tdl9VGf8KEgygahoPI8RSOr8qb0NE+oqN6Csd3KW6hj/YRHdXL26paoY/2ER3RSzjSRKGP9hEdjRmONFHoo31ER+KG4yvn9O18ET7aR3QkZjhqBT7aR3Q0L+GoFfhoH9ERvfyfwyvw0T6io3r5P4dntI/oqF7eVhHRD4aDyJGv12s5nU7Yvrjb7ZZSSul+v2MXUUj/AWfd6UcpdZaiAAAAAElFTkSuQmCC" alt="数値じゃないよと表示された結果"></figure>
+  <div class="orig"><ul><li>「こんにちは」は数値ではないため、「数値じゃないよ」と表示された</li></ul></div>
+  <div class="point">ここで使った <b>if 〜 else</b> は、LESSON 13 でくわしく学びます。</div>
+</section>
+
+<!-- LESSON 11 -->
+<section id="l11">
+  <h2><span class="ls">LESSON 11</span>リストでたくさんのデータを扱おう</h2>
+  <p class="lead">データをたくさん使うときは「変数」ではなく、「<b>リスト</b>」を使う。<br>「名前」ではなく「番号」で指定できるので、データがたくさんあっても扱いやすい</p>
+  <p>リストの1つ1つの値のことを「<b>要素</b>」、指定する番号のことを「<b>インデックス</b>」と呼ぶ（インデックスは「0」から始まり、「1」「2」と続いていく）</p>
+
+  <div class="syntax">リスト名 = [要素1, 要素2, 要素3, ...]
+print(リスト名[インデックス])</div>
+
+  <div class="figure">
+    <div class="lockers">
+      <div class="locker"><div class="no">[0]</div><div class="val">おにぎり</div></div>
+      <div class="locker"><div class="no">[1]</div><div class="val">パスタ</div></div>
+      <div class="locker pick"><div class="no">[2]</div><div class="val">ハンバーガー</div></div>
+      <div class="locker"><div class="no">[3]</div><div class="val">カレー</div></div>
+      <div class="locker"><div class="no">[4]</div><div class="val">定食</div></div>
+    </div>
+    <div class="cap">リストは<b>番号つきのロッカー</b>のようなもの。lunch[2] は「2番のロッカーの中身」＝ハンバーガー。</div>
+  </div>
+  <span class="label prog">プログラム</span>
+<pre class="code">lunch = [<span class="s">"おにぎり"</span>,<span class="s">"パスタ"</span>,<span class="s">"ハンバーガー"</span>,<span class="s">"カレー"</span>,<span class="s">"定食"</span>]
+print(lunch[2])</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALsAAAA2CAYAAACfvuhsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALESURBVHhe7dxBcuMgEIVheg7rM+QIuUpO4StZG2+ZhYcMbgGSEeC2+L8qFqYtgSpPRCJVEe+9d50ty+Kcc+7n58ddLhddRmMi4uIfa/xZ12K6pj/n+oJUTffpz7m+I3LX+0d9D6gSQiUiunSIiLx0Tn3jxHMyEfZwQXGjVq6N0HK1tcBE2L33q0atXDsid/P4f6ug7n+nFtcdjjcRdrQXB1qHpXTzhP6WgS/NZSTCflK5MJfEAX8l8HGIU8fVzKWlMB8TYY/v/NColWvW9Jpjy3OaCHv8a1WvArqf2mt8YqXtYc8cR8xFjyFsPc4t99siBCW0UnBH2bqBUuLriI8l7CekwxF/jlfgVJBy/UGqX/fp8XK1Ut9RqWsg7JgGYcc0CDumQdgxDcKOaZgIu94K0/ukugE1TIRdb4XprSvdgBomwg6MQNgxDRNh18/kPLOjBxNh18/kPLOjBxNhB0Yg7JgGYcc0CHtCeAfu9S6sz9t7PDwQdkzjFGEXabsqhg2fURs/o8eblbmwp0Kb6ot5/2hb30tJHZPqOyrckPEji27oy1zYU/YGubQy7jk+KI2X698Sbsh4Fdd9KbXjYe0jwm5JuBG2Wiujxzuzjwl7abXtoTSeXpVTrSV97lTDto8J+xEiBALGwt4jlKVzlmq9vGNMPJgKe2sECzEzYW8ZzPDSVjrfVr2Hd4yJ/8yEfU8ISt+Jdyb2vLRt1d3O7+yVCrqeM/oyE/ajQsCthiY1L+tzPpvThB3YQtgxjd+wf0nmLygHaoAlv2H/9j4b3NoaYMnTY0wpuLU1wIrVM3spuLU1wIJV2N1GcGtrwLslw/4l4r4zm7+1NeDdVmEvBba2BljwFPZSYGtrgBVP++y5wNbWAEue9tlzamuAJatnduCsCDumIX7A/4BelsU559z9ftclYBi5Xq/dww5YILfbjbBjCn8B+B0zKp7/D4MAAAAASUVORK5CYII=" alt="lunch[2]を表示した結果"></figure>
+
+  <h3>🎋 第2章で行ったおみくじプログラムのリスト</h3>
+<pre class="code"><span class="k">import</span> random
+kuji = [<span class="s">"大吉"</span>, <span class="s">"中吉"</span>, <span class="s">"小吉"</span>, <span class="s">"凶"</span>]
+print(random.choice(kuji))</pre>
+  <div class="orig"><ul>
+    <li>2行目の["大吉", "中吉", "小吉", "凶"]がリスト</li>
+    <li>データが4つなので、0番～3番で読み出すことができる</li>
+  </ul></div>
+  <p>リストはデータを増やしたり減らしたりするのがやりやすい</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="k">import</span> random
+kuji = [<span class="s">"大吉"</span>,<span class="s">"中吉"</span>,<span class="s">"小吉"</span>,<span class="s">"凶"</span>,<span class="s">"半吉"</span>,<span class="s">"末吉"</span>,<span class="s">"大凶"</span>,<span class="s">"大大吉"</span>]
+print(random.choice(kuji))</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL4AAAChCAYAAAB59AXTAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAfBSURBVHhe7d1NdtwqFIVR8GAzBg/BU8koMqW4ky6v8YyCj4CSrn64Ed9ei4a5gpJcpxClhh1TSilc6PPzM4QQws+fP8OPHz+0DAzxph3Ak8QYtSsEgu9XjPFb69V69VZ/rZ6PUb0xWtP6EWfOp/MQfMdSSkvTN66slbvVGGNzXHmsjnvlijl7yuvQa98qz1FD8LHIQbEGrWXvyq2BrZ3T3jnV8ODnCyjbLLU7tFa8p4ud1T54CH55C9VbpfY/rXZE64OUvlZH7R/pjOvW8UfnHB58tJXh1je590HK/WeGv3cu3mw5R4LvWCvYPWXY94S/DEttnOVczqTnc9Tw4JcrSW6z1Ly56hzvnDNuWO2Dh+CXt2xdVbT/abWtUmUFvsKWc7zjXPQ1toZ5j+HBh03rLpJDk9vZgbF49WGqKa+jNrY2Z+vYUPm9EHyn9A0sf85vetn02Fp/VuvXPn29Vq3Xd1TvGizK3wvBx2Ps+ZAQfEyJ4GNKBB9TIviY0vDg62O58tGc9pc14IjhwS8fMenjK+3f860d6BkefGAEgo8pDQ++7uHZ4+MOw4Ove3j2+LjD8OADIxB8TIngY0oug2/9Dmsdh/m4DD5wteHBj3HdWv3liq79W8cBwUPwU1q3Vn/5NFP7t44DgofgAyO4CH5tW6J9te1Kra59tXGAi+C3tiSvtitabzVAuQh+FuPfoKbEao3ruAl+GfpsS/h1W6MNqBke/BxQDX2Ww98LsW5t2OLgleHB3xLSLccAewwP/hl0e/PqDgG4DP6e1V23N9qAGpfBB65G8DGltxBCeO9siK01wLO3EEL4SKkZYmsN8GzZ6vRCbK0BXn3b4/dCbK0BHq2+3PZCbK0B3qyC/x5j+Gg8ALfWAG++Bb8XXmsN8GgJfi+81hrg1fIcvxVeaw3wbHmO32KtAZ6tvtwCMyD4eLTWn5Yn+E71/i+A1nr1Vn+tno9RvTFa0/oRZ86n8xB8x8r/C6BvXOv/BsQYm+PKY3XcK1fM2VNeh177VnmOGoKPRQ6KNWgte1duDWztnPbOqYYHP19A2Wap3aG14j1d7Kz2wUPwy1uo3iq1/2m1I1ofpPS1Omr/SGdct44/Oufw4KOtDLe+yb0PUu4/M/y9c/FmyzkSfMdawe4pw74n/GVYauMs53ImPZ+jhge/XElym6XmzVXneOecccNqHzwEv7xl66qi/U+rbZUqK/AVtpzjHeeir7E1zHsMDz5sWneRHJrczg6MxasPU015HbWxtTlbx4bK74XgO6VvYPlzftPLpsfW+rNav/bp67Vqvb6jetdgUf5eCD4eY8+HhOBjSgQfUyL4mBLBx5SGB18fy5WP5rS/rAFHDA9++YhJH19p/55v7UDP8OADIxB8TGl48HUPzx4fdxgefN3Ds8fHHYYHHxiB4GNKBB9Tchl863dY6zjMx2Xwgav9s8GPcd1a/dwJoNwEvxfOWi2ldWv18xQUyk3we1Kqhx+wchH8GG2rcm07o318YFDjIvhb1FZ93c60GqCGB9+62gNHDA/+ntDXjtVtjTagZnjwz6BbG7Y4eOURwQf2chV86/ZEtzfWeTAPV8G3bFN0e6MNqHEVfOAuBB9TegshhPfOhthaAzx7CyGEj5SaIbbWAM+WrU4vxNYa4NW3PX4vxNYa4NHqy20vxNYa4M0q+O8xho/GA3BrDfDmW/B74bXWAI+W4PfCa60BXi3P8VvhtdYAz5bn+C3WGuDZ6sstMAOCj0dr/Wl5gu9U7/8CaK1Xb/XX6vkY1RujNa0fceZ8Og/Bd6z8vwD6xrX+b0CMsTmuPFbHvXLFnD3ldei1b5XnqCH4WOSgWIPWsnfl1sDWzmnvnGp48PMFlG2W2h1aK97Txc5qHzwEv7yF6q1S+59WO6L1QUpfq6P2j3TGdev4o3MODz7aynDrm9z7IOX+M8PfOxdvtpwjwXesFeyeMux7wl+GpTbOci5n0vM5anjwy5Ukt1lq3lx1jnfOGTes9sFD8Mtbtq4q2v+02lapsgJfYcs53nEu+hpbw7zH8ODDpnUXyaHJ7ezAWLz6MNWU11EbW5uzdWyo/F4IvlP6BpY/5ze9bHpsrT+r9Wufvl6r1us7qncNFuXvheDjMfZ8SAg+pkTwMSWCjykRfExpePD1sVz5aE77yxpwxPDgl4+Y9PGV9u/51g70DA8+MALBx5SGB1/38OzxcYfhwdc9PHt83GF48IERCD6mRPAxJZfBt36HvXsc/l0ugw9cbbrgx7hurX7uBM81PPgatF4QzxiX0rq1+nl6+lzDg69B6wXxjHFA8BB8FeP/YdWV+pU942p3BO3bMg/+Xe6Cfwe9I7QanstV8POqHb7CuXXVtY7DvFwF/066rdGGZ3MT/HLVzras3tZxobPlwfO5CH4tvFkvxNZxwPDg98Kb1UJsHVfS7U1ueL7hwX8V3kyP059bWsfp9kYbnm148IERCD6m9BZCCO+dja21Bnj2FkIIHyk1Q2ytAZ4tW51eiK01wKtve/xeiK01wKPVl9teiK01wJtV8N9jDB+NB9nWGuDNt+D3wmutAR4twe+F11oDvFqe47fCa60Bni3P8VusNcCz1ZdbYAYEH1OK6eK/vf35+RlCCOHPnz9aAoaJv379ujT4gEfx9+/fBB/T+Q8DvIl+Tt3uiQAAAABJRU5ErkJggg==" alt="くじを増やしたおみくじの結果"><figcaption>リストに書き足すだけで、くじの種類が8つに増えた</figcaption></figure>
+
+  <h3>🐢 第2章で行ったタートルグラフィックスで使われているリスト</h3>
+  <p>3行目のリストを変えるだけで、星の線の色が変わる</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">from</span> turtle <span class="k">import</span> *</span></span><span class="row"><span class="cd">shape(<span class="s">"turtle"</span>)</span></span></span><span class="rows"><span class="row"><span class="cd">col = [<span class="s">"red"</span>,<span class="s">"blue"</span>,<span class="s">"green"</span>,<span class="s">"brown"</span>,<span class="s">"black"</span>]</span><span class="cm"><span class="c"># ← ここだけ変更</span></span></span></span><span class="rows"><span class="row"><span class="cd"><span class="k">for</span> i <span class="k">in</span> range(5):</span></span><span class="row"><span class="cd">    color(col[i])</span></span><span class="row"><span class="cd">    forward(200)</span></span><span class="row"><span class="cd">    left(144)</span></span><span class="row"><span class="cd">done()</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,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" alt="色を変えた星"><figcaption>赤・青・緑・茶・黒の星になった</figcaption></figure>
+</section>
+
+<!-- LESSON 12 -->
+<section id="l12">
+  <h2><span class="ls">LESSON 12</span>プログラムの3つの基本の形</h2>
+  <p class="lead">プログラムは「<b>順次</b>」「<b>分岐</b>」「<b>反復</b>」の3つの組み合わせ</p>
+  <div class="flow3">
+    <div class="fl f1">
+      <svg viewBox="0 0 200 170"><g font-size="13" text-anchor="middle">
+        <rect class="box" x="50" y="8" width="100" height="32" rx="8" fill="#fff" stroke="#2b8aef" stroke-width="2"/><text x="100" y="29" fill="#243b53">処理1</text>
+        <line x1="100" y1="40" x2="100" y2="62" stroke="#2b8aef" stroke-width="2"/><path d="M94,56 L100,64 L106,56" fill="#2b8aef"/>
+        <rect class="box" x="50" y="66" width="100" height="32" rx="8" fill="#fff" stroke="#2b8aef" stroke-width="2"/><text x="100" y="87" fill="#243b53">処理2</text>
+        <line x1="100" y1="98" x2="100" y2="120" stroke="#2b8aef" stroke-width="2"/><path d="M94,114 L100,122 L106,114" fill="#2b8aef"/>
+        <rect class="box" x="50" y="124" width="100" height="32" rx="8" fill="#fff" stroke="#2b8aef" stroke-width="2"/><text x="100" y="145" fill="#243b53">処理3</text>
+      </g></svg>
+      <div class="k">① 順次</div><div class="v">上から順番に、実行する</div>
+    </div>
+    <div class="fl f2">
+      <svg viewBox="0 0 200 170"><g font-size="13" text-anchor="middle">
+        <path class="box" d="M100,8 L160,40 L100,72 L40,40 Z" fill="#fff" stroke="#f5821f" stroke-width="2"/><text x="100" y="45" fill="#243b53">もしも〜</text>
+        <line x1="40" y1="40" x2="40" y2="110" stroke="#f5821f" stroke-width="2"/><path d="M34,104 L40,112 L46,104" fill="#f5821f"/>
+        <line x1="160" y1="40" x2="160" y2="110" stroke="#f5821f" stroke-width="2"/><path d="M154,104 L160,112 L166,104" fill="#f5821f"/>
+        <text x="24" y="80" fill="#1f9d55" font-weight="bold">はい</text><text x="180" y="80" fill="#e84393" font-weight="bold">いいえ</text>
+        <rect class="box" x="5" y="114" width="80" height="32" rx="8" fill="#fff" stroke="#f5821f" stroke-width="2"/><text x="45" y="135" fill="#243b53">処理A</text>
+        <rect class="box" x="115" y="114" width="80" height="32" rx="8" fill="#fff" stroke="#f5821f" stroke-width="2"/><text x="155" y="135" fill="#243b53">処理B</text>
+      </g></svg>
+      <div class="k">② 分岐（if文）</div><div class="v">もしも〜なら実行する</div>
+    </div>
+    <div class="fl f3">
+      <svg viewBox="0 0 200 170"><g font-size="13" text-anchor="middle">
+        <rect class="box" x="50" y="20" width="100" height="32" rx="8" fill="#fff" stroke="#1f9d55" stroke-width="2"/><text x="100" y="41" fill="#243b53">処理1</text>
+        <line x1="100" y1="52" x2="100" y2="80" stroke="#1f9d55" stroke-width="2"/><path d="M94,74 L100,82 L106,74" fill="#1f9d55"/>
+        <rect class="box" x="50" y="84" width="100" height="32" rx="8" fill="#fff" stroke="#1f9d55" stroke-width="2"/><text x="100" y="105" fill="#243b53">処理2</text>
+        <path d="M150,100 C190,100 190,36 156,36" fill="none" stroke="#1f9d55" stroke-width="2"/><path d="M162,30 L154,36 L162,42" fill="#1f9d55"/>
+        <text x="100" y="150" fill="#1f9d55" font-weight="bold">くり返す 🔁</text>
+      </g></svg>
+      <div class="k">③ 反復（for文）</div><div class="v">同じ処理を繰り返す</div>
+    </div>
+  </div>
+  <div class="orig"><ul>
+    <li><b>①順次</b>（上から順番に、実行する）</li>
+    <li><b>②分岐</b>（もしも～なら実行する）
+      <ul><li>条件によって「処理をするかしないかの選択」を行ったり「場合分け」を行ったりする</li><li>Pythonでは、「if文」を使う</li></ul></li>
+    <li><b>③反復</b>（同じ処理を繰り返す）
+      <ul><li>「回数を指定した繰り返し」や「リストの要素をすべて調べる繰り返し」を行うことができる</li><li>「for文」を使う</li></ul></li>
+  </ul></div>
+  <div class="point">朝のしたくで例えると…「顔を洗う→着替える」が<b>順次</b>、「もしも雨なら傘を持つ」が<b>分岐</b>、「歯を10回みがく」が<b>反復</b>。どんなに大きなプログラムも、この3つの組み合わせでできています。</div>
+</section>
+
+<!-- LESSON 13 -->
+<section id="l13">
+  <h2><span class="ls">LESSON 13</span>if文（もしも〜なら）</h2>
+  <p class="lead">if文は、「もしも△△だったら」の部分と、「〇〇をする」の部分に分けて書く</p>
+  <div class="syntax">if 条件式:
+    条件式が正しいときにする処理</div>
+
+  <h3>⚖️ 2つの値を比較する記号：比較演算子</h3>
+  <div class="tbl"><table>
+    <tr><th style="width:90px;text-align:center">記号</th><th>働き</th><th>例（score が 80 のとき）</th></tr>
+    <tr><td class="sym">==</td><td>左辺が右辺と同じ</td><td><code>score == 80</code> → True</td></tr>
+    <tr><td class="sym">!=</td><td>左辺が右辺と違う</td><td><code>score != 80</code> → False</td></tr>
+    <tr><td class="sym">&lt;</td><td>左辺が右辺より小さい</td><td><code>score &lt; 80</code> → False</td></tr>
+    <tr><td class="sym">&lt;=</td><td>左辺が右辺以下</td><td><code>score &lt;= 80</code> → True</td></tr>
+    <tr><td class="sym">&gt;</td><td>左辺が右辺より大きい</td><td><code>score &gt; 80</code> → False</td></tr>
+    <tr><td class="sym">&gt;=</td><td>左辺が右辺以上</td><td><code>score &gt;= 80</code> → True</td></tr>
+  </table></div>
+  <div class="point">「同じ」は <b>=</b> ではなく <b>==</b>（イコール2つ）。<b>=</b> 1つは「箱に入れる」でしたね。</div>
+
+  <div class="orig"><ul>
+    <li>「〇〇をする」の部分は、一段「インデント（字下げ）」して表現する</li>
+    <li>複数行ある場合はそれらをすべてインデントする</li>
+    <li>Pythonでは「インデントしている部分」が「ひとまとまり」として扱われ、これを「<b>ブロック</b>」という</li>
+    <li>ブロックにするには行の先端に「タブ」または「半角スペース4文字」を入れる</li>
+    <li>IDLEで入力しているときは、自動的にタブが入力されてインデントされる</li>
+  </ul></div>
+
+  <h3>✏️ if文を試してみよう</h3>
+  <p>もしもscoreが80点以上だったら、"やったね！次もこの調子だ"と表示され、80点より小さかったら何も表示されないプログラム</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">score = 90
+<span class="k">if</span> score >= 80:
+    print(<span class="s">"やったね！"</span>)
+    print(<span class="s">"次もこの調子だ"</span>)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMoAAABFCAYAAAALg3mlAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAASWSURBVHhe7dn9cdswDAVwsgtky8zQEbpKtksmYP+omcDPAAjSkgyp73enu5pfpis8SXbq5+dne3t7K3v7+voqpZTy8fFR3t/fsZsopVpraa2VX9hB11BrvTu8Pq/fatf6+xjkzcE+7H/GlusxKBfWWvs+sGBkX2vtu73erqDaPDkW543ssaZHfg787FF9jcKg0JZ6Ya0WpmX2ziALvNwCiPNn10wTlL5xebDP7zvCVlf4s6kQtjRBkbdmvAVjO/ueZwWv3a6+2P5KW3xunD+7Zpqg0PZkGLAovOD19i3D4u0lG22PDMqFWUHwyHDMhEUWlzZvZS9bwv3MShMUecXpB/v8vmz22uORa1blblIyBUU+CuDVB9vZN6cpV/g9RPZ4xF7wPazin5EmKHQs6y7Vi6wfzxbYFkbh08jPoc3V1rTGFgbluvCEy9e9SOSBY7X2TmvHNnw/q89re5b3GWYxKEQ3XqgYFKIABoUogEEhCmBQiALSBAV/rsTfwfEgOlKaoODPlfjzIh5ER0oTFKLMGBSigDRBwe8g/I5CmaQJCn4H4XcUyiRNUIgyY1CIAhgUogAG5Wbl94GVOXROKYOCBYivr+TKn+1KUgblKLX+HPL1CM6RbZH5dD7pg4KFuKXWfg75egTn1Hq/1tb7pNdLFRS8UmMB7lWE/X1WaHP32ie9TqqgyED01+iIIuwhjdzFtD3S9aQKylZmCl2DdzHNyrp0XqcLivao09v7gYXuFbW1HpGUNihY4DIEmtEdIMoLVeftY9ZW69C+0gYFbRGCPa0+6q3MoeOdJiirvKu/1+fBOfi4t7ou5XXJoMir+2zB9kLHw4Nz+uuI7HdK+id1UFYLSF7dPVa/nO+tI9txrDWHzil1UErwy7U0O/5I2h0K71zY742xxmu0Mb1N66N7qYKyesJW5z0Li3W0D7zryHbZj/DuhgftL1VQ2sSzvdTnySvkzDpY7JH5VXyBL6KYrXm4thwn9z2jr2OFBd8L31funXypglLgpOEJxhMvYcHOnHw5JzLfK04rLLi2nN//ba2JZEC8Ofheo/FkSxeUDgsBT/qreCHpmhIWL+j9NbZ7RnuQInsmX9qgWCdWO+legXl9R5JBx/1b7UUJmAyVdkSszPnfpQvK6MRpxSSv4FgA2tX9FbzitNqLErD++bHNCppmZc7/Ll1QUA3+AU8roEy84tTattL//+g5qYLyipM6CuBIdM/eHeVIr3zvM0sVFCSLMHJXOUJkH1Z4rDvHq8NDY2mCgsWFr0ugSLV+bZ1n9ffR1tbaLH2sPLY0sxfypQnKKCSdFgZJFrG3Tofj8bBgYUfeb7RmGTwaReaPWJ+XfGmCInnFVoL9WMgeOR6PqNF4bV1tvLcOzh+xxuFerHH0I2VQiLJhUIgC7oLy23lYXe0juoK7oPxpzSz61T6iK3h49PKKfrWP6OweglIGRb/aR3RmalDKoOhX+4jOygzK71rLH+MH9tU+orNSg+IV+2of0Zk9BMUr9tU+orN7+DuKVeyrfURX8PB3FMtqH9EVPDx6EdEjBoUogEEhCmBQiAIYFKKAv2KHsr8XBQHeAAAAAElFTkSuQmCC" alt="if文の実行結果"></figure>
+  <div class="orig"><ul><li>「score >= 80」の条件だと、80ピッタリも含まれる（「score > 80」の条件では80は含まれない）</li></ul></div>
+
+  <h3>🔀 「そうでないとき」の処理を書く</h3>
+  <div class="syntax">if 条件式:
+    条件式が正しいときにする処理
+else:
+    条件式が正しくないときにする処理</div>
+  <p>もしもscoreが80点以上だったら、"やったね！次もこの調子だ"と表示されて、そうでなかったら"残念でした"と表示されるプログラム</p>
+  <span class="label prog">プログラム</span>
+<pre class="code">score = 60
+<span class="k">if</span> score >= 80:
+    print(<span class="s">"やったね！"</span>)
+    print(<span class="s">"次もこの調子だ"</span>)
+<span class="k">else</span>:
+    print(<span class="s">"残念でした"</span>)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALgAAABDCAYAAAAvZs8dAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANbSURBVHhe7dhhcqQgEIZhyGFzhhwhV8nx5gTsj12mOl8AFXHa7bxPlZUMjYo1H+qQSyklXejxeKSUUvr6+krv7+9aBi71pg34v+Wcv22j2qjea2/Vax812kdrWj/DHo+AB1RKeW4aHFuzD++cc3c/21f323LFMUfsdeScCTjOq6HSyXTW0Tt7HUdVSvEPuH1E6QVpO7XXWXVH9eYecPsI00eVtlM7rzdhyr87sLZ7WnHd7gHHejbEGpDRhKntK0M+GssrEPCAegEesaE+EnIb3NZ+M2NZyT3gdobrI1Lbqd3TVWNccUz3gNtHps52bad2TGncUa+wZ4yvGIueI7NM+Pv0ngo1HHUbhfVVtiZNi72OcodlQqylgbCf7Z22FZ5ee9Vq1zY9X682ajvLXgMBR2gEHKERcIRGwBEaAUdo7gHXZStdx9QNOMI94LpspctMugFHuAccuBIBR2juAdd3bN7BsZJ7wPUdm3dwrOQecOBKBByhEXCEduuA19+Ue39b5ry/r5e7jy8a94DXUI7CWUq/VuX8t9+evkrHMBpLrx335B7wujBSw5nkTqz/q1q3Cyw15K3+qRFoe+76/8oFG3su+xnXcw94Zb/0XuBs6DScvdC2wtQ6Zt3H0v1m6bn0WnAd94DbMNq2Gi4bWkv3aYW21a9Fw63nWkXPg+u5B7yldbfrBcNOAN32GIWu177KzHhxjHvAS+NHof3Ct0Kgd+7RZNjr7P57rRwz2twDnkzI65esX7r+7bETYavvFVoTsPIa0293i4CfVYPVmgij0Hm667iiuUXAt+5uvXorJPVp0Pt8ld4Y4cs94L1gtF419ga17rOn/9EJ0Oqv41RbdVzHPeD6xdtg21eOUahqXbdKz6F0/y3af+v4LXqMvefGMe4BVzbYo3btU+u67XV0nyP9e310rL1+mHe7gAMrEXCE9pZSSh+Dl7/ZGnAHbyml9FlKN6yzNeAOnq8oo7DO1gBv397BR2GdrQGefvzIHIV1tgZ4+RHwj5zTZ2dBdrYGePkW8FFIZ2uAp2fARyGdrQHenuvgvZDO1oA7eK6D98zWgDv48SMTiISAIzQCjtAIOEIj4AiNgCM0Ao7QCDhCI+AIjYAjNAKO0Ag4QiPgCI2AIzQCjtAIOEL7AxOesa9rIT/jAAAAAElFTkSuQmCC" alt="if else文の実行結果"></figure>
+
+  <h3>➕ 条件を追加する：elif</h3>
+  <p>if文ではさらに条件を追加することもできる。</p>
+  <p>「もしも『条件A』だったら『処理1』をして、そうでない場合にもしも『条件B』だったら『処理2』をして、どちらでもない場合は『処理3』をする」という2つの条件によって3つの処理の分岐を行う。</p>
+  <p>「<b>elif</b>」を使うと条件を追加していくことができる。</p>
+  <div class="syntax">if 条件式A:
+    条件式Aが正しいときにする処理1
+elif 条件式B:
+    条件式Aが正しくなくて、条件式Bが正しいときにする処理2
+else:
+    どちらも正しくないときにする処理3</div>
+  <div class="point">elif は「else if（そうでなくて、もしも）」を縮めた言葉です。上から順に条件を調べて、<b>最初に当てはまったところだけ</b>が実行されます。</div>
+  <div class="warn">書式の最後につく「<b>:</b>（コロン）」は必ず<b>半角</b>で入力します。全角の「：」だとエラーになります。</div>
+</section>
+
+<!-- LESSON 14 -->
+<section id="l14">
+  <h2><span class="ls">LESSON 14</span>for文（くり返し）</h2>
+  <p class="lead">Pythonのfor文には、「<b>回数を指定して繰り返すfor文</b>」と「<b>リストの要素について繰り返すfor文</b>」の2種類がある。</p>
+
+  <h3>🔢 回数を指定して繰り返すfor文</h3>
+  <p>「回数を指定して繰り返すfor文」は、「回数」を決めて「繰り返す処理」を指示し、回数をカウントするための「カウント変数」も指定する。</p>
+  <div class="syntax">for カウント変数 in range(回数):
+    繰り返す処理</div>
+  <p>5×0～5×9の10個の掛け算をするプログラム</p>
+  <p>繰り返す回数：0～9の10回、繰り返す処理：5かける、カウントの値と、その掛け算の答えを表示すること</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">for</span> i <span class="k">in</span> range(10):</span><span class="cm"><span class="c"># i に 0,1,2,…,9 が順に入る</span></span></span><span class="row"><span class="cd">    print(5,<span class="s">"×"</span>,i,<span class="s">"="</span>,5*i)</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJgAAACxCAYAAAA4YXTfAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAmdSURBVHhe7ZlrltyqDkbxGWzGkCFkKhlej6DOnyhRqXlYD+DDpb0W655rWUaGXYA71+v1epXJfH19lVJK+f37d/nx44cMJw/mP3khOZ/rut5aL9aLt67X4nSPJAV7KK/X62+TE89jfAO7rquZx++VeT1SsCQEklPKDCGYXHp5kfJ6xtZxd5XqASGYXLL5i8nrGfPTEvb1ZwWS1z1ACJbEwyWSYvaEpetRkqVgD6UlUA8ulUYyLrHMgxCM/9rkEi2vZwyTVo0QgslzBv/lyesZ0/FSrEQeWjVCCJaspbUqkozUpCwWUrAHIsXQrIqt60TturzG/38KlkwlBUumkoIlU0nBkqmkYMlUIASTn83801le57EEHwjB5Gez5rM6wQZCsOS5pGDJVCAEk2esPIM9BwjB5Bkrz2DPAUKw5LmkYMlUUrBkKilYMhUIwa7re9vJ6jpW97cSCMFKKeX1em8aRhMzinOu670OTa6F1f2tBkYwD72JoQlM9gAjmHebqEm2Ui5ev+c9ngaMYBHbBM9dKVepbPEr+0YGQrDIySDJIp+Z2IEQLBKSy7oKJrFACBYlA1+5Vksmz18r+0YGQrAIatviSsnk+UvW8qlACEYiUNNOTi9HK5m3Fi2r+1sNhGBFrABaRjmjuMRTi4XV/a0ERrDkmaRgyVQgBONnEGq7WVWDfO9V/a4CQrBS+QrTMJqUUVyivd+L593RgRHMw6vzpWj5MtPen7SBEcy7RdQks8hlRW5zspYelpxTgBGMbxHWgea5K+UqlW1O03fEu6MCIZhmMkbQJEU+cyan1GkFQrBISK6nrQSnAiFYlAx85VotGT9Hac5Td+87FQjBIqhtiyslk+cvWcunAiEYiUBNOzm9nJWSWfC+OzoQghWxAmgZ5YziNSw5Vjzvjg6MYMkzScGSqUAIJr++dp+ZdtTR6mtHLZFACFYqX2EaRoM/inPooE1Nk2ul1ceOWqKBEcxDb/BpkpBBr88DjGDeraAm2Uq5eP2e93gaMIJFbAU81yoXz9E8g9dPLQERLHIySLLIZyZ2IASLhOSyroJEShoDhGBeGQguhUcyi1zy/GXt+2lACBZBTQqLZLXn3EGevyzPeCIQgpEI1LST08uxSoawEnnHBQEIwYpYAbSMckZxjlyFNLkeWv2sriMaGMGSZ5KCJVOBEEyeeXaee0rAvypYqPUlx6R2DzoQgpXK2UfDaOBHcc614R+Ye314xgUBGME89EQgYZBBr88DjGDebaAmmUUu7f2E3MpkLVain7caGMEitiWea5GL4JN69xlyK7ubNyJiXHYCIVjUZBQmmeeZKJPqeQcUIASLhOTaKUbyDwjBomTgK5dVMktOmXQGi3jGbiAEi6C2LVols8C3VWoJiGAkAjXt5PRytJJ5a4kEqRYrEIIVsQJoGeWM4hJPLVZafe2oJRIYwZJnkoIlU4EQjJ8zqKGwopbee/diJwAhWKl8hWkYDf4o3sKap4EO79R4n73YKcAI5qE3+DRJyR5gBPNuBTXJPHJpc3n9nvd4GjCCRWwFPFcriBdeP7U78PtW17wCCMEiB5Uk8zzTm5/8A0KwSEgO6yq4i6dKDSFYlAx8kqyS8S2W//cIup+3uzxVroIiWAS1SbJIxs9QXNYRMu9OTmnU/SQgBCMRqGkHvJdjkWw1rZXPOy4IQAhWxAqgZZQzivfw5N6Bv3ft/VvXTwFGsOSZpGDJVCAEk2eQnWcmWceKWlp9yTpk/AQgBCuVs4iG0cCP4hJPLVquP4d3arLWlbXMAEYwD7WJIWgCkz3ACObdBmqSWeWy1MJztLk9op+3GhjBetvEXXiuVa5irEVuZXf75vfVarbUggSEYHJQPdBEWJ9pzZsBUi1WIASLhOQ67dfu+VEgAyFYlAx8kqySWXKK8wzWkkvzDFQgBIugNklWySzwsxK1O9TqfhIQgpEI1LQD3svRSuatxQLvj9e6o5ZoIAQrYgXQMsoZxSWeWrTwvmp9tq6fAoxgyTNJwZKpQAgmzyCaM9MMVtfR668XOwEIwUrlLKJhNPijOOca/ONzNL3+erFTgBHMQ2/waZKSPcAI5t0KapJFyHU3n9eveY+7zz8VGMEitgKe65VLI0mpbPGavrmUmrwTgBAsclBJMs8zKd8ju4aIHxcqEIJFQnJ4JsojZ/IOhGAeGTh85fJKpoVvc9TucPe+U4EQLILatrhSMr7NUUtABCMRqGknp5ejlcxbi5Zef73YKUAIVsQKoGWUM4pLPLVY6PXXi50AjGDJM0nBkqlACMbPGdR2IetYUUurL1mHjJ8AhGCl8hWmYTTwozjHU4eFa/AP2qvriQZGMA+1iSFoApM9wAjm3QZqknnl0uTLrUzW0mL0fO3z0IARrLdN3IXnauSIQG5lmr65RDIvYlx2AiGYHFQPNBGRz5xNS6KT3qEFhGCRkFzeX/tpkqICIZhXBoJLESGZBr7NUbtD775e7BQgBIugtuKslIxvc9QSEMFIBGrayenlrJTMQu/de7FTgBCsiBVAyyhnFK9hybHSe/de7ARgBEueSQqWTAVCMH7OoLaTnXXIPnfWEgGEYKXyFaZhNPijOIcO09Q0uV5kXztriQJGMA+9wadJSvYAI5h3K6hJtlIuXr/lPVbWuhIYwSK2Ap5rnTB6BrW7z+D1U0tABIucDBLE+kzK9cquwVMvOhCCRUKTtUKMZAyEYFEy8JVgtWR8W6V2B7qP59zNPQEIwSKobTMrJZPnL1lLi1rO3dwTgBCMRKCmHeBejlYyby2RINViBUKwIn7JWkY5o7jEU4sX2efOWiKAESx5JilYMhUIwfg5g9pOdtbB+5RjsqMeLxCClcbX1F1GAz+Kc64Nf2glan15xgUBGME89EQgYZI9wAjm3QZqkq2US25lspYRrVqtz0MBRrCIbYnntiZMg6YOuZV5+yYixmUnEIJFTUZhklmfSfmeZ2hp9VW7dhoQgkVCk+X5tUeuQJ8OhGAeGTh8JbBKZskpjjMY3cdz5P+eDIRgEXC5CKtkFmjV4+0OtZy7uScAIRiJQE07wL0crWTeWiJBqsUKhGBF/JK1jHJGcYmnFi+yz521RAAjWPJMUrBkKilYMpW/gv3snIStsST5K9iv16spizWWJG9bZE8Wayz5bL6dwXqyWGPJ5/JNsDKQxRpLPpOqYD+vq/xq/GXPGks+k2+C9SSxxpLP5U2wniTWWPLZvP0drCWJNZYkb38Ha2GNJcm3M1iSRJKCJVNJwZKppGDJVFKwZCopWDKVFCyZSgqWTCUFS6byP8ruu8dLLnuKAAAAAElFTkSuQmCC" alt="5の段の掛け算"></figure>
+  <div class="orig"><ul><li>掛け算が10行表示された</li></ul></div>
+  <div class="point">range(10) は「0から9までの10個の数」。0から数えるので、<b>10は入らない</b>ことに注意。</div>
+
+  <h3>📋 リストのすべての要素について繰り返すfor文</h3>
+  <p>「リストのすべての要素について繰り返すfor文」は、「リスト」と「繰り返す処理」を指示し、リストから取り出した要素を一時的に入れて使うための「要素を入れる変数」も指定する。</p>
+  <div class="syntax">for 要素を入れる変数 in リスト:
+    繰り返す処理</div>
+  <span class="label prog">プログラム</span>
+<pre class="code">scorelist = [64, 100, 78, 80, 72]
+<span class="k">for</span> i <span class="k">in</span> scorelist:
+    print(i)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABuCAYAAADs69dUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALYSURBVHhe7dnBkesgEEVR+Ak4S8cwIUwqzs6OgL+irEHQZigYPbXuqdLG7d0thJDi8/lMt9strPZ6vUIIITwej3C/38sxFvlX/gBfCOxUjDHEGAnsWUqJwN7JBM63lO3FzJ71kAmcUtpdzOxZD5nAmC/ykOVbUnrIKveZ3n2o/P1Ksx4ygct9pncfKn+/0qyHTGCsQWCn8konsHMEdo7AzhHYOQI7JxO4PMzPPOxfmUzg8jA/87B/ZTKBsQaBnZMJXO6x7MFzyAQu91j24DlkAmMNAjtHYOcI7JxU4Bjfl+XTHG8ygWMMIaX31YrY+h11MoGxhmzg2lE3r3L0kwvcswejn1Tg7T5cRmb1jpEKTMD5pAK35NW8vX2XKxx1pwi8PT7lVc5q7yMTOO+7+SLgHDKBQ7FSLZ/meJMKjPkI7Jxc4NbT8XZ/Llmzq5MK3AqUH7pqL0GsGcQC8/A0n1RgzEdg5wjsHIGdI7BzBHbuFIGtDxHWDIKBW4GsDxHW7OrkAmMuAjsnE3i7j9Y+HLR+h00m8HYfLfdSPiiMkwmMNSQDc9yZRzJwKd+WOev+3ikCswePkwvMCp1LLjDmIrBzpwjMQ9Y4ucCteK2XILDJBcZcBHZOKrD1QcGaoU0msPUyw5rBJhMYaxDYOZnAnHXXkAnMPruGTGCsQWDnCOycTGDrIcuawSYTOHz4oGDN0CYVGPMR2DmZwNs9Nl+tOfrJBN7useU+y0uQcTKBsYZkYI5C80gGLm1jE/93ThEY4+QCWyvUmqFOLnALccecIjBxx50icKi8CEEfucC1lVq+BKn9B3VygTEXgZ0jsHM/An8ZTy+jMxzrR+DvlJqxRmc41u4WbcUaneE4u8DhQ6zRGY5RDRw+xBqd4e81A3/FGL4bbxRGZ/h71cBWpNEZjrELbEUaneE4u3NwK9LoDMfanYNbRmc41u4WDV8I7ByBnSOwcwR2jsDO/Qf6YbD2iww83QAAAABJRU5ErkJggg==" alt="リストの要素を順に表示"></figure>
+  <div class="orig"><ul><li>リストから順番に表示された</li></ul></div>
+
+  <h3>➕ リストの中の点数を足すfor文</h3>
+  <p>リストの中に入っている点数の合計を求めるプログラム</p>
+  <p>合計値を求めるため、合計値用変数（total）を用意して、あらかじめ0にリセットしておく。</p>
+  <p>「繰り返す処理」は、「リストから取り出した値を、合計値用変数に足すこと」</p>
+  <p>繰り返しが終わったら、total変数に合計値が求まるため表示、1回だけ行えばいいため、インデントのあとにインデントせずに行う</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd">scorelist = [64, 100, 78, 80, 72]</span></span><span class="row"><span class="cd">total = 0</span><span class="cm"><span class="c"># 合計を入れる箱を0にしておく</span></span></span><span class="row"><span class="cd"><span class="k">for</span> i <span class="k">in</span> scorelist:</span></span><span class="row"><span class="cd">    total = total + i</span><span class="cm"><span class="c"># 今の合計に i を足して、箱に入れ直す</span></span></span><span class="row"><span class="cd">print(total)</span><span class="cm"><span class="c"># インデントなし → くり返しが終わってから1回だけ</span></span></span></span></pre>
+  <div class="tbl"><table>
+    <tr><th>回目</th><th>i（取り出した点数）</th><th>total = total + i</th></tr>
+    <tr><td>1</td><td>64</td><td>0 + 64 = <b>64</b></td></tr>
+    <tr><td>2</td><td>100</td><td>64 + 100 = <b>164</b></td></tr>
+    <tr><td>3</td><td>78</td><td>164 + 78 = <b>242</b></td></tr>
+    <tr><td>4</td><td>80</td><td>242 + 80 = <b>322</b></td></tr>
+    <tr><td>5</td><td>72</td><td>322 + 72 = <b>394</b></td></tr>
+  </table></div>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAA/CAYAAAACEjHEAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJESURBVHhe7d1RbsIwDIDhZpceR9gVuGVv4L1g5rokrAGDSf5PqrTFIDHpJ6S8bJGL72XRH3d6Z2pdV1nXVc7nsx9hUF/LxY+I/rjTO8O8rmEBz0RYCEFYAyqlbK7WrDWvrd+a62MUYQ1KRK6Xj8DOxJyRSynV59nH+ufdQlh4Co1SY0wRlt9i7TvFrzN7nXu7UkuKsPzWbP8gv87scbVQ5bLj+PUeKcLC89l4fJCtUHX90bgIa1C1cFpsTEfisvHq81KEZd9dfiv268xy8q8xRVj+HGHfaX6d2TFyYOd5hH+NKcLCa9V2QY1Qr56QFWENyAdxZBesratb635NRAgLMQgLIQgLIQgLIQgLIVKE5W9/7S2wX7cz5JUiLH/7e+T2GDmlCAvjISyESBGWP0Nxxvp8KcLyZyjOWJ8vRVgYD2EhBGEhBGEhRJqwSvm7vNbMujfH66QIq5RlEfm7bCCtmVVbx3ukCAvjSRHWo19N6a6GPFKEtbhzVC0SPu4+R5qwauco/b0WXG0d75UmrBYNDp8jRVitj7j/zHRHs2t4rxRh9bIfn7qjsbPlkCIse47yZ6bWDHmlCGtxu4/Xmln35nidNGFhLISFEISFENewTo379N4Z5nUN60ekGknvDPPafBS2IumdYU67M1Yrkt4Z5rMLa7kTSe8Mc7kZ1qmU6v8h7J1hLruwWnH0zjCfTVitOHpnmNPme6xaHL0zzGvzPVZN7wzz2p2xgGcgLIQgLIQgLIQgLIQgLIQgLIQgLIQgLIT4BYoE+tXDNKuaAAAAAElFTkSuQmCC" alt="合計の表示"></figure>
+  <div class="orig"><ul><li>順番に次々と足されていき、最後に合計が表示される</li></ul></div>
+
+  <h3>🪆 for文の入れ子</h3>
+  <p>for文の「繰り返す処理」のところに、さらにfor文を入れることもできる、「繰り返しの中で繰り返しを行う」という二重の繰り返しのことを、「<b>for文の入れ子</b>」という。</p>
+  <div class="syntax">for カウント変数1 in range(回数):
+    for カウント変数2 in range(回数):
+        繰り返す処理</div>
+  <div class="orig"><ul><li>for文の入れ子では、外側のfor文のカウントが1つ進むたびに、「内側のfor文がすべて繰り返し終わるまで繰り返す」</li></ul></div>
+  <div class="point"><b>時計</b>をイメージしてみましょう。短い針（外側のfor）が1つ進むあいだに、長い針（内側のfor）はぐるっと1周します。</div>
+  <p>0から9までの整数同士を掛け合わせるプログラム</p>
+  <p>「繰り返しの中で繰り返す」ため、内側のfor文の「繰り返す処理」はインデントが二段階になっている</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="k">for</span> i <span class="k">in</span> range(10):
+    <span class="k">for</span> j <span class="k">in</span> range(10):
+        print(j,<span class="s">"×"</span>,i,<span class="s">"="</span>,j*i)</pre>
+  <span class="label out">出力結果</span>
+  <div class="shots-row result">
+    <figure class="shot"><img src="data:image/png;base64,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" alt="入れ子の実行結果（0〜1の段）"><figcaption>0〜1の段</figcaption></figure>
+    <figure class="shot"><img src="data:image/png;base64,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" alt="入れ子の実行結果（2〜3の段）"><figcaption>2〜3の段</figcaption></figure>
+    <figure class="shot"><img src="data:image/png;base64,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" alt="入れ子の実行結果（4〜5の段）"><figcaption>4〜5の段</figcaption></figure>
+    <figure class="shot"><img src="data:image/png;base64,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" alt="入れ子の実行結果（6〜7の段）"><figcaption>6〜7の段</figcaption></figure>
+    <figure class="shot"><img src="data:image/png;base64,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" alt="入れ子の実行結果（8〜9の段）"><figcaption>8〜9の段</figcaption></figure>
+  </div>
+  <p>10回 × 10回 ＝ <b>100行</b>の掛け算が表示されます。</p>
+  <div class="orig"><ul>
+    <li>「繰り返しの中で行う繰り返しの中で、さらに繰り返しを行う」こともできる</li>
+    <li>「for文の入れ子」は、二重三重四重に重ねていくことができるが、その分繰り返しの量が多くなり、処理に時間がかかるようになる</li>
+  </ul></div>
+</section>
+
+<!-- LESSON 15 -->
+<section id="l15">
+  <h2><span class="ls">LESSON 15</span>関数とモジュール</h2>
+  <p class="lead">「ある仕事を行う命令のまとまり」をブロックに書いてまとめたもの：<b>関数</b>（print()やint()など）</p>
+  <p>関数は「関数名」を決めて「def 関数名():」と指定し、「その関数で行う処理」を指示して作り、「関数名」は「この関数は何をするものなのか」をわかりやすく表現した名前をつける</p>
+  <p>「関数で行う処理」はまとまった処理のため、「ブロック」で作る</p>
+  <div class="syntax">def 関数名():
+    関数で行う処理</div>
+  <div class="warn">ブロックの前は必ず「:（コロン）」がつく</div>
+
+  <h3>👋 関数を使ってみよう</h3>
+  <p>「こんにちはと表示する関数」を作って、3回呼び出すプログラム</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">def</span> sayhello():</span><span class="cm"><span class="c"># 関数を作る（この時点ではまだ動かない）</span></span></span><span class="row"><span class="cd">    print(<span class="s">"こんにちは"</span>)</span></span><span class="row"><span class="cd"> </span></span><span class="row"><span class="cd">sayhello()</span><span class="cm"><span class="c"># 呼び出す（1回目）</span></span></span><span class="row"><span class="cd">sayhello()</span><span class="cm"><span class="c"># 呼び出す（2回目）</span></span></span><span class="row"><span class="cd">sayhello()</span><span class="cm"><span class="c"># 呼び出す（3回目）</span></span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALMAAABRCAYAAACZmJd6AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAASLSURBVHhe7dhBcuQgDAVQmMPmDDlCrpJT5Ey9ydbZDCm1WgIhbLWa/FflDYKWU/ONGdfjOI5ysdvtVkop5fPzs7y9vfEywCn+8QF4fbXWu6tX69W1cane5nC9NbzG67MQ5k0dx/F78ZDQGn0x11rVdXQuXzdyxW9KEGY4RXsQ+IOzambHThFm/qqhN8/HUYuzulNGSxFm+hrirxs+jto67eE4/u+sfPyZZv7uFGGG89HA8jD0Ho42fmage/dyJoR5U1pYe2iAZwJNQyqt89yLR4ow0yeXv+b4OGo5XXWPM7+ZIsz0tcefYj6O2pxD2CmvYLnHq+8lRZghlrbbt7C1qxfMKKMHhEKYN8T/8Wd2e228kcb5GO+n1XpjHggzbANhhm0gzLANhBm2gTDDNlKEmX8qop+L+DitAVApwsw/FfFPO/wCkKQIM8AZEGbYRoow8zMxzszgkSLM/EyMMzN4pAgzwBkQZtgGwgzb2C7Mkf8/jOwFY9uF2So6iL1+vRrYpQtzrfJlUWsp3o8dvJ/Wl9dG8yFOujAfh3xdjffT+vLaaL5EegDwMKxLF2avurAre6z0kx6AmYcBZNuE+Vn4DgvPs0WYo1/VtB/dYSN6g26LMBf26vaEanaNdCzw9oZzpAqzJwiWs6vnd3tG/SxwPDlfqjD/Ffx40sZgzUuH2borj+YUckTgl1Wbb+klwRFlXaowa4GaDRb9nZlw0d2S7poaem+W+Q3/O9s663qQpQpzUQKlBUUaa7Q1Ta9m1bs3js+ZWQs26cK8amYHXxXZC8a2C7NVdBB7/Xo1sEsXZnqWpJcFPX/O4v20vrw2mg9x0oWZn5OjzpW8n9aX10bzJdIDgIdhXbowe9WFXdljpZ/0AMw8DCDbJszPwndYeJ4twhz9qqb96A4b0Rt0W4S5sFe3J1Sza6Rjgbc3nCNVmD1BsJxdPb/bM+pngePJ+VKF+a/gx5M2BmteOszWXXk0p5AjAr+s2nxLLwmOKOtShVkL1Gyw6O/MhIvulnTX1NB7s8xv+N/Z1lnXgyxVmIsSKC0o0lijrWl6NavevXF8zsxasEkX5lUzO/iqyF4wtl2YraKD2OvXq4FdujDTsyS9LOj5cxbvp/XltdF8iJMuzPycHHWu5P20vrw2mi+RHgA8DOvShdmrLuzKHiv9pAdg5mEA2TZhfha+w8LzbBHm6Fc17Ud32IjeoNsizIW9uj2hml0jHQu8veEcqcLsCYLl7Or53Z5RPwscT86XKsx/BT+etDFY89Jhtu7KozmFHBH4ZdXmW3pJcERZlyrMWqBmg0V/ZyZcdLeku6aG3ptlfsP/zrbOuh5kqcJclEBpQZHGGm1N06tZ9e6N43Nm1oJNujADeCHMsI3fML93DqXeGkCk3zB/HIcaTG8NINLdMaMXTG8NIMrDmbkXTG8NIMJDmMsgmN4awNXEML/XWj6UD6DeGsDVHsLcC6S3BhDhLsy9QHprAFHuvjNrgfTWACLdfWfWeGsAkR7OzACvCmGGbdTjuP6ccLvdSimlfH9/8xLAaerX19flYQaI8AO9ooXFxOdL/gAAAABJRU5ErkJggg==" alt="関数を3回呼び出した結果"></figure>
+
+  <h3>📨 引数を使って関数にデータを渡す</h3>
+  <p>関数に引き渡すデータのこと：<b>引数（ひきすう／パラメータ）</b></p>
+  <p>関数が処理したあと結果として戻ってくる値：<b>戻り値（もどりち）</b></p>
+  <div class="figure">
+    <svg viewBox="0 0 640 170" width="640" role="img" aria-label="引数を渡して戻り値が返ってくる関数の図">
+      <rect class="bg" x="0" y="0" width="640" height="170" rx="14" fill="#fafcff"/>
+      <defs><marker id="f1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5cf6"/></marker></defs>
+      <rect x="20" y="58" width="130" height="50" rx="12" fill="#fff1e0" stroke="#f5821f" stroke-width="2"/>
+      <text x="85" y="80" font-size="13" text-anchor="middle" fill="#f5821f" font-weight="bold">引数</text>
+      <text x="85" y="99" font-size="15" text-anchor="middle" fill="#243b53">120（本体価格）</text>
+      <line x1="152" y1="83" x2="222" y2="83" stroke="#8b5cf6" stroke-width="3" marker-end="url(#f1)"/>
+      <rect x="226" y="30" width="190" height="106" rx="16" fill="#f0eaff" stroke="#8b5cf6" stroke-width="3"/>
+      <text x="321" y="62" font-size="15" text-anchor="middle" fill="#8b5cf6" font-weight="bold">関数 postTaxPrice</text>
+      <text x="321" y="92" font-size="14" text-anchor="middle" fill="#243b53">price × 1.1 を計算</text>
+      <text x="321" y="118" font-size="22" text-anchor="middle">⚙️</text>
+      <line x1="418" y1="83" x2="488" y2="83" stroke="#8b5cf6" stroke-width="3" marker-end="url(#f1)"/>
+      <rect x="492" y="58" width="130" height="50" rx="12" fill="#e3f7ec" stroke="#1f9d55" stroke-width="2"/>
+      <text x="557" y="80" font-size="13" text-anchor="middle" fill="#1f9d55" font-weight="bold">戻り値</text>
+      <text x="557" y="99" font-size="15" text-anchor="middle" fill="#243b53">132.0（税込）</text>
+      <text class="t" x="320" y="160" font-size="13" text-anchor="middle" fill="#5b6b7d">自動販売機に「お金」を入れると「ジュース」が出てくるのと同じイメージ</text>
+    </svg>
+  </div>
+  <div class="syntax">def 関数名(引数1, 引数2, ...):
+    関数で行う処理
+    return 戻り値</div>
+  <div class="tbl"><table>
+    <tr><th>種類</th><th>どんなときに使う？</th><th>この章の例</th></tr>
+    <tr><td>① 引数も戻り値もない関数</td><td>決まった仕事をさせたいとき</td><td>sayhello()</td></tr>
+    <tr><td>② 引数だけある関数</td><td>違うデータを渡して、処理を調整したいとき</td><td>sayhello2(name)</td></tr>
+    <tr><td>③ 戻り値だけある関数</td><td>結果に変化があるので知りたいとき</td><td>omikuji()</td></tr>
+    <tr><td>④ 引数も戻り値もある関数</td><td>データを渡して計算するときや、実行結果を知りたいとき</td><td>postTaxPrice(price)</td></tr>
+  </table></div>
+
+  <h3>🧾 消費税（10％）を計算してくれるプログラム</h3>
+  <p>商品の本体価格を渡すと、消費税計算を行い、消費税込みの金額がわかる関数（④引数も戻り値もある関数）</p>
+  <p>商品の価格（price）を引数として渡すと、関数の中で10％の消費税計算を行い、税込み金額を戻り値として返す</p>
+  <p>関数は「postTaxPrice（本体価格）」</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">def</span> postTaxPrice(price):</span><span class="cm"><span class="c"># price に渡された価格が入る</span></span></span><span class="row"><span class="cd">    ans = price * 1.1</span></span><span class="row"><span class="cd">    <span class="k">return</span> ans</span><span class="cm"><span class="c"># 計算結果を返す</span></span></span><span class="row"><span class="cd"> </span></span><span class="row"><span class="cd">print(postTaxPrice(120),<span class="s">"円"</span>)</span></span><span class="row"><span class="cd">print(postTaxPrice(128),<span class="s">"円"</span>)</span></span><span class="row"><span class="cd">print(postTaxPrice(980),<span class="s">"円"</span>)</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALUAAABUCAYAAADES3aOAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAPySURBVHhe7dpNUiQhEIbhxMN6Bo/gVTyFZ+qNW2YztHQKCU39kEW/TwQRM2SjZfhBZdVMiDHGjxDkM0YpGa0lt9tNRES+vr7k/f1dl4HdvYmIGczRGjDLm54Aro5QYzmEejEhhIdh1ax6bb5UT5/RrDW6putbEOoFxRjvQ4clr8XsmSiEUF2Xf1avaznia1pCCIQa26UNoTfQVs+e4Ok6poda34LyH0LPUzvPXifnDNNDnd+e9G1Iz1PbrrZJ4v+TVs/PNPpzTw819pcHV4fC2iRpfs9gW9dyFEK9oFpoLXmQnwl2HtbSupFr2Wp6qPOdrG9/ep6aT0dd4+jXnB7q/Haod7Wep/acWDg5j9BzjWdcS/oe00ONc9VO/xSINKyAnqW1UUqih1d62JcOQf73/EQtBaY2n5Tm9Zz+frWaNbcVocZyCDWWQ6ixHEKN5RBqLGd6qPUrpvw1k57Pa0DN9FDrV0z6lZAeQMv0UAN7I9RYzvRQ656ZnhpbTQ+17pnpqbHV9FADeyPUWA6hxnIINZbjJtS1Fxsh/A7NqllG1uVrWgNzuQh1LQghiMT4O/LPWTXL6DqRx3XpRUxpDnO5CDVhwJ5chLqGsGOE61CL6mXzkOd/1jW8NvehHu1/j1B6ICzNYS73oW4585TWD4Wlgflch7p18rUCzen5mlyH2tIKNF6X61CnPjoNHeJWP1tqCVpfE9fnJtS1cNX6Vd3L6rplZE2P0sbC+dyE2rueDXDERsHzCDWW4ybUPbdu/Rmrn7aMrNP9uzUwl4tQ9wRBfyYM/sek0XVS6ONrc5jLRagJA/bkItQt6XQFelwi1HtKLUcabJb1uA/13sHb0lPnmyGtK81hLveh9kQ/FJYG5nMdan0a5nM9OD1fk+tQl05BTkO0uA61JfXDaZTCXmoJetbh2tyEuidc+jP6FO81uq6FVscHN6H2rmcDHLFR8DxCjeW4CXXt1p33v7X5Vv0ZI+v0dVgDx3MR6tovOxj/UJLP61u+tc4yuk4q11Oaw/FchJpfOPbkItRbpRMWkFVCraXWIQ0C/1qWDPWW3nhUvonS9yvN4XiXD7WXk1g/FJYGznH5UI/i9FzXy4Ya63Id6tEHvp51pZagZx38cxPqWoBaPak1b62rGV3XQqtzHjehvrKeDXDERkEZocZyCDWW8yYi8mE0fKM1YJY3EZHPGKsBHa0Bs9zbDyugozVghoee2groaA04258HRSugozXgTH9C/RGCfFZeqI7WgDM9hNoK5mgNONs91FYwR2vADPf31LVgjtaAWe7vqWtGa8Asfx4Ugasj1FhOiPHYHuJ2u4mIyM/Pjy4Bhwjf39+Hhho42z+woiFdtC9idAAAAABJRU5ErkJggg==" alt="消費税計算の結果"></figure>
+  <div class="orig"><ul><li>「仕事を関数にまとめて書く」ということは、「プログラムの意味が分かりやすい」ことになり、それだけバグ（プログラムのエラー）が少なくなることにも繋がる</li></ul></div>
+
+  <h3>🎁 引数か戻り値だけの関数の使い道</h3>
+  <p>ユーザー名つきで、こんにちはと表示する関数（②引数だけある関数）</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="k">def</span> sayhello2(name):
+    print(<span class="s">"こんにちは、"</span> + name + <span class="s">"さん。"</span>)
+sayhello2(<span class="s">"フタバ"</span>)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPMAAAA3CAYAAADZj3ydAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARUSURBVHhe7d1LdusgDAZg6GK7hi6hW+nyMumUO7nKUVRJgLDBJv93DoMiXrZRHDuD5lJKSSd6PB4ppZR+fn7S5+enDAPAQT5kBQCklHOWVZfE14lk3kzO+aV4MS9u1WtxaiN5fWRMxkccOZ4cR/59JUjmDZVSnkVuPh7jT1g5Z7Mfbyv71Zwxpocfhzz2VjTG1cl1IplhGG2qaPJYeu+wcnNra+od806WJzOdXF4Q82Mz3OHOdIbceVf2rk8txtvImFbPaetcnsz0lYgXxPzYCGujlP93MVm/0hHHLfsfMSahhKLCz50X09podVY/y/JkhuPxhJUbl28UKbKBary1XM3oGnv7trTX2ljrRDJvyEpWD0/gnoTmG0vrF1nLkeR6jkTHS0XyYpbamJ7lycwXLg9A1iN2TWetceaY2bjb1dCHlfdB1vuB5o3prXN5MssD5guV9Yj1KcpmOEPLGmesRc7hbfwj9BxPa9vWdprlyQxz0Z1J3qEoEaicmQStah8QGn4cWl9tTKttqpyXaMzj9ZN/S0jmzciLLTeYLLKtVk+0elkn57NiXt0o7xgivPMyErN4/TxIZnh7vUmzSm2dSGaATSCZATaBZAbYBJIZYBPLk5m/hqfSEgOAV8uTmb+Gl6/jZX3tbR7AO1uezABwDCQzwCaWJ7N8JsYzM0DM8mSWz8R4ZgaIWZ7MAHAMJDPAJpDMAJvYKplnvh+bOdcqRxwjjdE6Vms7LtJnR1slc6vZF9+bz4sB9LhUMueslxY5pxR92S3ns+aVsVr7leTatNJC9mntR+iaWNdGG1urs+SB676bSyVzKXo5m5zPmlfGau012kZt2bS95NpkqaEkkcWjHYNWx8nxaQ75N9RdKpmjZn86j8znbdwdlVJP6KiR67CjLZJ5FXmH3cXqJDnzA2Bnt0/mM7+qavh8/A47Y+6jeMnKY/Kcev08LeeH5pJzWmZf9zu4fTIn8dU1cmF7+2hfi6NzXw0/rpFz2oM+JHihes/odd/NZZI5cjFoE3gi43pq87XouQMdreWcSZQsXr9a3GL10+qI1Yezzu2q8z7DZZL5XdBGrN2BtLpRLUmgoX5nrMkTWauHn/vZxzLDbZO5ZWO2tEnsziNLK2rfMpdG21xaXVR0fbKf1T8yNuk9zpa5Wtrs6DLJbCUUlVZ8nJ4LWsQzW60vX1tLeyKPk/pp/Xs3uhRZXwr0G20jzwmVHnwMa66WNnd2mWRORkJZG0qrI1Yf4sVaeWuTZJuRvj1a55Ci/Ubwc+LNb9WnxnW3tLmrSyUzAMQhmQE28ZFSSl/OA0o0BgBzfaSU0ncpZmJGYwAw1/NrtpeY0RgAzPPyzOwlZjQGAHP8eQHmJWY0BgDn+5PMXzmnb+OHuGgMAM73ksxeQkZjADDHM5m9hIzGAGCe5+/MVkJGYwAw1/N3Zks0BgBz/XkBBgD3hGQG2EQuJ/+f1MfjkVJK6ff3V4YA4ED/AM6Q2laoQJJKAAAAAElFTkSuQmCC" alt="名前つきのあいさつ"></figure>
+
+  <p>実行して初めて処理の結果が分かるおみくじなど、処理に変化があるから知りたいときの関数（③戻り値だけある関数）</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">import</span> random</span></span><span class="row"><span class="cd"><span class="k">def</span> omikuji():</span></span></span><span class="rows"><span class="row"><span class="cd">    kuji = [<span class="s">'大吉'</span>, <span class="s">'中吉'</span>, <span class="s">'小吉'</span>, <span class="s">'凶'</span>]</span></span></span><span class="rows"><span class="row"><span class="cd">    <span class="k">return</span> random.choice(kuji)</span></span><span class="row"><span class="cd">kekka = omikuji()</span><span class="cm"><span class="c"># 戻り値を kekka の箱に入れる</span></span></span><span class="row"><span class="cd">print(<span class="s">"結果は"</span>,kekka,<span class="s">"です。"</span>)</span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,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" alt="おみくじ関数の結果"><figcaption>実行するたびに結果が変わる</figcaption></figure>
+
+  <h3>📥 importで読み込む</h3>
+  <p><b>import</b>：別のファイルに書いた関数などのプログラムを読み込んで利用することができる</p>
+  <p><b>モジュール</b>：importで読み込むプログラムファイルのこと</p>
+  <div class="syntax">import モジュール名         <span class="note">… インポートする方法</span>
+モジュール名.関数名         <span class="note">… importしたモジュールの関数を実行する方法</span></div>
+
+  <h3>🛠️ モジュールを作ってみよう</h3>
+  <p>消費税（10％）を計算してくれるプログラムで作った、税込み金額を計算するプログラムを2つのファイルに分けます。1つ目のファイルには「モジュール」を作り、2つ目のファイルには「そのモジュールを読み込んで動かすプログラム」を書きます。</p>
+  <div class="figure">
+    <svg viewBox="0 0 640 150" width="640" role="img" aria-label="tax.pyをimportして使う図">
+      <rect class="bg" x="0" y="0" width="640" height="150" rx="14" fill="#fafcff"/>
+      <defs><marker id="m1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f9d55"/></marker></defs>
+      <rect x="30" y="30" width="220" height="90" rx="12" fill="#f0eaff" stroke="#8b5cf6" stroke-width="2"/>
+      <text x="140" y="58" font-size="16" text-anchor="middle" fill="#8b5cf6" font-weight="bold">📄 tax.py（モジュール）</text>
+      <text x="140" y="90" font-size="14" text-anchor="middle" fill="#243b53" font-family="Consolas,monospace">def postTaxPrice(price)</text>
+      <line x1="390" y1="75" x2="258" y2="75" stroke="#1f9d55" stroke-width="3" marker-end="url(#m1)"/>
+      <text x="324" y="52" font-size="14" text-anchor="middle" fill="#1f9d55" font-weight="bold">import tax</text>
+      <rect x="390" y="30" width="220" height="90" rx="12" fill="#e7f1ff" stroke="#2b8aef" stroke-width="2"/>
+      <text x="500" y="58" font-size="16" text-anchor="middle" fill="#2b8aef" font-weight="bold">📄 2つ目のファイル</text>
+      <text x="500" y="90" font-size="13" text-anchor="middle" fill="#243b53" font-family="Consolas,monospace">tax.postTaxPrice(120)</text>
+    </svg>
+    <div class="cap">2つ目のファイルが tax.py を「借りて」使うイメージ</div>
+  </div>
+  <p><b>① モジュールを作る</b></p>
+  <ul>
+    <li>IDLEの <span class="menu">File</span> メニュー → <span class="menu">New File</span> を選択して、1つ目のファイルを作る</li>
+    <li>このファイルには関数部分だけを書いて「モジュール」にする（<b>tax.py</b>というファイル名で保存）</li>
+  </ul>
+  <span class="label prog">tax.py</span>
+<pre class="code"><span class="k">def</span> postTaxPrice(price):
+    ans = price * 1.1
+    <span class="k">return</span> ans</pre>
+  <p><b>② モジュールを読み込んで動かすプログラムを作る</b></p>
+  <ul>
+    <li>再び、<span class="menu">File</span> メニュー → <span class="menu">New File</span> を選択して、2つ目のファイルを作る</li>
+    <li>1つ目のファイルのモジュール名を指定して、importで読み込む</li>
+    <li>関数を呼び出すときは、「モジュール名.関数名」で指定する（taxというモジュールの中のpostTaxPrice関数なので、「tax.postTaxPrice」と指定する）</li>
+  </ul>
+  <span class="label prog">2つ目のファイル</span>
+<pre class="code"><span class="k">import</span> tax
+
+print(tax.postTaxPrice(120),<span class="s">"円"</span>)
+print(tax.postTaxPrice(128),<span class="s">"円"</span>)
+print(tax.postTaxPrice(980),<span class="s">"円"</span>)</pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJ8AAABRCAYAAADM+XQkAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAOzSURBVHhe7ZpRbsIwDIYdDssZdoRdheP1hdfsZSnBxE4wtHbT/5MiTXbNOuXDcaulnHOmDVmWhYiIbrcbXa9XngYn5sIDAOwF5AtKSulpaTktL8Vb+XINR6vhOZ7XgHyByTmvi29qnasnp5SSWFdfy+t6bPGZkA+sFHG56J8idUR3+XjLrm+Sx2fL7cE7nWhv3OWr2zlv2zw+W+4TJJnzf+ficU+kv9tdPiBTC8Y3T5O5xL8poHYvViBfYCS5NGrh3hGwlqpVZ7mXHu7y1d8oflzw+Gy5aGx1j9JnustXHx/828Xjs+VGyY1OtAUj9/jNe3GXD9iQummRoyxNpL2QhIZ8QeGb9U43leKFVpzH+O+TclqsB+QDbkA+4AbkA25APuAG5ANuuMvHXxnUrw14vM6B4+MuH39lwB/x+QLz4C4fOC+QD7jhLh+f6TDznQd3+fhMh5nvPLjLB84L5ANuQD7gBuQDboSRT3qQTemxOFpOw1JX1/QWGCOEfNKGpUSU82PV12k5DWsd0XNdefBuxcAYIeTDpp2TEPJJQMq5CS0fsVmrlrH+mefAMQgvn3U+24LWg0UrBsYIL1+PPbsef7hoLTBOaPl6naQnHrpRbELLp9ETD8QntHxlziuLy9abt1pHYe8zwX6EkU+SQJqn+KzF8xqWmhFaXwAgE0a+6IyIuoXQMwP5gBth5Bs5svg12rynYanj86W2wBgh5BvZMH5NMv6DgLWOGnOmFANjhJAPm3ZOQsjXo3QrMBeHkO+blKO2LEjtR3j5vi3IJzNfLW2pa8XAGOHliwR/uGgtME5o+Xh3qWMjoBvFJrR8ra6C7jIPoeXTKPNaWS0pW0fhSB3YhzDyjUjAr+FdcRRrXQ8c8e8RRr7ojIi6hdAzA/mAG2Hkk46sej6T4r38O1jq+H1oCzwIIZ+0KUl5IVzH+VGn1WlY60i4n1YMPAghHzbmnISQ71NKxwLHYgr5OOXILAtixmRK+T6Z3azUspff14qBB4eXL0pn4w8XrQWeObx8VtCN/DmtfMCf0PJZHxxG6lpH4Ugd+B5h5JM2ujczaXGtTsJa1wNH/Cth5DsyI6JuIfTRgXzADcgH3LgQEf0oA4k1B0CPCxHRb86iSNYcAD3WY1cTyZoDQONp5tNEsuYAkHh54NBEsuYAaPEi309K9Cu8kLLmAGjxJJ8mkDUHgMQqnyaQNQeAxvqeTxLImgOgx/qeT8KaA6DHywMHAHsB+YAbKedtz85lWYiI6H6/8xQ4OX+Vl8h7r2DJLAAAAABJRU5ErkJggg==" alt="モジュールを読み込んで実行した結果"></figure>
+  <div class="orig"><ul><li>importで読み込んでいるため、つながって動いている</li></ul></div>
+  <div class="point">2つのファイルは<b>同じフォルダ</b>に保存しておきましょう。import するときは「.py」を付けずに <b>import tax</b> と書きます。</div>
+
+  <h3>📚 用意されたモジュールをimportする</h3>
+  <div class="orig"><ul>
+    <li>数値計算に使う「math」「random」、日付や時刻に使う「datetime」「time」「calendar」、データファイルに使う「csv」や「json」、ユーザーインターフェースが作れる「tkinter」などのこと：<b>標準モジュール</b></li>
+    <li>これらはPython環境にすでに用意されているため、importで指定するだけで使うことができる</li>
+    <li>「おみくじプログラム」で使っていた、「毎回何が出るかわからない数」のことを「random（ランダム、乱数）」という</li>
+    <li>「choice()」という関数は、リストの中からランダムに1つ選び出すという命令</li>
+  </ul></div>
+  <div class="point">第1章で出てきた「<b>batteries included（バッテリー付属）</b>」の道具箱が、この標準モジュールです。</div>
+
+  <h3>✂️ モジュール名を省略する（その1）：as</h3>
+  <p>「モジュール名.関数」と指定して使ったとき、プログラムの中で何度もその関数を実行するような場合、長いモジュール名だと読みにくいため、「<b>import モジュール名 as 省略名</b>」とすることで、モジュール名を省略名で書くことができるようになる</p>
+  <span class="label prog">例</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">import</span> calendar <span class="k">as</span> cal</span><span class="cm"><span class="c"># calendar を cal という短い名前で使う</span></span></span><span class="row"><span class="cd">print(cal.month(2026,6))</span></span></span></pre>
+
+  <h3>✂️ モジュール名を省略する（その2）：from</h3>
+  <p>「モジュール名.関数名」と指定して使うとき、関数名の前のモジュール名を書かずに済ませる「<b>from モジュール名 import *</b>」という方法もある</p>
+  <div class="orig"><ul>
+    <li>タートルグラフィックスのプログラムで使っていた方法で、標準ライブラリの「turtle」をインポートするため、本来なら「turtle.shape("turtle")」と書くところを、「from turtle import *」と指定することで、「shape("turtle")」と省略できていた</li>
+    <li>簡単なプログラムでは省略できて便利だが、プログラムが複雑になってくると、同じ関数名がぶつかってエラーになってしまうこともあるため、注意が必要</li>
+  </ul></div>
+
+  <h3>📅 時刻を扱うモジュール</h3>
+  <p>「datetime」は日付と時刻を、「calendar」はカレンダーに関する処理を扱うことができるモジュール</p>
+  <span class="label prog">プログラム</span>
+<pre class="code"><span class="rows"><span class="row"><span class="cd"><span class="k">import</span> calendar</span></span><span class="row"><span class="cd">print(calendar.month(2026,6))</span><span class="cm"><span class="c"># 2026年6月のカレンダー</span></span></span></span></pre>
+  <span class="label out">出力結果</span>
+  <figure class="shot result"><img src="data:image/png;base64,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" alt="2026年6月のカレンダー"></figure>
+  <div class="warn">「calendar」というモジュールを読み込んで動かすプログラムのため、保存するファイル名には「calendar.py」以外の名前をつける</div>
+  <p>自分のファイルを calendar.py という名前にすると、Pythonは本物の calendar モジュールではなく<b>自分のファイルを読み込んでしまう</b>ためです。</p>
+</section>
+
+<!-- 用語 -->
+<section id="words">
+  <h2><span>📘</span> ことばのミニ辞典</h2>
+  <dl class="words">
+    <dt>変数</dt><dd>名前のついた、値を入れておく箱。「変数名 = 値」で作る。</dd>
+    <dt>データ型（int／float／str／bool）</dt><dd>データの種類。整数・小数・文字列・True/False。</dd>
+    <dt>len()</dt><dd>文字列やリストの長さ（個数）を調べる。</dd>
+    <dt>\n</dt><dd>改行コード。画面では「￥n」と表示されることもある。</dd>
+    <dt>int()／float()／str()</dt><dd>データ型を変換する命令。</dd>
+    <dt>isdigit()</dt><dd>数値に変換できるかを調べ、True か False を返す。</dd>
+    <dt>リスト・要素・インデックス</dt><dd>[ ] でまとめたデータの集まり。1つ1つが要素、番号（0から）がインデックス。</dd>
+    <dt>順次・分岐・反復</dt><dd>プログラムの3つの基本の形。</dd>
+    <dt>if／elif／else</dt><dd>条件によって処理を分ける（分岐）。</dd>
+    <dt>比較演算子</dt><dd>== != &lt; &lt;= &gt; &gt;= など、2つの値をくらべる記号。</dd>
+    <dt>ブロック</dt><dd>インデントしてひとまとまりにした部分。</dd>
+    <dt>for／range()</dt><dd>同じ処理をくり返す（反復）。</dd>
+    <dt>関数・def・return</dt><dd>仕事のまとまりに名前をつけたもの。def で作り、return で結果を返す。</dd>
+    <dt>引数・戻り値</dt><dd>関数に渡すデータ／関数から返ってくる結果。</dd>
+    <dt>モジュール・import</dt><dd>読み込んで使うプログラムファイル／それを読み込む命令。</dd>
+  </dl>
+</section>
+
+<!-- クイズ -->
+<section id="quiz">
+  <h2><span>✅</span> かくにんクイズ</h2>
+  <p class="lead">ボタンを押して答えてみよう！</p>
+  <div class="quiz" data-ok="1">
+    <div class="qq">Q1. w = "パイソン" のとき、w[1] は？</div>
+    <div class="opts"><button>パ</button><button>イ</button><button>ソ</button></div>
+    <div class="ans" data-exp="番号は0から始まるので、0番が「パ」、1番が「イ」です。"></div>
+  </div>
+  <div class="quiz" data-ok="2">
+    <div class="qq">Q2. a = "5" のとき、print(int(a)+5) の結果は？</div>
+    <div class="opts"><button>55</button><button>エラー</button><button>10</button></div>
+    <div class="ans" data-exp="int() で文字列 "5" を整数 5 に変換してから足すので 10 です。"></div>
+  </div>
+  <div class="quiz" data-ok="0">
+    <div class="qq">Q3. score = 80 のとき、if score > 80: の中の処理は実行される？</div>
+    <div class="opts"><button>実行されない</button><button>実行される</button></div>
+    <div class="ans" data-exp="「>」は「より大きい」なので80ピッタリは含まれません。含めたいときは「>=」を使います。"></div>
+  </div>
+  <div class="quiz" data-ok="1">
+    <div class="qq">Q4. for i in range(3): で、i に入る数は？</div>
+    <div class="opts"><button>1, 2, 3</button><button>0, 1, 2</button><button>0, 1, 2, 3</button></div>
+    <div class="ans" data-exp="range(3) は0から数えて3個、つまり 0, 1, 2 です。"></div>
+  </div>
+  <div class="quiz" data-ok="2">
+    <div class="qq">Q5. 関数が処理したあとに返してくる値を何という？</div>
+    <div class="opts"><button>引数</button><button>要素</button><button>戻り値</button></div>
+    <div class="ans" data-exp="return で返す値が「戻り値」、関数に渡すデータが「引数」です。"></div>
+  </div>
+</section>
+
+<!-- まとめ -->
+<section>
+  <h2><span>🎯</span> この章のまとめ</h2>
+  <ul class="summary">
+    <li>📦 <b>変数</b>は名前つきの箱。「変数名 = 値」で作れる。データには int・float・str・bool の型がある。</li>
+    <li>🔤 文字列は <b>+</b> でつなぐ、<b>len()</b> で長さ、<b>[ ]</b> で一部を取り出す（番号は0から）。</li>
+    <li>🔄 <b>int()・float()・str()</b> で型を変換。変換できるかは <b>isdigit()</b> で事前にチェック。</li>
+    <li>🗄️ <b>リスト</b>は番号つきロッカー。たくさんのデータをまとめて扱える。</li>
+    <li>🧩 プログラムは<b>順次・分岐（if）・反復（for）</b>の組み合わせ。インデントした部分がブロック。</li>
+    <li>⚙️ <b>関数</b>は仕事のまとまり。引数で受け取り、return で戻り値を返す。<b>import</b> でモジュールを読み込める。</li>
+  </ul>
+  <div class="point">次の章では、ここで学んだ部品を組み合わせてアプリを作ります。お楽しみに！</div>
+</section>
+
+<nav class="chapnav" aria-label="章の切り替え">
+  <a class="prev" href="第2章「Pythonを触ってみよう」.html"><small>◀ 前の章</small><b>第2章「Pythonを触ってみよう」</b></a>
+  <a class="next" href="第4章「アプリを作ってみよう」.html"><small>次の章 ▶</small><b>第4章「アプリを作ってみよう」</b></a>
+</nav>
+
+<footer>第3章「プログラムの基本を知ろう」</footer>
+</div>
+
+<script>
+  (function(){
+    var s = "こんにちは。私はパイソンです。", box = document.getElementById('strip');
+    for (var i = 0; i < s.length; i++) {
+      var cls = i === 0 ? 'a' : (i >= 6 && i < 12 ? 'b' : (i >= 12 ? 'c' : ''));
+      var neg = i - s.length;
+      box.insertAdjacentHTML('beforeend',
+        '<div class="cell ' + cls + '"><div class="ch">' + s[i] + '</div><div class="p">' + i +
+        '</div><div class="m">' + (neg >= -3 ? neg : '&nbsp;') + '</div></div>');
+    }
+  })();
+</script>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(function(q){
+    var ok = Number(q.dataset.ok);
+    var btns = q.querySelectorAll('button');
+    var ans = q.querySelector('.ans');
+    btns.forEach(function(b, i){
+      b.addEventListener('click', function(){
+        btns.forEach(function(x){ x.classList.remove('ok','ng'); });
+        if(i === ok){
+          b.classList.add('ok');
+          ans.textContent = '⭕ 正解！ ' + ans.dataset.exp;
+        }else{
+          b.classList.add('ng');
+          ans.textContent = '❌ ざんねん、もう一度考えてみよう。';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
